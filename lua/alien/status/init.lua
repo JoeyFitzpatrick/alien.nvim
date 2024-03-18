@@ -65,6 +65,7 @@ function M.git_status()
 
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, tree_lines)
+		require("alien.utils").set_buffer_colors()
 	end
 	require("alien.utils").open_unmod_tab(set_lines)
 end
