@@ -1,6 +1,7 @@
 local M = {}
-function M.git_status()
-	local git_status_output = vim.fn.systemlist("git status --porcelain")
+M.get_status_lines = function()
+	local status_command = require("alien.commands").status
+	local git_status_output = vim.fn.systemlist(status_command)
 
 	-- Parse the output into a tree structure
 	local file_tree = {}
@@ -67,7 +68,11 @@ function M.git_status()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, tree_lines)
 		require("alien.utils").set_buffer_colors()
 	end
-	require("alien.utils").open_unmod_tab(set_lines)
+	return set_lines
+end
+
+M.git_status = function()
+	require("alien.utils").open_status_buffer(M.get_status_lines())
 end
 
 return M

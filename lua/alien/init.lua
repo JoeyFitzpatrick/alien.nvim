@@ -1,7 +1,4 @@
 local M = {}
-M.hello = function()
-	vim.print("Hello, world!")
-end
 M.status = function()
 	require("alien.status").git_status()
 end
