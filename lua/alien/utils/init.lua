@@ -113,7 +113,10 @@ M.get_file_name_from_tree = function()
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 	local current_line = lines[current_line_num]
 
-	local file_status, file_name = string.match(current_line, "^%s*(%a+)?%s*(.*)")
+	-- Trim the text to remove unwanted leading spaces for more reliable matching.
+	current_line = current_line:match("^%s*(.-)%s*$")
+	local regex_pattern = "^(%S)%s+(.+)$"
+	local file_status, filename = current_line:match(regex_pattern)
 	local num_spaces_current_line = #current_line - #current_line:gsub(" ", "")
 
 	-- If no matching status, assume the file status is the first non-whitespace character sequence
@@ -121,29 +124,31 @@ M.get_file_name_from_tree = function()
 		file_status = string.match(current_line, "^(%S+)")
 	end
 
-	if not file_name or #file_name == 0 then
+	if not filename or #filename == 0 then
 		-- If no file name on the current line, we cannot proceed.
 		return nil
 	end
 
-	-- Function that checks the indentation difference
-	local function check_indent(line, base_indentation)
-		local line_indentation = #line - #line:gsub(" ", "")
-		return line_indentation < base_indentation - 1
-	end
+	return { status = file_status, filename = filename }
 
-	local path = {}
-	table.insert(path, file_name)
+	-- 	-- Function that checks the indentation difference
+	-- 	local function check_indent(line, base_indentation)
+	-- 		local line_indentation = #line - #line:gsub(" ", "")
+	-- 		return line_indentation < base_indentation - 1
+	-- 	end
 
-	for i = current_line_num - 1, 1, -1 do
-		if check_indent(lines[i], num_spaces_current_line) then
-			local folder = lines[i]:match("^%s*(.*)")
-			table.insert(path, 1, folder)
-			num_spaces_current_line = #lines[i] - #lines[i]:gsub(" ", "")
-		end
-	end
+	-- 	local path = {}
+	-- 	table.insert(path, file_name)
 
-	local full_path = table.concat(path, "/")
-	return { status = file_status, filename = full_path }
+	-- 	for i = current_line_num - 1, 1, -1 do
+	-- 		if check_indent(lines[i], num_spaces_current_line) then
+	-- 			local folder = lines[i]:match("^%s*(.*)")
+	-- 			table.insert(path, 1, folder)
+	-- 			num_spaces_current_line = #lines[i] - #lines[i]:gsub(" ", "")
+	-- 		end
+	-- 	end
+
+	-- 	local full_path = table.concat(path, "/")
+	-- 	return { status = file_status, filename = full_path }
 end
 return M

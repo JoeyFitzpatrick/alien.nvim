@@ -8,13 +8,14 @@ M.set_status_buffer_keymaps = function(bufnr)
 		set_lines()
 		vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 	end, { buffer = bufnr, noremap = true, silent = true })
-	vim.keymap.set("n", "L", function()
+	vim.keymap.set("n", "<space>", function()
 		local file = require("alien.utils").get_file_name_from_tree()
 		if not file then
 			print("no file found")
 			return
 		end
-		print(file.filename, file.status)
+		vim.print(file.filename)
+		-- print(file.filename, file.status)
 	end, { buffer = bufnr })
 end
 
