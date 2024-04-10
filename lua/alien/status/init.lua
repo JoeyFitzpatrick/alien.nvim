@@ -2,7 +2,6 @@ local M = {}
 M.get_status_lines = function()
 	local status_command = require("alien.commands").status
 	local git_status_output = vim.fn.systemlist(status_command)
-
 	-- Parse the output into a tree structure
 	local file_tree = {}
 	for _, line in ipairs(git_status_output) do
@@ -14,7 +13,7 @@ M.get_status_lines = function()
 		for i, part in ipairs(path_parts) do
 			if i == #path_parts then
 				-- If it's a file, add it with the status code
-				current_level[part] = status
+				current_level[part] = { status = status, file_path = file_path, filename = part }
 			else
 				-- If it's a directory, traverse or create a new level
 				current_level[part] = current_level[part] or {}
@@ -22,9 +21,11 @@ M.get_status_lines = function()
 			end
 		end
 	end
+	print(require("alien.utils.helpers").dump(file_tree))
 
 	local function format_tree(level, indent)
 		local lines = {}
+		local metadata = {}
 
 		-- Utility to determine if a directory has from a single subdirectory to extend name formatting.
 		local function has_single_subdirectory(value)
@@ -33,7 +34,11 @@ M.get_status_lines = function()
 		end
 
 		for name, value in pairs(level) do
-			if type(value) == "table" then
+			if value.filename ~= nil or value.file_path ~= nil or value.status ~= nil then
+				-- File entries are added directly.
+				table.insert(lines, indent .. value.status .. " " .. value.filename)
+				metadata[#lines] = name
+			else
 				-- Detect whether to extend the line for a directory with a single subdir.
 				local sub_keys = vim.tbl_keys(value)
 				if #sub_keys == 1 and type(value[sub_keys[1]]) == "table" then
@@ -53,9 +58,6 @@ M.get_status_lines = function()
 					table.insert(lines, indent .. name .. "/")
 					vim.list_extend(lines, format_tree(value, indent .. "  "))
 				end
-			else
-				-- File entries are added directly.
-				table.insert(lines, indent .. value .. " " .. name)
 			end
 		end
 
