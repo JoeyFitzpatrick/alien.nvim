@@ -12,6 +12,7 @@ M.current_branch = "git branch --show-current"
 M.current_branch_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
 M.num_commits_to_pull = "git rev-list --count HEAD" .. "..$(" .. M.current_branch_remote .. ")"
 M.num_commits_to_push = "git rev-list --count $(" .. M.current_branch_remote .. ")..HEAD"
+
 M.stage_or_unstage_all = function()
 	local status = vim.fn.system(M.status)
 	for line in status:gmatch("[^\r\n]+") do
@@ -28,6 +29,10 @@ M.stage_or_unstage_file = function(status, filename)
 	else
 		return M.unstage_file .. " " .. filename
 	end
+end
+
+M.commit = function(message)
+	return 'git commit -m "' .. message .. '"'
 end
 
 return M

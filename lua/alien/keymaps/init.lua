@@ -47,6 +47,14 @@ M.set_status_buffer_keymaps = function(bufnr)
 		vim.notify(result)
 		M.redraw_status_buffer()
 	end, keymap_opts(bufnr))
+
+	vim.keymap.set("n", "C", function()
+		vim.ui.input({ prompt = "Commit message: " }, function(input)
+			local result = "git commit: \n" .. vim.fn.system(commands.commit(input))
+			vim.notify(result)
+		end)
+		M.redraw_status_buffer()
+	end, keymap_opts(bufnr))
 end
 
 return M
