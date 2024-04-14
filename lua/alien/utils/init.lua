@@ -67,19 +67,8 @@ M.get_palette = function()
 	}
 end
 
-M.find_status_prefix = function(str)
-	local prefixes = {}
-	for _ in str:gmatch("%S+") do
-		local start_pos, end_pos = _.find(str, _, 1, true)
-		table.insert(prefixes, { start_pos, end_pos })
-	end
-
-	-- Check if we have at least two non-space character groups found
-	if #prefixes >= 2 then
-		local second_non_space_start = prefixes[2][1]
-		-- Fetch and return the previous three characters
-		return str:sub(second_non_space_start - 3, second_non_space_start - 1)
-	end
+M.get_status_prefix = function(str)
+	return str:sub(1, 2)
 end
 
 M.set_buffer_colors = function()
@@ -89,16 +78,16 @@ M.set_buffer_colors = function()
 	for line_number = 1, line_count do
 		local line = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number, false)[1]
 
-		local status_prefix = M.find_status_prefix(line)
+		local status_prefix = M.get_status_prefix(line)
 
 		-- Now that we have the status prefix, check the conditions.
-		if status_prefix == "A  " or status_prefix == "M  " then
+		if status_prefix == "A " or status_prefix == "M " then
 			vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienStaged", line_number - 1, 0, -1)
-		elseif status_prefix == "MM " then
+		elseif status_prefix == "MM" then
 			vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienPartiallyStaged", line_number - 1, 0, -1)
-		elseif status_prefix == "?? " or status_prefix == " M " then
+		elseif status_prefix == "??" or status_prefix == " M" then
 			vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienUnstaged", line_number - 1, 0, -1)
 		end
@@ -106,52 +95,9 @@ M.set_buffer_colors = function()
 end
 
 M.get_file_name_from_tree = function()
-	local current_win = vim.api.nvim_get_current_win()
-	local current_cursor_pos = vim.api.nvim_win_get_cursor(current_win)
-	local current_line_num = current_cursor_pos[1]
-
-	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-	local current_line = lines[current_line_num]
-
-	local spaces_current_line = current_line:match("^(%s*)")
-	local num_spaces_current_line = #spaces_current_line
-
-	local file_status = require("alien.utils").find_status_prefix(current_line)
-
-	-- Trim the text to remove unwanted leading spaces for more reliable matching.
-	current_line = current_line:match("^%s*(.-)%s*$")
-	local regex_pattern = "^(%S)%s+(.+)$"
-	local _, filename = current_line:match(regex_pattern)
-
-	-- If no matching status, assume the file status is the first non-whitespace character sequence
-	if not file_status or #file_status == 0 then
-		file_status = string.match(current_line, "^(%S+)")
-	end
-
-	if not filename or #filename == 0 then
-		-- If no file name on the current line, we cannot proceed.
-		return nil
-	end
-
-	-- Function that checks the indentation difference
-	local function check_indent(line, base_indentation)
-		local line_indentation = #line - #line:gsub(" ", "")
-		return line_indentation < base_indentation - 1
-	end
-
-	local path = {}
-	table.insert(path, filename)
-
-	for i = current_line_num - 1, 1, -1 do
-		if check_indent(lines[i], num_spaces_current_line) then
-			local folder = lines[i]:match("^%s*(.*)")
-			table.insert(path, 1, folder)
-			num_spaces_current_line = #lines[i] - #lines[i]:gsub(" ", "")
-		end
-	end
-
-	local full_path = table.concat(path, "/")
-	full_path = full_path:gsub("//", "/")
-	return { status = file_status, filename = full_path }
+	local line = vim.api.nvim_get_current_line()
+	local status = line:sub(1, 2)
+	local filename = line:sub(4)
+	return { status = status, filename = filename }
 end
 return M
