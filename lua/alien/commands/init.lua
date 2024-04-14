@@ -5,6 +5,7 @@ M.stage_all = "git add -A"
 M.unstage_all = "git reset"
 M.stage_file = "git add --"
 M.unstage_file = "git reset HEAD --"
+M.current_branch = "git branch --show-current"
 M.stage_or_unstage_all = function()
 	local status = vim.fn.system(M.status)
 	for line in status:gmatch("[^\r\n]+") do
