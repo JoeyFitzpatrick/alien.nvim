@@ -81,13 +81,13 @@ M.set_buffer_colors = function()
 		local status_prefix = M.get_status_prefix(line)
 
 		-- Now that we have the status prefix, check the conditions.
-		if status_prefix == "A " or status_prefix == "M " then
+		if status_prefix:sub(1, 1) ~= " " and status_prefix:sub(2, 2) == " " then
 			vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienStaged", line_number - 1, 0, -1)
 		elseif status_prefix == "MM" then
 			vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienPartiallyStaged", line_number - 1, 0, -1)
-		elseif status_prefix == "??" or status_prefix == " M" then
+		elseif status_prefix == "??" or status_prefix:sub(1, 1) == " " then
 			vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienUnstaged", line_number - 1, 0, -1)
 		end
