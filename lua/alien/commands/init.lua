@@ -1,5 +1,8 @@
 local M = {}
 
+M.pull = "git pull"
+M.push = "git push"
+M.force_push = "git push --force"
 M.status = "git status --porcelain --untracked=all"
 M.stage_all = "git add -A"
 M.unstage_all = "git reset"
