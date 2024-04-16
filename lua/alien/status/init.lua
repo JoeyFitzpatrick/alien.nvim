@@ -6,7 +6,7 @@ M.get_status_lines = function()
 	local lines = vim.fn.systemlist(commands.status)
 
 	local current_branch = vim.fn.systemlist(commands.current_branch)[1] .. M.get_push_pull_string()
-	table.insert(lines, 1, "Branch: " .. current_branch)
+	table.insert(lines, 1, "Head:     " .. current_branch)
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 		utils.set_buffer_colors()

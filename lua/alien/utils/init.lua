@@ -34,6 +34,7 @@ local M = {}
 M.open_status_buffer = function(callback)
 	-- Create a new tab
 	vim.cmd("tabnew")
+	vim.cmd("setlocal norelativenumber")
 
 	callback()
 	-- Get the current buffer number
@@ -72,23 +73,25 @@ M.get_status_prefix = function(str)
 end
 
 M.set_buffer_colors = function()
-	local colors = M.get_palette()
 	local line_count = vim.api.nvim_buf_line_count(0)
 
-	for line_number = 1, line_count do
-		local line = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number, false)[1]
+	local HEAD_LINE = 1
+
+	local line = vim.api.nvim_buf_get_lines(0, HEAD_LINE - 1, HEAD_LINE, false)[1]
+	vim.api.nvim_buf_add_highlight(0, -1, "AlienBranchName", HEAD_LINE - 1, 6, -1)
+
+	-- Start at line 2, since the first two lines are the HEAD and upstream branch.
+	for line_number = 2, line_count do
+		line = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number, false)[1]
 
 		local status_prefix = M.get_status_prefix(line)
 
 		-- Now that we have the status prefix, check the conditions.
 		if status_prefix:sub(1, 1) ~= " " and status_prefix:sub(2, 2) == " " then
-			vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienStaged", line_number - 1, 0, -1)
 		elseif status_prefix == "MM" then
-			vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienPartiallyStaged", line_number - 1, 0, -1)
 		elseif status_prefix == "??" or status_prefix:sub(1, 1) == " " then
-			vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienUnstaged", line_number - 1, 0, -1)
 		end
 	end
