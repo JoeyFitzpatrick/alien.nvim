@@ -43,6 +43,7 @@ M.open_status_buffer = function(callback)
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 	if #lines > 1 then
 		vim.api.nvim_win_set_cursor(0, { FIRST_STATUS_LINE_NUMBER, 0 })
+		require("alien.status.diff").git_diff_current_buffer()
 	else
 		vim.api.nvim_win_set_cursor(0, { 1, 0 })
 	end
