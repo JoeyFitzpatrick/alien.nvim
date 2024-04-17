@@ -40,7 +40,12 @@ M.open_status_buffer = function(callback)
 
 	callback()
 
-	vim.api.nvim_win_set_cursor(0, { FIRST_STATUS_LINE_NUMBER, 0 })
+	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+	if #lines > 1 then
+		vim.api.nvim_win_set_cursor(0, { FIRST_STATUS_LINE_NUMBER, 0 })
+	else
+		vim.api.nvim_win_set_cursor(0, { 1, 0 })
+	end
 	-- Get the current buffer number
 	local bufnr = vim.api.nvim_get_current_buf()
 
