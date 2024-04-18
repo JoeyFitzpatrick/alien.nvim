@@ -1,4 +1,5 @@
-local STATUSES = require("alien.status.constants").STATUSES
+local constants = require("alien.status.constants")
+local STATUSES = constants.STATUSES
 
 local M = {}
 
@@ -12,8 +13,7 @@ M.stage_file = "git add --"
 M.unstage_file = "git reset HEAD --"
 M.current_branch = "git branch --show-current"
 M.current_branch_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
-M.num_commits_to_pull = "git rev-list --count HEAD" .. "..$(" .. M.current_branch_remote .. ")"
-M.num_commits_to_push = "git rev-list --count $(" .. M.current_branch_remote .. ")..HEAD"
+M.local_branches = "git branch --list"
 
 M.stage_or_unstage_all = function()
 	local status = vim.fn.system(M.status)
@@ -46,6 +46,23 @@ M.restore_file = function(file)
 		return "git clean -f -- " .. file.filename
 	end
 	return "git restore -- " .. file.filename
+end
+
+M.num_commits = function(pull_or_push)
+	local current_remote = vim.fn.system(M.current_branch_remote)
+	if vim.v.shell_error == constants.NO_UPSTREAM_ERROR then
+		return "0"
+	end
+	current_remote = current_remote:gsub("\n", "")
+	local pull_command = "git rev-list --count HEAD.." .. current_remote
+	print(pull_command)
+	local push_command = "git rev-list --count " .. current_remote .. "..HEAD"
+	local command = pull_or_push == "pull" and pull_command or push_command
+	local result = vim.fn.system(command)
+	if vim.v.shell_error == 0 then
+		return result:gsub("\n", "")
+	end
+	return "0"
 end
 
 return M

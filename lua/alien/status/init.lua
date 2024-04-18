@@ -16,8 +16,8 @@ end
 
 M.get_push_pull_string = function()
 	local push_pull_string = ""
-	local num_commits_to_pull = vim.fn.systemlist(commands.num_commits_to_pull)[1]
-	local num_commits_to_push = vim.fn.systemlist(commands.num_commits_to_push)[1]
+	local num_commits_to_pull = commands.num_commits("pull")
+	local num_commits_to_push = commands.num_commits("push")
 	if num_commits_to_pull ~= "0" then
 		push_pull_string = push_pull_string .. " ↓" .. num_commits_to_pull
 	end
