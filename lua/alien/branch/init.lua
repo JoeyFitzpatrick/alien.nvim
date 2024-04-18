@@ -1,8 +1,9 @@
 local window = require("alien.window")
+local commands = require("alien.commands")
 
 local M = {}
 M.get_buffer_args = function()
-	local lines = {}
+	local lines = vim.fn.systemlist(commands.local_branches)
 	table.insert(lines, 1, "Branches")
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)

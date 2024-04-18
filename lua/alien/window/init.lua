@@ -38,6 +38,7 @@ M.open_alien_buffer = function(opts)
 	local set_lines = opts.set_lines
 	local cursor_pos = opts.cursor_pos
 	local post_open_hook = opts.post_open_hook
+	local set_keymaps = opts.set_keymaps
 	-- Create a new tab
 	vim.cmd("tabnew")
 	vim.cmd("setlocal norelativenumber")
@@ -55,7 +56,9 @@ M.open_alien_buffer = function(opts)
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = bufnr })
 	vim.api.nvim_buf_set_var(bufnr, require("alien.status.constants").IS_ALIEN_GIT_STATUS_BUFFER, true)
-	require("alien.keymaps").set_status_buffer_keymaps(bufnr)
+	if set_keymaps then
+		set_keymaps(bufnr)
+	end
 	if post_open_hook then
 		post_open_hook()
 	end

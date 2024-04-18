@@ -23,6 +23,7 @@ M.get_buffer_args = function()
 		set_lines = set_lines,
 		cursor_pos = cursor_pos,
 		post_open_hook = post_open_hook,
+		set_keymaps = require("alien.keymaps.status").set_status_buffer_keymaps,
 	}
 end
 
