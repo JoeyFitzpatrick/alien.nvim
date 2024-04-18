@@ -1,3 +1,5 @@
+local constants = require("alien.status.constants")
+
 local M = {}
 
 M.pull = "git pull"
@@ -24,7 +26,7 @@ M.stage_or_unstage_all = function()
 end
 
 M.stage_or_unstage_file = function(status, filename)
-	if status:sub(1, 1) == " " and status:sub(2, 2) ~= " " or status == "??" then
+	if status:sub(1, 1) == " " and status:sub(2, 2) ~= " " or status == constants.UNTRACKED then
 		return M.stage_file .. " " .. filename
 	else
 		return M.unstage_file .. " " .. filename
@@ -39,8 +41,11 @@ M.file_contents = function(filename)
 	return "git show HEAD:" .. filename
 end
 
-M.restore_file = function(filename)
-	return "git restore -- " .. filename
+M.restore_file = function(file)
+	if file.status == constants.UNTRACKED then
+		return "git clean -f -- " .. file.filename
+	end
+	return "git restore -- " .. file.filename
 end
 
 return M

@@ -67,6 +67,15 @@ M.set_status_buffer_keymaps = function(bufnr)
 		vim.cmd("normal! k")
 		diff.git_diff_current_buffer()
 	end)
+	map("d", function()
+		local file = utils.get_file_name_from_tree()
+		if not file then
+			print("no file found")
+			return
+		end
+		vim.fn.system(commands.restore_file(file))
+		M.redraw_status_buffer()
+	end)
 end
 
 return M
