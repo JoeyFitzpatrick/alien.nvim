@@ -24,7 +24,7 @@ M.stage_or_unstage_all = function()
 end
 
 M.stage_or_unstage_file = function(status, filename)
-	if status:sub(1, 1) == " " and status:sub(2, 2) ~= " " then
+	if status:sub(1, 1) == " " and status:sub(2, 2) ~= " " or status == "??" then
 		return M.stage_file .. " " .. filename
 	else
 		return M.unstage_file .. " " .. filename

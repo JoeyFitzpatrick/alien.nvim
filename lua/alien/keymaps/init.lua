@@ -21,7 +21,7 @@ M.set_status_buffer_keymaps = function(bufnr)
 		M.redraw_status_buffer()
 	end, keymap_opts(bufnr))
 
-	vim.keymap.set("n", "s", function()
+	vim.keymap.set("n", "<space>", function()
 		local file = utils.get_file_name_from_tree()
 		if not file then
 			print("no file found")
@@ -44,6 +44,8 @@ M.set_status_buffer_keymaps = function(bufnr)
 		M.redraw_status_buffer()
 	end, keymap_opts(bufnr))
 
+	-- TODO: make this work without leader
+	-- probably the same as lazygit: allow force push after attempting a regular push
 	vim.keymap.set("n", "<leader>P", function()
 		local result = "git force push: \n" .. vim.fn.system(commands.force_push)
 		vim.notify(result)

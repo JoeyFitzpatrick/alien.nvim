@@ -56,6 +56,7 @@ M.open_status_buffer = function(callback)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = bufnr })
+	vim.api.nvim_buf_set_var(bufnr, require("alien.status.constants").IS_ALIEN_GIT_STATUS_BUFFER, true)
 	require("alien.keymaps").set_status_buffer_keymaps(bufnr)
 end
 

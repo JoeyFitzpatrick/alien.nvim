@@ -17,6 +17,28 @@ local setup_colors = function()
 	--	]])
 end
 
+local setup_autocmds = function()
+	vim.api.nvim_create_augroup("AlienGitStatus", { clear = true })
+
+	-- Create an autocommand for the BufEnter event that checks for our custom variable
+	vim.api.nvim_create_autocmd("BufEnter", {
+		group = "AlienGitStatus",
+		pattern = "*", -- This pattern could be more specific or left as '*' to check all entering buffers
+		callback = function(args)
+			local bufnr = args.buf -- Get the buffer number from the autocommand arguments
+			local status, is_alien_git_status =
+				pcall(vim.api.nvim_buf_get_var, bufnr, require("alien.status.constants").IS_ALIEN_GIT_STATUS_BUFFER)
+			is_alien_git_status = status and is_alien_git_status
+
+			-- Check if this is indeed the buffer we are interested in
+			if is_alien_git_status then
+				-- Set 'timeout' to false for this specific buffer
+				vim.api.nvim_set_option_value("timeoutlen", 0, {})
+			end
+		end,
+	})
+end
+
 local M = {}
 M.status = function()
 	require("alien.status").git_status()
@@ -24,5 +46,6 @@ end
 M.setup = function(opts)
 	opts = opts or {}
 	setup_colors()
+	setup_autocmds()
 end
 return M
