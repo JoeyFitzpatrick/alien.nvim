@@ -1,4 +1,4 @@
-local utils = require("alien.utils")
+local window = require("alien.window")
 
 local M = {}
 M.get_buffer_args = function()
@@ -6,7 +6,7 @@ M.get_buffer_args = function()
 	table.insert(lines, 1, "Branches")
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-		utils.set_buffer_colors()
+		window.set_buffer_colors()
 	end
 	return {
 		set_lines = set_lines,
@@ -15,7 +15,7 @@ M.get_buffer_args = function()
 end
 
 M.git_branches = function()
-	utils.open_alien_buffer(M.get_buffer_args())
+	window.open_alien_buffer(M.get_buffer_args())
 end
 
 return M

@@ -1,5 +1,5 @@
 local setup_colors = function()
-	local colors = require("alien.utils").get_palette()
+	local colors = require("alien.window").get_palette()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))

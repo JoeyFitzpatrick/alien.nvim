@@ -1,5 +1,5 @@
 local commands = require("alien.commands")
-local utils = require("alien.utils")
+local window = require("alien.window")
 
 local FIRST_STATUS_LINE_NUMBER = 2
 
@@ -11,7 +11,7 @@ M.get_buffer_args = function()
 	table.insert(lines, 1, "Head:   " .. current_branch)
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-		utils.set_buffer_colors()
+		window.set_buffer_colors()
 	end
 	local cursor_pos = { 1, 0 }
 	local post_open_hook = nil
@@ -40,7 +40,7 @@ M.get_push_pull_string = function()
 end
 
 M.git_status = function()
-	utils.open_alien_buffer(M.get_buffer_args())
+	window.open_alien_buffer(M.get_buffer_args())
 end
 
 return M

@@ -1,5 +1,5 @@
 local commands = require("alien.commands")
-local utils = require("alien.utils")
+local window = require("alien.window")
 local diff = require("alien.status.diff")
 
 local keymap_opts = function(bufnr)
@@ -24,7 +24,7 @@ M.set_status_buffer_keymaps = function(bufnr)
 		M.redraw_status_buffer()
 	end)
 	map("<space>", function()
-		local file = utils.get_file_name_from_tree()
+		local file = window.get_file_name_from_tree()
 		if not file then
 			print("no file found")
 			return
@@ -68,7 +68,7 @@ M.set_status_buffer_keymaps = function(bufnr)
 		diff.git_diff_current_buffer()
 	end)
 	map("d", function()
-		local file = utils.get_file_name_from_tree()
+		local file = window.get_file_name_from_tree()
 		if not file then
 			print("no file found")
 			return

@@ -1,4 +1,3 @@
-local utils = require("alien.utils")
 local commands = require("alien.commands")
 
 local M = {}
