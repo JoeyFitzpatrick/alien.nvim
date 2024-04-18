@@ -35,4 +35,8 @@ M.commit = function(message)
 	return 'git commit -m "' .. message .. '"'
 end
 
+M.file_contents = function(filename)
+	return "git show HEAD:" .. filename
+end
+
 return M

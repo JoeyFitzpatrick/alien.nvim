@@ -1,4 +1,5 @@
 local utils = require("alien.utils")
+local commands = require("alien.commands")
 
 local M = {}
 
@@ -17,14 +18,9 @@ M.git_diff_current_buffer = function()
 	local filetype = vim.fn.fnamemodify(filename, ":e") -- Extract the file extension
 
 	-- Read the file contents from the last commit
-	local git_command = "git show HEAD:" .. filename
-	local last_commit_content = { "" }
-	if status ~= "??" then
-		last_commit_content = vim.fn.systemlist(git_command)
-		if vim.v.shell_error ~= 0 then
-			print("Error reading from git. Make sure you are in a git repository and the file is tracked.")
-			return
-		end
+	local last_commit_content = vim.fn.systemlist(commands.file_contents(filename))
+	if vim.v.shell_error ~= 0 then
+		last_commit_content = { "" }
 	end
 
 	local window_height = vim.api.nvim_win_get_height(0)
