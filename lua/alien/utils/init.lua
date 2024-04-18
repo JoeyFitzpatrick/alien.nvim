@@ -1,4 +1,5 @@
 local FIRST_STATUS_LINE_NUMBER = 2
+local STATUSES = require("alien.status.constants").STATUSES
 
 local function to_hex(dec)
 	local hex = ""
@@ -135,7 +136,7 @@ M.set_buffer_colors = function()
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienStaged", line_number - 1, 0, -1)
 		elseif status_prefix == "MM" then
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienPartiallyStaged", line_number - 1, 0, -1)
-		elseif status_prefix == require("alien.status.constants").UNTRACKED or status_prefix:sub(1, 1) == " " then
+		elseif status_prefix == STATUSES.UNTRACKED or status_prefix:sub(1, 1) == " " then
 			vim.api.nvim_buf_add_highlight(0, -1, "AlienUnstaged", line_number - 1, 0, -1)
 		end
 	end
