@@ -9,11 +9,11 @@ end
 
 local M = {}
 M.set_status_buffer_keymaps = function(bufnr)
+	require("alien.keymaps").set_general_keymaps(bufnr)
 	local map = function(lhs, rhs)
 		vim.keymap.set("n", lhs, rhs, keymap_opts(bufnr))
 	end
 
-	map("q", "<cmd>tabclose<CR>")
 	map("a", function()
 		vim.fn.system(commands.stage_or_unstage_all())
 		redraw_status_buffer()

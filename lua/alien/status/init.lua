@@ -20,6 +20,7 @@ M.get_buffer_args = function()
 		post_open_hook = require("alien.status.diff").git_diff_current_buffer
 	end
 	return {
+		buffer_type = require("alien.window").BUFFER_TYPES.STATUS,
 		set_lines = set_lines,
 		cursor_pos = cursor_pos,
 		post_open_hook = post_open_hook,

@@ -10,8 +10,10 @@ M.get_buffer_args = function()
 		window.set_buffer_colors()
 	end
 	return {
+		buffer_type = window.BUFFER_TYPES.BRANCHES,
 		set_lines = set_lines,
 		cursor_pos = { 1, 0 },
+		set_keymaps = require("alien.keymaps.branch").set_status_buffer_keymaps,
 	}
 end
 

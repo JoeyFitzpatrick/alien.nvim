@@ -1,6 +1,5 @@
 local FIRST_STATUS_LINE_NUMBER = 2
 local STATUSES = require("alien.status.constants").STATUSES
-
 local function to_hex(dec)
 	local hex = ""
 	if type(dec) == "string" then
@@ -34,7 +33,19 @@ local function get_colors(name)
 end
 
 local M = {}
+M.BUFFER_TYPES = {
+	STATUS = "status",
+	BRANCHES = "branches",
+}
+M.get_buffer_type_string = function(buffer_type)
+	if buffer_type == M.BUFFER_TYPES.STATUS then
+		return "[ Status ] -- Branches"
+	elseif buffer_type == M.BUFFER_TYPES.BRANCHES then
+		return "Status -- [ Branches ]"
+	end
+end
 M.open_alien_buffer = function(opts)
+	local buffer_type = opts.buffer_type
 	local set_lines = opts.set_lines
 	local cursor_pos = opts.cursor_pos
 	local post_open_hook = opts.post_open_hook
@@ -44,6 +55,7 @@ M.open_alien_buffer = function(opts)
 	vim.cmd("setlocal norelativenumber")
 
 	set_lines()
+	vim.api.nvim_buf_set_lines(0, 0, 0, false, { M.get_buffer_type_string(buffer_type) })
 
 	vim.api.nvim_win_set_cursor(0, cursor_pos)
 	-- Get the current buffer number
