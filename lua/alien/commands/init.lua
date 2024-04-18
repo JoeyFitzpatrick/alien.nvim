@@ -39,4 +39,8 @@ M.file_contents = function(filename)
 	return "git show HEAD:" .. filename
 end
 
+M.restore_file = function(filename)
+	return "git restore -- " .. filename
+end
+
 return M
