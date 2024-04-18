@@ -8,9 +8,9 @@ end
 
 local M = {}
 M.redraw_status_buffer = function()
-	local set_lines = require("alien.status").get_status_lines()
+	local buffer_args = require("alien.status").get_buffer_args()
 	vim.api.nvim_set_option_value("modifiable", true, { buf = vim.api.nvim_get_current_buf() })
-	set_lines()
+	buffer_args.set_lines()
 	vim.api.nvim_set_option_value("modifiable", false, { buf = vim.api.nvim_get_current_buf() })
 end
 M.set_status_buffer_keymaps = function(bufnr)

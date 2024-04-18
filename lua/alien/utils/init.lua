@@ -34,20 +34,17 @@ local function get_colors(name)
 end
 
 local M = {}
-M.open_status_buffer = function(callback)
+M.open_alien_buffer = function(opts)
+	local set_lines = opts.set_lines
+	local cursor_pos = opts.cursor_pos
+	local post_open_hook = opts.post_open_hook
 	-- Create a new tab
 	vim.cmd("tabnew")
 	vim.cmd("setlocal norelativenumber")
 
-	callback()
+	set_lines()
 
-	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-	if #lines > 1 then
-		vim.api.nvim_win_set_cursor(0, { FIRST_STATUS_LINE_NUMBER, 0 })
-		require("alien.status.diff").git_diff_current_buffer()
-	else
-		vim.api.nvim_win_set_cursor(0, { 1, 0 })
-	end
+	vim.api.nvim_win_set_cursor(0, cursor_pos)
 	-- Get the current buffer number
 	local bufnr = vim.api.nvim_get_current_buf()
 
@@ -59,6 +56,9 @@ M.open_status_buffer = function(callback)
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = bufnr })
 	vim.api.nvim_buf_set_var(bufnr, require("alien.status.constants").IS_ALIEN_GIT_STATUS_BUFFER, true)
 	require("alien.keymaps").set_status_buffer_keymaps(bufnr)
+	if post_open_hook then
+		post_open_hook()
+	end
 end
 
 M.get_palette = function()

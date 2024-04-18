@@ -43,6 +43,9 @@ local M = {}
 M.status = function()
 	require("alien.status").git_status()
 end
+M.branches = function()
+	require("alien.branch").git_branches()
+end
 M.setup = function(opts)
 	opts = opts or {}
 	setup_colors()
