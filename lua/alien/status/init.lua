@@ -74,7 +74,7 @@ M.get_buffer_args = function()
 	end
 	local cursor_pos = { 1, 0 }
 	local post_open_hook = nil
-	if #lines > 1 then
+	if #lines >= FIRST_STATUS_LINE_NUMBER then
 		cursor_pos = { FIRST_STATUS_LINE_NUMBER, 0 }
 		post_open_hook = require("alien.status.diff").git_diff_current_buffer
 	end
