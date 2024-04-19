@@ -67,15 +67,7 @@ M.display_branch_picker = function(opts)
 					local result = vim.fn.system(commands.checkout_branch(branch_name))
 					vim.notify(result)
 					require("alien.keymaps").redraw_branch_buffer()
-					local buffers = vim.api.nvim_list_bufs()
-					for _, buf in ipairs(buffers) do
-						if vim.api.nvim_buf_get_name(buf) ~= "" then
-							-- test comment
-							vim.api.nvim_buf_call(buf, function()
-								vim.cmd([[e!]])
-							end)
-						end
-					end
+					helpers.reload_named_buffers()
 				end)
 				return true
 			end,

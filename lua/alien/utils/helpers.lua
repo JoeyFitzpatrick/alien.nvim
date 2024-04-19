@@ -58,4 +58,14 @@ M.load_plugin = function(plugin_name)
 	end
 	return plugin
 end
+M.reload_named_buffers = function()
+	local buffers = vim.api.nvim_list_bufs()
+	for _, buf in ipairs(buffers) do
+		if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf) ~= "" then
+			vim.api.nvim_buf_call(buf, function()
+				vim.cmd([[e!]])
+			end)
+		end
+	end
+end
 return M
