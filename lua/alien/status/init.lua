@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local window_constants = require("alien.window.constants")
 local STATUSES = require("alien.status.constants").STATUSES
 
 local FIRST_STATUS_LINE_NUMBER = 3
@@ -10,7 +11,7 @@ local M = {}
 M.set_buffer_colors = function()
 	local line_count = vim.api.nvim_buf_line_count(0)
 
-	local HEAD_LINE = 1
+	local HEAD_LINE = 2
 	local line = vim.api.nvim_buf_get_lines(0, HEAD_LINE - 1, HEAD_LINE, false)[1]
 
 	-- Split the line by whitespace using gmatch and store the parts in a table
@@ -63,9 +64,11 @@ end
 
 M.get_buffer_args = function()
 	local lines = vim.fn.systemlist(commands.status)
+	local buffer_type = window_constants.BUFFER_TYPES.STATUS
 
 	local current_branch = vim.fn.systemlist(commands.current_branch)[1] .. M.get_push_pull_string()
 	table.insert(lines, 1, "Head:   " .. current_branch)
+	table.insert(lines, 1, window_constants.BUFFER_TYPE_STRING[buffer_type])
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 	end
@@ -76,7 +79,7 @@ M.get_buffer_args = function()
 		post_open_hook = require("alien.status.diff").git_diff_current_buffer
 	end
 	return {
-		buffer_type = require("alien.window").BUFFER_TYPES.STATUS,
+		buffer_type = buffer_type,
 		set_lines = set_lines,
 		cursor_pos = cursor_pos,
 		post_open_hook = post_open_hook,

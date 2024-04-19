@@ -65,4 +65,8 @@ M.num_commits = function(pull_or_push)
 	return "0"
 end
 
+M.checkout_local_branch = function(branch)
+	return "git checkout " .. branch
+end
+
 return M

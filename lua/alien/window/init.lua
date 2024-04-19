@@ -1,6 +1,7 @@
 local status = require("alien.status")
 local branch = require("alien.branch")
 local helpers = require("alien.utils.helpers")
+local constants = require("alien.window.constants")
 
 local function to_hex(dec)
 	local hex = ""
@@ -35,18 +36,13 @@ local function get_colors(name)
 end
 
 local M = {}
-M.BUFFER_TYPES = {
-	STATUS = "status",
-	BRANCHES = "branches",
-}
-M.BUFFER_TYPE_ARRAY = { M.BUFFER_TYPES.STATUS, M.BUFFER_TYPES.BRANCHES }
 local get_next_buffer_type = function(buffer_type)
-	local index = helpers.next_index(M.BUFFER_TYPE_ARRAY, buffer_type)
-	return M.BUFFER_TYPE_ARRAY[index]
+	local index = helpers.next_index(constants.BUFFER_TYPE_ARRAY, buffer_type)
+	return constants.BUFFER_TYPE_ARRAY[index]
 end
 local get_previous_buffer_type = function(buffer_type)
-	local index = helpers.prev_index(M.BUFFER_TYPE_ARRAY, buffer_type)
-	return M.BUFFER_TYPE_ARRAY[index]
+	local index = helpers.prev_index(constants.BUFFER_TYPE_ARRAY, buffer_type)
+	return constants.BUFFER_TYPE_ARRAY[index]
 end
 M.open_next_buffer = function()
 	local buffer_type = vim.api.nvim_buf_get_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE)
@@ -60,13 +56,6 @@ M.open_previous_buffer = function()
 	vim.cmd("tabclose")
 	M.open_window(prev_buffer_type)
 end
-M.get_buffer_type_string = function(buffer_type)
-	if buffer_type == M.BUFFER_TYPES.STATUS then
-		return "[ Status ] -- Branches"
-	elseif buffer_type == M.BUFFER_TYPES.BRANCHES then
-		return "Status -- [ Branches ]"
-	end
-end
 M.open_alien_buffer = function(opts)
 	local buffer_type = opts.buffer_type
 	local set_lines = opts.set_lines
@@ -79,7 +68,6 @@ M.open_alien_buffer = function(opts)
 	vim.cmd("setlocal norelativenumber")
 
 	set_lines()
-	vim.api.nvim_buf_set_lines(0, 0, 0, false, { M.get_buffer_type_string(buffer_type) })
 	vim.api.nvim_buf_set_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE, buffer_type)
 
 	vim.api.nvim_win_set_cursor(0, cursor_pos)
@@ -113,9 +101,9 @@ M.git_branches = function()
 end
 
 M.open_window = function(type)
-	if type == M.BUFFER_TYPES.STATUS then
+	if type == constants.BUFFER_TYPES.STATUS then
 		M.git_status()
-	elseif type == M.BUFFER_TYPES.BRANCHES then
+	elseif type == constants.BUFFER_TYPES.BRANCHES then
 		M.git_branches()
 	end
 end
