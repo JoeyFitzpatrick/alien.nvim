@@ -40,9 +40,25 @@ M.BUFFER_TYPES = {
 	BRANCHES = "branches",
 }
 M.BUFFER_TYPE_ARRAY = { M.BUFFER_TYPES.STATUS, M.BUFFER_TYPES.BRANCHES }
-M.get_next_buffer_type = function(buffer_type)
+local get_next_buffer_type = function(buffer_type)
 	local index = helpers.next_index(M.BUFFER_TYPE_ARRAY, buffer_type)
 	return M.BUFFER_TYPE_ARRAY[index]
+end
+local get_previous_buffer_type = function(buffer_type)
+	local index = helpers.prev_index(M.BUFFER_TYPE_ARRAY, buffer_type)
+	return M.BUFFER_TYPE_ARRAY[index]
+end
+M.open_next_buffer = function()
+	local buffer_type = vim.api.nvim_buf_get_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE)
+	local next_buffer_type = get_next_buffer_type(buffer_type)
+	vim.cmd("tabclose")
+	M.open_window(next_buffer_type)
+end
+M.open_previous_buffer = function()
+	local buffer_type = vim.api.nvim_buf_get_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE)
+	local prev_buffer_type = get_previous_buffer_type(buffer_type)
+	vim.cmd("tabclose")
+	M.open_window(prev_buffer_type)
 end
 M.get_buffer_type_string = function(buffer_type)
 	if buffer_type == M.BUFFER_TYPES.STATUS then

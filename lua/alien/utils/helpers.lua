@@ -38,4 +38,16 @@ M.next_index = function(t, value)
 		return (index % #t) + 1
 	end
 end
+M.prev_index = function(t, value)
+	local index = nil
+	for i, v in ipairs(t) do
+		if v == value then
+			index = i
+			break
+		end
+	end
+	if index then
+		return (index - 2) % #t + 1
+	end
+end
 return M
