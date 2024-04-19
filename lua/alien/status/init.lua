@@ -72,7 +72,7 @@ M.get_buffer_args = function()
 	local set_lines = function()
 		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 	end
-	local cursor_pos = { 1, 0 }
+	local cursor_pos = { FIRST_STATUS_LINE_NUMBER - 1, 0 }
 	local post_open_hook = nil
 	if #lines >= FIRST_STATUS_LINE_NUMBER then
 		cursor_pos = { FIRST_STATUS_LINE_NUMBER, 0 }
