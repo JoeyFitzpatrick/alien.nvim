@@ -50,4 +50,12 @@ M.prev_index = function(t, value)
 		return (index - 2) % #t + 1
 	end
 end
+M.load_plugin = function(plugin_name)
+	local status, plugin = pcall(require, plugin_name)
+	if not status then
+		error("Error loading plugin: " .. plugin_name)
+		return
+	end
+	return plugin
+end
 return M

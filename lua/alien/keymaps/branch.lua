@@ -20,6 +20,9 @@ M.set_status_buffer_keymaps = function(bufnr)
 		vim.notify(result)
 		redraw_branch_buffer()
 	end)
+	map("b", function()
+		require("alien.branch").display_branch_picker()
+	end)
 end
 
 return M
