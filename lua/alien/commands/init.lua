@@ -14,6 +14,7 @@ M.unstage_file = "git reset HEAD --"
 M.current_branch = "git branch --show-current"
 M.current_branch_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
 M.local_branches = "git branch --list"
+M.all_branches = "git branch --all --sort=-committerdate | head -n 100 | sed 's|remotes/origin/||' | awk '!seen[$0]++'"
 
 M.stage_or_unstage_all = function()
 	local status = vim.fn.system(M.status)
