@@ -26,4 +26,16 @@ M.table_to_string = function(tbl)
 	s[#s + 1] = "}"
 	return s
 end
+M.next_index = function(t, value)
+	local index = nil
+	for i, v in ipairs(t) do
+		if v == value then
+			index = i
+			break
+		end
+	end
+	if index then
+		return (index % #t) + 1
+	end
+end
 return M

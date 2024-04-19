@@ -1,5 +1,7 @@
-local FIRST_STATUS_LINE_NUMBER = 2
-local STATUSES = require("alien.status.constants").STATUSES
+local status = require("alien.status")
+local branch = require("alien.branch")
+local helpers = require("alien.utils.helpers")
+
 local function to_hex(dec)
 	local hex = ""
 	if type(dec) == "string" then
@@ -37,6 +39,11 @@ M.BUFFER_TYPES = {
 	STATUS = "status",
 	BRANCHES = "branches",
 }
+M.BUFFER_TYPE_ARRAY = { M.BUFFER_TYPES.STATUS, M.BUFFER_TYPES.BRANCHES }
+M.get_next_buffer_type = function(buffer_type)
+	local index = helpers.next_index(M.BUFFER_TYPE_ARRAY, buffer_type)
+	return M.BUFFER_TYPE_ARRAY[index]
+end
 M.get_buffer_type_string = function(buffer_type)
 	if buffer_type == M.BUFFER_TYPES.STATUS then
 		return "[ Status ] -- Branches"
@@ -50,12 +57,14 @@ M.open_alien_buffer = function(opts)
 	local cursor_pos = opts.cursor_pos
 	local post_open_hook = opts.post_open_hook
 	local set_keymaps = opts.set_keymaps
+	local set_colors = opts.set_colors
 	-- Create a new tab
 	vim.cmd("tabnew")
 	vim.cmd("setlocal norelativenumber")
 
 	set_lines()
 	vim.api.nvim_buf_set_lines(0, 0, 0, false, { M.get_buffer_type_string(buffer_type) })
+	vim.api.nvim_buf_set_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE, buffer_type)
 
 	vim.api.nvim_win_set_cursor(0, cursor_pos)
 	-- Get the current buffer number
@@ -68,11 +77,30 @@ M.open_alien_buffer = function(opts)
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = bufnr })
 	vim.api.nvim_buf_set_var(bufnr, require("alien.status.constants").IS_ALIEN_GIT_STATUS_BUFFER, true)
+	if set_colors then
+		set_colors(bufnr)
+	end
 	if set_keymaps then
 		set_keymaps(bufnr)
 	end
 	if post_open_hook then
 		post_open_hook()
+	end
+end
+
+M.git_status = function()
+	M.open_alien_buffer(status.get_buffer_args())
+end
+
+M.git_branches = function()
+	M.open_alien_buffer(branch.get_buffer_args())
+end
+
+M.open_window = function(type)
+	if type == M.BUFFER_TYPES.STATUS then
+		M.git_status()
+	elseif type == M.BUFFER_TYPES.BRANCHES then
+		M.git_branches()
 	end
 end
 
@@ -97,64 +125,6 @@ M.get_palette = function()
 		blue = "#" .. blue,
 		purple = "#" .. purple,
 	}
-end
-
-M.get_status_prefix = function(str)
-	return str:sub(1, 2)
-end
-
-M.set_buffer_colors = function()
-	local line_count = vim.api.nvim_buf_line_count(0)
-
-	local HEAD_LINE = 1
-	local line = vim.api.nvim_buf_get_lines(0, HEAD_LINE - 1, HEAD_LINE, false)[1]
-
-	-- Split the line by whitespace using gmatch and store the parts in a table
-	local parts = {}
-	for part in line:gmatch("%S+") do
-		table.insert(parts, part)
-	end
-
-	-- Add highlight for the second part of the line with "AlienBranchName" color
-	if parts[2] then
-		local start_col = #parts[1] + 1 -- Calculate the start column for the second part
-		-- Loop through the line to find the exact start position of the second part
-		for i = start_col, #line do
-			if line:sub(i, i + #parts[2] - 1) == parts[2] then
-				start_col = i - 1
-				break
-			end
-		end
-		vim.api.nvim_buf_add_highlight(0, -1, "AlienBranchName", HEAD_LINE - 1, start_col, start_col + #parts[2])
-	end
-
-	-- Add highlight for the third part of the line with "AlienPushPullString" color
-	if parts[3] then
-		local start_col = #parts[1] + #parts[2] + 2 -- Calculate the start column for the third part
-		-- Loop through the line to find the exact start position of the third part
-		for i = start_col, #line do
-			if line:sub(i, i + #parts[3] - 1) == parts[3] then
-				start_col = i - 1
-				break
-			end
-		end
-		vim.api.nvim_buf_add_highlight(0, -1, "AlienPushPullString", HEAD_LINE - 1, start_col, start_col + #parts[3])
-	end
-
-	for line_number = FIRST_STATUS_LINE_NUMBER, line_count do
-		line = vim.api.nvim_buf_get_lines(0, line_number - 1, line_number, false)[1]
-
-		local status_prefix = M.get_status_prefix(line)
-
-		-- Now that we have the status prefix, check the conditions.
-		if status_prefix:sub(1, 1) ~= " " and status_prefix:sub(2, 2) == " " then
-			vim.api.nvim_buf_add_highlight(0, -1, "AlienStaged", line_number - 1, 0, -1)
-		elseif status_prefix == "MM" then
-			vim.api.nvim_buf_add_highlight(0, -1, "AlienPartiallyStaged", line_number - 1, 0, -1)
-		elseif status_prefix == STATUSES.UNTRACKED or status_prefix:sub(1, 1) == " " then
-			vim.api.nvim_buf_add_highlight(0, -1, "AlienUnstaged", line_number - 1, 0, -1)
-		end
-	end
 end
 
 M.get_file_name_from_tree = function()

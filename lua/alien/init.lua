@@ -1,11 +1,13 @@
 local setup_colors = function()
 	local colors = require("alien.window").get_palette()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
+	vim.cmd(string.format("highlight %s guifg=%s", "AlienCurrentBranch", colors.green))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchName", colors.purple))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPushPullString", colors.yellow))
 
+	-- If I ever want to change the diff colors...
 	--	vim.cmd([[
 	--		hi DiffAdd      gui=none    guifg=NONE          guibg=#bada9f
 	--		hi diffAdded      gui=none    guifg=NONE          guibg=#bada9f
@@ -41,10 +43,10 @@ end
 
 local M = {}
 M.status = function()
-	require("alien.status").git_status()
+	require("alien.window").git_status()
 end
 M.branches = function()
-	require("alien.branch").git_branches()
+	require("alien.window").git_branches()
 end
 M.setup = function(opts)
 	opts = opts or {}
