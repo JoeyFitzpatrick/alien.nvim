@@ -14,6 +14,7 @@ M.unstage_file = "git reset HEAD --"
 M.current_branch = "git branch --show-current"
 M.current_branch_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
 M.local_branches = "git branch --list"
+-- remove the "remotes/origin/" prefix from remote branches, and remove duplicates
 M.all_branches = "git branch --all --sort=-committerdate | head -n 100 | sed 's|remotes/origin/||' | awk '!seen[$0]++'"
 
 M.stage_or_unstage_all = function()
@@ -66,8 +67,8 @@ M.num_commits = function(pull_or_push)
 	return "0"
 end
 
-M.checkout_local_branch = function(branch)
-	return "git checkout " .. branch
+M.checkout_branch = function(branch)
+	return "git switch " .. branch
 end
 
 return M
