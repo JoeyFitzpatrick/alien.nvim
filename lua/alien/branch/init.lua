@@ -1,7 +1,7 @@
 local commands = require("alien.commands")
 local window_constants = require("alien.window.constants")
 
-local FIRST_BRANCH_LINE_NUMBER = 1
+local FIRST_BRANCH_LINE_NUMBER = 2
 
 local M = {}
 M.is_current_branch = function(line)

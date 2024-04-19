@@ -18,6 +18,7 @@ M.set_status_buffer_keymaps = function(bufnr)
 		local branch_name = require("alien.branch").get_branch_name_from_line(line)
 		local result = vim.fn.system(commands.checkout_local_branch(branch_name))
 		vim.notify(result)
+		redraw_branch_buffer()
 	end)
 end
 
