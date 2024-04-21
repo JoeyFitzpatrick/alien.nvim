@@ -85,7 +85,8 @@ end
 
 M.push_branch_upstream = function()
 	local current_branch = vim.fn.system(M.current_branch)
-	local current_remote = vim.fn.system(M.current_branch_remote)
+	--TODO: get the remote programatically
+	local current_remote = "origin"
 	return "git push --set-upstream " .. current_remote .. " " .. current_branch
 end
 
