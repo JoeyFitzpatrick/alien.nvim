@@ -24,6 +24,15 @@ M.set_status_buffer_keymaps = function(bufnr)
 	map("b", function()
 		require("alien.branch").display_branch_picker()
 	end)
+	map("n", function()
+		local line = vim.api.nvim_get_current_line()
+		local base_branch = require("alien.branch").get_branch_name_from_line(line)
+		vim.ui.input({ prompt = "New branch name: " }, function(input)
+			local result = vim.fn.system(commands.new_branch(base_branch, input))
+			vim.notify(result)
+		end)
+		redraw_branch_buffer()
+	end)
 end
 
 return M

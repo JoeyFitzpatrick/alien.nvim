@@ -71,4 +71,8 @@ M.checkout_branch = function(branch)
 	return "git switch " .. branch
 end
 
+M.new_branch = function(existing_branch, new_branch)
+	return "git switch --create " .. new_branch .. " " .. existing_branch
+end
+
 return M
