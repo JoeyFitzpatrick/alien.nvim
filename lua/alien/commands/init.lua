@@ -81,6 +81,8 @@ end
 
 M.delete_local_branch = function(branch)
 	return "git branch --delete " .. branch
+end
+
 M.push_branch_upstream = function()
 	local current_branch = vim.fn.system(M.current_branch)
 	local current_remote = vim.fn.system(M.current_branch_remote)
