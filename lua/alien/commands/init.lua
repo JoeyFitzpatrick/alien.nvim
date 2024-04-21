@@ -6,7 +6,8 @@ local M = {}
 M.pull = "git pull"
 M.push = "git push"
 M.force_push = "git push --force"
-M.status = "git status --porcelain --untracked=all"
+-- sort by file name
+M.status = "git status --porcelain --untracked=all | sort -k1.4"
 M.stage_all = "git add -A"
 M.unstage_all = "git reset"
 M.stage_file = "git add --"
