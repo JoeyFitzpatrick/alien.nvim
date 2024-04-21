@@ -75,4 +75,12 @@ M.new_branch = function(existing_branch, new_branch)
 	return "git switch --create " .. new_branch .. " " .. existing_branch
 end
 
+M.delete_remote_branch = function(branch)
+	return "git push origin --delete " .. branch
+end
+
+M.delete_local_branch = function(branch)
+	return "git branch --delete " .. branch
+end
+
 return M
