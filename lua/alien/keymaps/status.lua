@@ -2,23 +2,16 @@ local commands = require("alien.commands")
 local window = require("alien.window")
 local diff = require("alien.status.diff")
 local redraw_status_buffer = require("alien.keymaps").redraw_status_buffer
-
-local keymap_opts = function(bufnr)
-	return { buffer = bufnr, noremap = true, silent = true }
-end
+local map = require("alien.keymaps").map
+local set_keymaps = require("alien.keymaps").set_keymaps
 
 local M = {}
-M.set_status_buffer_keymaps = function(bufnr)
-	require("alien.keymaps").set_general_keymaps(bufnr)
-	local map = function(lhs, rhs)
-		vim.keymap.set("n", lhs, rhs, keymap_opts(bufnr))
-	end
-
+M.set_status_buffer_keymaps = function()
 	map("a", function()
 		vim.fn.system(commands.stage_or_unstage_all())
 		redraw_status_buffer()
 	end)
-	map("<space>", function()
+	map("<Space>", function()
 		local file = window.get_file_name_from_tree()
 		if not file then
 			print("no file found")
@@ -74,6 +67,7 @@ M.set_status_buffer_keymaps = function(bufnr)
 		vim.fn.system(commands.restore_file(file))
 		redraw_status_buffer()
 	end)
+	set_keymaps()
 end
 
 return M
