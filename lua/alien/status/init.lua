@@ -89,14 +89,14 @@ M.get_buffer_args = function()
 end
 
 M.get_push_pull_string = function()
-	local push_pull_string = ""
+	local push_pull_string = " "
 	local num_commits_to_pull = commands.num_commits("pull")
 	local num_commits_to_push = commands.num_commits("push")
 	if num_commits_to_pull ~= "0" then
-		push_pull_string = push_pull_string .. " ↓" .. num_commits_to_pull
+		push_pull_string = push_pull_string .. "↓" .. num_commits_to_pull
 	end
 	if num_commits_to_push ~= "0" then
-		push_pull_string = push_pull_string .. " ↑" .. num_commits_to_push
+		push_pull_string = push_pull_string .. "↑" .. num_commits_to_push
 	end
 	return push_pull_string
 end
