@@ -1,7 +1,8 @@
 local commands = require("alien.commands")
-local redraw_branch_buffer = require("alien.keymaps").redraw_branch_buffer
+local redraw_buffer = require("alien.window").redraw_buffer
 local map = require("alien.keymaps").map
 local set_keymaps = require("alien.keymaps").set_keymaps
+local get_buffer_args = require("alien.branch").get_buffer_args
 
 local get_branch_name = function()
 	local line = vim.api.nvim_get_current_line()
@@ -10,11 +11,11 @@ end
 
 local M = {}
 M.branch_buffer_keymaps = function()
-	map("<space>", function()
+	map("s", function()
 		local branch_name = get_branch_name()
 		local result = vim.fn.system(commands.checkout_branch(branch_name))
 		vim.notify(result)
-		redraw_branch_buffer()
+		redraw_buffer(get_buffer_args())
 		require("alien.utils.helpers").reload_named_buffers()
 	end)
 	map("b", function()
@@ -26,7 +27,7 @@ M.branch_buffer_keymaps = function()
 			local result = vim.fn.system(commands.new_branch(base_branch, input))
 			vim.notify(result)
 		end)
-		redraw_branch_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 	map("d", function()
 		local branch = get_branch_name()
@@ -46,7 +47,7 @@ M.branch_buffer_keymaps = function()
 				end
 			end
 		)
-		redraw_branch_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 	set_keymaps()
 end

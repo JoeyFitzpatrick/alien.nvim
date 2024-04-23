@@ -44,16 +44,23 @@ local get_previous_buffer_type = function(buffer_type)
 	local index = helpers.prev_index(constants.BUFFER_TYPE_ARRAY, buffer_type)
 	return constants.BUFFER_TYPE_ARRAY[index]
 end
+M.close_tab = function()
+	local current_tab = vim.api.nvim_get_current_tabpage()
+	vim.cmd("bdelete")
+	if vim.api.nvim_get_current_tabpage() == current_tab then
+		vim.cmd("tabclose")
+	end
+end
 M.open_next_buffer = function()
 	local buffer_type = vim.api.nvim_buf_get_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE)
 	local next_buffer_type = get_next_buffer_type(buffer_type)
-	vim.cmd("tabclose")
+	M.close_tab()
 	M.open_window(next_buffer_type)
 end
 M.open_previous_buffer = function()
 	local buffer_type = vim.api.nvim_buf_get_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE)
 	local prev_buffer_type = get_previous_buffer_type(buffer_type)
-	vim.cmd("tabclose")
+	M.close_tab()
 	M.open_window(prev_buffer_type)
 end
 M.open_alien_buffer = function(opts)
@@ -90,6 +97,13 @@ M.open_alien_buffer = function(opts)
 	if post_open_hook then
 		post_open_hook()
 	end
+end
+
+M.redraw_buffer = function(buffer_args)
+	vim.api.nvim_set_option_value("modifiable", true, { buf = vim.api.nvim_get_current_buf() })
+	buffer_args.set_lines()
+	buffer_args.set_colors()
+	vim.api.nvim_set_option_value("modifiable", false, { buf = vim.api.nvim_get_current_buf() })
 end
 
 M.git_status = function()
@@ -133,8 +147,8 @@ end
 
 M.get_file_name_from_tree = function()
 	local line = vim.api.nvim_get_current_line()
-	local status = line:sub(1, 2)
+	local git_status = line:sub(1, 2)
 	local filename = line:sub(4)
-	return { status = status, filename = filename }
+	return { status = git_status, filename = filename }
 end
 return M

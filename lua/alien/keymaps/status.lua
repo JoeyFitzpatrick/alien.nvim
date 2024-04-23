@@ -1,7 +1,8 @@
 local commands = require("alien.commands")
 local window = require("alien.window")
 local diff = require("alien.status.diff")
-local redraw_status_buffer = require("alien.keymaps").redraw_status_buffer
+local redraw_buffer = window.redraw_buffer
+local get_buffer_args = require("alien.status").get_buffer_args
 local map = require("alien.keymaps").map
 local set_keymaps = require("alien.keymaps").set_keymaps
 
@@ -9,9 +10,9 @@ local M = {}
 M.set_status_buffer_keymaps = function()
 	map("a", function()
 		vim.fn.system(commands.stage_or_unstage_all())
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
-	map("<Space>", function()
+	map("s", function()
 		local file = window.get_file_name_from_tree()
 		if not file then
 			print("no file found")
@@ -19,12 +20,12 @@ M.set_status_buffer_keymaps = function()
 		end
 
 		vim.fn.system(commands.stage_or_unstage_file(file.status, file.filename))
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 	map("p", function()
 		local result = "git pull: \n" .. vim.fn.system(commands.pull)
 		vim.notify(result)
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 	map("P", function()
 		local result = vim.fn.system(commands.push)
@@ -32,7 +33,7 @@ M.set_status_buffer_keymaps = function()
 			result = vim.fn.system(commands.push_branch_upstream())
 		end
 		vim.notify(result)
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 
 	-- TODO: make this work without leader
@@ -40,7 +41,7 @@ M.set_status_buffer_keymaps = function()
 	map("<leader>P", function()
 		local result = "git force push: \n" .. vim.fn.system(commands.force_push)
 		vim.notify(result)
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 
 	map("c", function()
@@ -48,7 +49,7 @@ M.set_status_buffer_keymaps = function()
 			local result = "git commit: \n" .. vim.fn.system(commands.commit(input))
 			vim.notify(result)
 		end)
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 	map("j", function()
 		vim.cmd("normal! j")
@@ -65,7 +66,7 @@ M.set_status_buffer_keymaps = function()
 			return
 		end
 		vim.fn.system(commands.restore_file(file))
-		redraw_status_buffer()
+		redraw_buffer(get_buffer_args())
 	end)
 	set_keymaps()
 end
