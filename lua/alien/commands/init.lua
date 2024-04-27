@@ -91,4 +91,13 @@ M.push_branch_upstream = function()
 	return "git push --set-upstream " .. current_remote .. " " .. current_branch
 end
 
+M.staged_stats = function()
+	local stats = vim.fn.systemlist("git diff --staged --shortstat")[1]
+	print(type(stats))
+	if not stats then
+		return "No staged changes"
+	end
+	return stats
+end
+
 return M
