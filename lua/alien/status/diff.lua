@@ -21,9 +21,9 @@ M.git_diff_current_buffer = function()
 		last_commit_content = { "" }
 	end
 
-	local window_width = vim.api.nvim_win_get_width(0)
-	local split_width = math.floor(window_width * 0.80)
-	vim.cmd("bo " .. split_width .. " vsplit " .. filename)
+	local window_height = vim.api.nvim_win_get_height(0)
+	local split_height = math.floor(window_height * 0.65)
+	vim.cmd("bo " .. split_height .. " split " .. filename)
 	M.diff_win_ids = { vim.api.nvim_get_current_win() }
 	-- Create a non-writable, non-file buffer with the file contents
 	vim.cmd("vnew")
