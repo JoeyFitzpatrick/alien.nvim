@@ -24,8 +24,8 @@ local M = {}
 M.status = function()
 	require("alien.window").git_status()
 end
-M.branches = function()
-	require("alien.window").git_branches()
+M.toggle_time_machine = function()
+	require("alien.time-machine").toggle()
 end
 M.setup = function(opts)
 	opts = opts or {}
