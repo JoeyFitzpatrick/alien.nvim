@@ -1,8 +1,8 @@
 local commands = require("alien.commands")
 local window = require("alien.window")
-local diff = require("alien.status.diff")
+local diff = require("alien.window.status.diff")
 local redraw_buffer = window.redraw_buffer
-local get_buffer_args = require("alien.status").get_buffer_args
+local get_buffer_args = require("alien.window.status").get_buffer_args
 local map = require("alien.keymaps").map
 local set_keymaps = require("alien.keymaps").set_keymaps
 

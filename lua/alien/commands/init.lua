@@ -1,4 +1,4 @@
-local constants = require("alien.status.constants")
+local constants = require("alien.window.status.constants")
 local STATUSES = constants.STATUSES
 
 local M = {}

@@ -1,6 +1,6 @@
 local commands = require("alien.commands")
 local window_constants = require("alien.window.constants")
-local STATUSES = require("alien.status.constants").STATUSES
+local STATUSES = require("alien.window.status.constants").STATUSES
 
 local FIRST_STATUS_LINE_NUMBER = 4
 local get_status_prefix = function(str)
@@ -77,7 +77,7 @@ M.get_buffer_args = function()
 	local post_open_hook = nil
 	if #lines >= FIRST_STATUS_LINE_NUMBER then
 		cursor_pos = { FIRST_STATUS_LINE_NUMBER, 0 }
-		post_open_hook = require("alien.status.diff").git_diff_current_buffer
+		post_open_hook = require("alien.window.status.diff").git_diff_current_buffer
 	end
 	return {
 		buffer_type = buffer_type,

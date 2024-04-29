@@ -1,5 +1,5 @@
-local status = require("alien.status")
-local branch = require("alien.branch")
+local status = require("alien.window.status")
+local branch = require("alien.window.branch")
 local helpers = require("alien.utils.helpers")
 local constants = require("alien.window.constants")
 
@@ -87,7 +87,7 @@ M.open_alien_buffer = function(opts)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = bufnr })
-	vim.api.nvim_buf_set_var(bufnr, require("alien.status.constants").IS_ALIEN_GIT_STATUS_BUFFER, true)
+	vim.api.nvim_buf_set_var(bufnr, require("alien.window.status.constants").IS_ALIEN_GIT_STATUS_BUFFER, true)
 	if set_colors then
 		set_colors(bufnr)
 	end

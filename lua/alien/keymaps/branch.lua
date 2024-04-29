@@ -2,11 +2,11 @@ local commands = require("alien.commands")
 local redraw_buffer = require("alien.window").redraw_buffer
 local map = require("alien.keymaps").map
 local set_keymaps = require("alien.keymaps").set_keymaps
-local get_buffer_args = require("alien.branch").get_buffer_args
+local get_buffer_args = require("alien.window.branch").get_buffer_args
 
 local get_branch_name = function()
 	local line = vim.api.nvim_get_current_line()
-	return require("alien.branch").get_branch_name_from_line(line)
+	return require("alien.window.branch").get_branch_name_from_line(line)
 end
 
 local M = {}
@@ -19,7 +19,7 @@ M.branch_buffer_keymaps = function()
 		require("alien.utils.helpers").reload_named_buffers()
 	end)
 	map("b", function()
-		require("alien.branch").display_branch_picker()
+		require("alien.window.branch").display_branch_picker()
 	end)
 	map("n", function()
 		local base_branch = get_branch_name()
@@ -35,7 +35,7 @@ M.branch_buffer_keymaps = function()
 			{ "delete local branch", "delete remote branch" },
 			{ prompt = "Delete branch: " },
 			function(choice)
-				local is_current_branch = require("alien.branch").is_current_branch(vim.api.nvim_get_current_line())
+				local is_current_branch = require("alien.window.branch").is_current_branch(vim.api.nvim_get_current_line())
 				if choice == "delete local branch" and is_current_branch then
 					vim.notify("Cannot delete current branch")
 				elseif choice == "delete local branch" then
