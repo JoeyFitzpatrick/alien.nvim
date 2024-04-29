@@ -5,6 +5,7 @@ local M = {}
 M.time_machine_bufnr = nil
 M.viewed_file_bufnr = nil
 M.current_file_contents = nil
+M.current_time_machine_line_num = nil
 
 local setup_viewed_file = function(bufnr)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
@@ -15,6 +16,8 @@ local reset_viewed_file = function(bufnr)
 	vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, M.current_file_contents)
 	M.current_file_contents = nil
+	vim.keymap.del("n", "<c-n>", { buffer = bufnr })
+	vim.keymap.del("n", "<c-p>", { buffer = bufnr })
 end
 
 local get_current_file = function()
@@ -23,27 +26,56 @@ local get_current_file = function()
 	return relative_filename
 end
 
-local set_keymaps = function(bufnr)
-	vim.keymap.set("n", "s", function()
-		local line = vim.api.nvim_get_current_line()
-		local commit_hash = line:gmatch("%S+")()
-		vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
-		vim.api.nvim_buf_set_lines(
-			M.viewed_file_bufnr,
-			0,
-			-1,
-			false,
-			vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
-		)
-	end, { buffer = bufnr })
+local load_file = function()
+	local line = vim.api.nvim_buf_get_lines(
+		M.time_machine_bufnr,
+		M.current_time_machine_line_num,
+		M.current_time_machine_line_num + 1,
+		false
+	)[1]
+	local commit_hash = line:gmatch("%S+")()
+	vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
+	vim.api.nvim_buf_set_lines(
+		M.viewed_file_bufnr,
+		0,
+		-1,
+		false,
+		vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
+	)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
 end
 
-local setup_time_machine_buffer = function(bufnr)
-	set_keymaps(bufnr)
-	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
-	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = bufnr })
+local set_keymaps = function()
+	vim.keymap.set("n", "s", function()
+		M.current_time_machine_line_num = vim.api.nvim_win_get_cursor(0)[1] - 1
+		load_file()
+	end, { buffer = M.time_machine_bufnr })
+	vim.keymap.set("n", "<c-p>", function()
+		if M.current_time_machine_line_num == nil then
+			M.current_time_machine_line_num = 0
+			load_file()
+			return
+		end
+		local num_lines = vim.api.nvim_buf_line_count(M.time_machine_bufnr)
+		if M.current_time_machine_line_num < num_lines - 1 then
+			M.current_time_machine_line_num = M.current_time_machine_line_num + 1
+			load_file()
+		end
+	end, { buffer = M.viewed_file_bufnr })
+	vim.keymap.set("n", "<c-n>", function()
+		if M.current_time_machine_line_num > 0 then
+			M.current_time_machine_line_num = M.current_time_machine_line_num - 1
+			load_file()
+		end
+	end, { buffer = M.viewed_file_bufnr })
+	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
+end
+
+local setup_time_machine_buffer = function()
+	set_keymaps()
+	vim.api.nvim_set_option_value("modifiable", false, { buf = M.time_machine_bufnr })
+	vim.api.nvim_set_option_value("buftype", "nofile", { buf = M.time_machine_bufnr })
+	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = M.time_machine_bufnr })
 	vim.cmd("setlocal nowrap")
 end
 
@@ -71,7 +103,7 @@ M.toggle = function()
 		vim.cmd(split_width .. " vnew")
 		M.time_machine_bufnr = vim.api.nvim_get_current_buf()
 		load_time_machine_lines()
-		setup_time_machine_buffer(M.time_machine_bufnr)
+		setup_time_machine_buffer()
 	end
 end
 
