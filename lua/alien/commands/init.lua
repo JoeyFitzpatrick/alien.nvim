@@ -104,4 +104,8 @@ M.all_commits_for_file = function(filename)
 	return "git log --oneline --follow -- " .. filename
 end
 
+M.file_contents_at_commit = function(commit, filename)
+	return "git show " .. commit .. ":" .. filename
+end
+
 return M
