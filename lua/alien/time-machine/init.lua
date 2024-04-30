@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local CURRENT_CHANGES = "Current changes"
 
 local M = {}
 
@@ -65,13 +66,13 @@ end
 local load_file = function()
 	local commit_hash = get_current_commit_hash()
 	vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
-	vim.api.nvim_buf_set_lines(
-		M.viewed_file_bufnr,
-		0,
-		-1,
-		false,
-		vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
-	)
+	local lines = {}
+	if commit_hash == CURRENT_CHANGES:gmatch("%S+")() then
+		lines = M.current_file_contents
+	else
+		lines = vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
+	end
+	vim.api.nvim_buf_set_lines(M.viewed_file_bufnr, 0, -1, false, lines)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
 	set_current_line_highlight()
 end
@@ -130,6 +131,7 @@ local load_time_machine_lines = function()
 	if vim.v.shell_error ~= 0 then
 		commits = { "Error: no commits found" }
 	end
+	table.insert(commits, 1, CURRENT_CHANGES)
 	vim.api.nvim_buf_set_lines(M.time_machine_bufnr, 0, -1, false, commits)
 end
 
