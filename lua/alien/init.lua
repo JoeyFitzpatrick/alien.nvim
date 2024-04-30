@@ -6,6 +6,7 @@ local setup_colors = function()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchName", colors.purple))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchStar", colors.purple))
+	vim.cmd(string.format("highlight %s guifg=%s", "AlienTimeMachineCommit", colors.purple))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPushPullString", colors.yellow))
 
 	-- If I ever want to change the diff colors...
