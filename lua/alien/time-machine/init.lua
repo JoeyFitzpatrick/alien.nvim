@@ -55,14 +55,15 @@ local get_current_file = function()
 	return relative_filename
 end
 
-local load_file = function()
-	local line = vim.api.nvim_buf_get_lines(
-		M.time_machine_bufnr,
-		M.current_time_machine_line_num,
-		M.current_time_machine_line_num + 1,
-		false
-	)[1]
+local get_current_commit_hash = function()
+	local line_num = M.current_time_machine_line_num or vim.api.nvim_win_get_cursor(0)[1] - 1
+	local line = vim.api.nvim_buf_get_lines(M.time_machine_bufnr, line_num, line_num + 1, false)[1]
 	local commit_hash = line:gmatch("%S+")()
+	return commit_hash
+end
+
+local load_file = function()
+	local commit_hash = get_current_commit_hash()
 	vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
 	vim.api.nvim_buf_set_lines(
 		M.viewed_file_bufnr,
@@ -108,6 +109,9 @@ local set_keymaps = function()
 	vim.keymap.set("n", "<c-n>", time_machine_prev, { buffer = M.viewed_file_bufnr })
 	vim.keymap.set("n", "<c-p>", time_machine_next, { buffer = M.time_machine_bufnr })
 	vim.keymap.set("n", "<c-n>", time_machine_prev, { buffer = M.time_machine_bufnr })
+	vim.keymap.set("n", "o", function()
+		vim.fn.system(commands.open_commit_in_github(get_current_commit_hash()))
+	end, { buffer = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
 end
 

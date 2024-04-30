@@ -108,4 +108,8 @@ M.file_contents_at_commit = function(commit, filename)
 	return "git show " .. commit .. ":" .. filename
 end
 
+M.open_commit_in_github = function(commit_hash)
+	return "gh browse " .. commit_hash
+end
+
 return M
