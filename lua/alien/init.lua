@@ -9,6 +9,8 @@ local setup_colors = function()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienTimeMachineCommit", colors.purple))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPushPullString", colors.yellow))
 
+	vim.cmd(string.format("highlight %s guibg=%s", "AlienTimeMachineCurrentCommit", colors.orange))
+
 	-- If I ever want to change the diff colors...
 	--	vim.cmd([[
 	--		hi DiffAdd      gui=none    guifg=NONE          guibg=#bada9f
