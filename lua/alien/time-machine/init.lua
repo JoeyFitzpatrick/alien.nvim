@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local diff = require("alien.diff")
 local CURRENT_CHANGES = "Current changes"
 
 local M = {}
@@ -110,9 +111,19 @@ local set_keymaps = function()
 	vim.keymap.set("n", "<c-n>", time_machine_prev, { buffer = M.viewed_file_bufnr })
 	vim.keymap.set("n", "<c-p>", time_machine_next, { buffer = M.time_machine_bufnr })
 	vim.keymap.set("n", "<c-n>", time_machine_prev, { buffer = M.time_machine_bufnr })
+	vim.keymap.set("n", "q", M.close_time_machine, { buffer = M.time_machine_bufnr })
 	vim.keymap.set("n", "o", function()
 		vim.fn.system(commands.open_commit_in_github(get_current_commit_hash()))
 	end, { buffer = M.time_machine_bufnr })
+	vim.keymap.set("n", "d", function()
+		diff.alien_diff({
+			filename = get_current_file(),
+			diff_left = vim.fn.systemlist(
+				commands.file_contents_at_commit(get_current_commit_hash(), get_current_file())
+			),
+			diff_right = M.current_file_contents,
+		})
+	end)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
 end
 
@@ -135,12 +146,17 @@ local load_time_machine_lines = function()
 	vim.api.nvim_buf_set_lines(M.time_machine_bufnr, 0, -1, false, commits)
 end
 
-M.toggle = function()
+M.close_time_machine = function()
 	if M.time_machine_bufnr then
 		vim.cmd("bdelete " .. M.time_machine_bufnr)
 		M.time_machine_bufnr = nil
 		reset_viewed_file(M.viewed_file_bufnr)
 		M.viewed_file_bufnr = nil
+	end
+end
+M.toggle = function()
+	if M.time_machine_bufnr then
+		M.close_time_machine()
 	else
 		M.viewed_file_bufnr = vim.api.nvim_get_current_buf()
 		setup_viewed_file(M.viewed_file_bufnr)

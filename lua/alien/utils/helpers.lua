@@ -1,4 +1,35 @@
 local M = {}
+M.load_plugin = function(plugin_name)
+	local status, plugin = pcall(require, plugin_name)
+	if not status then
+		error("Error loading plugin: " .. plugin_name)
+		return
+	end
+	return plugin
+end
+M.reload_named_buffers = function()
+	local buffers = vim.api.nvim_list_bufs()
+	for _, buf in ipairs(buffers) do
+		if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf) ~= "" then
+			vim.api.nvim_buf_call(buf, function()
+				vim.cmd([[e!]])
+			end)
+		end
+	end
+end
+M.buf_set_temporary = function(bufnr, opts)
+	opts = opts or {}
+	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
+	vim.api.nvim_set_option_value("bufhidden", "wipe", { buf = bufnr })
+	if opts.filetype then
+		vim.api.nvim_set_option_value("filetype", opts.filetype, { buf = bufnr })
+	end
+	if opts.keymaps then
+		for _, keymap in ipairs(opts.keymaps) do
+			vim.keymap.set(keymap[1], keymap[2], keymap[3], { buffer = bufnr })
+		end
+	end
+end
 M.dump = function(output)
 	if type(output) == "table" then
 		local s = "{ "
@@ -48,24 +79,6 @@ M.prev_index = function(t, value)
 	end
 	if index then
 		return (index - 2) % #t + 1
-	end
-end
-M.load_plugin = function(plugin_name)
-	local status, plugin = pcall(require, plugin_name)
-	if not status then
-		error("Error loading plugin: " .. plugin_name)
-		return
-	end
-	return plugin
-end
-M.reload_named_buffers = function()
-	local buffers = vim.api.nvim_list_bufs()
-	for _, buf in ipairs(buffers) do
-		if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf) ~= "" then
-			vim.api.nvim_buf_call(buf, function()
-				vim.cmd([[e!]])
-			end)
-		end
 	end
 end
 return M
