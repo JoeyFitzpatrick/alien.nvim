@@ -54,6 +54,7 @@ end
 local get_current_file = function()
 	local filename = vim.api.nvim_buf_get_name(M.viewed_file_bufnr)
 	local relative_filename = vim.fn.fnamemodify(filename, ":.")
+	print("relative_filename: " .. relative_filename)
 	return relative_filename
 end
 
@@ -123,7 +124,7 @@ local set_keymaps = function()
 			),
 			diff_right = M.current_file_contents,
 		})
-	end)
+	end, { buffer = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
 end
 
@@ -133,6 +134,7 @@ local setup_time_machine_buffer = function()
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = M.time_machine_bufnr })
+	vim.api.nvim_set_option_value("winfixwidth", true, { win = vim.api.nvim_get_current_win() })
 	vim.cmd("setlocal nowrap")
 end
 

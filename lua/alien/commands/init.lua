@@ -101,7 +101,7 @@ M.staged_stats = function()
 end
 
 M.all_commits_for_file = function(filename)
-	return "git log --oneline --follow -- " .. filename
+	return "git log --oneline -- " .. filename
 end
 
 M.file_contents_at_commit = function(commit, filename)
