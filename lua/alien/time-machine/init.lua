@@ -40,19 +40,6 @@ local set_current_line_highlight = function()
 	end
 end
 
-local setup_viewed_file = function(bufnr)
-	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-	M.current_file_contents = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-end
-
-local reset_viewed_file = function(bufnr)
-	vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
-	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, M.current_file_contents)
-	M.current_file_contents = nil
-	vim.keymap.del("n", "<c-n>", { buffer = bufnr })
-	vim.keymap.del("n", "<c-p>", { buffer = bufnr })
-end
-
 local get_current_file = function()
 	local filename = vim.api.nvim_buf_get_name(M.viewed_file_bufnr)
 	local relative_filename = vim.fn.fnamemodify(filename, ":.")
@@ -65,20 +52,6 @@ local get_current_commit_hash = function()
 	local commit_hash = line:gmatch("%S+")()
 	return commit_hash
 end
-
--- local load_file = function()
--- 	local commit_hash = get_current_commit_hash()
--- 	vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
--- 	local lines = {}
--- 	if commit_hash == CURRENT_CHANGES:gmatch("%S+")() then
--- 		lines = M.current_file_contents
--- 	else
--- 		lines = vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
--- 	end
--- 	vim.api.nvim_buf_set_lines(M.viewed_file_bufnr, 0, -1, false, lines)
--- 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
--- 	set_current_line_highlight()
--- end
 
 local get_lines = function()
 	local commit_hash = get_current_commit_hash()
@@ -126,7 +99,10 @@ local time_machine_next = function()
 end
 
 local set_keymaps = function()
-	vim.keymap.set("n", "s", function()
+	local map = function(lhs, rhs)
+		vim.keymap.set("n", lhs, rhs, { buffer = M.time_machine_bufnr })
+	end
+	map("s", function()
 		if M.time_machine_bufnr == vim.api.nvim_get_current_buf() then
 			M.current_time_machine_line_num = vim.api.nvim_win_get_cursor(0)[1] - 1
 		end
@@ -136,16 +112,14 @@ local set_keymaps = function()
 			M.current_time_machine_line_num = vim.api.nvim_win_get_cursor(0)[1] - 1
 		end
 		load_file()
-	end, { buffer = M.time_machine_bufnr })
-	vim.keymap.set("n", "<c-p>", time_machine_next, { buffer = M.viewed_file_bufnr })
-	vim.keymap.set("n", "<c-n>", time_machine_prev, { buffer = M.viewed_file_bufnr })
-	vim.keymap.set("n", "<c-p>", time_machine_next, { buffer = M.time_machine_bufnr })
-	vim.keymap.set("n", "<c-n>", time_machine_prev, { buffer = M.time_machine_bufnr })
-	vim.keymap.set("n", "q", M.close_time_machine, { buffer = M.time_machine_bufnr })
-	vim.keymap.set("n", "o", function()
+	end)
+	map("<c-p>", time_machine_next)
+	map("<c-n>", time_machine_prev)
+	map("q", M.close_time_machine)
+	map("o", function()
 		vim.fn.system(commands.open_commit_in_github(get_current_commit_hash()))
-	end, { buffer = M.time_machine_bufnr })
-	vim.keymap.set("n", "d", function()
+	end)
+	map("d", function()
 		diff.alien_diff({
 			filename = get_current_file(),
 			diff_left = vim.fn.systemlist(
@@ -153,8 +127,7 @@ local set_keymaps = function()
 			),
 			diff_right = M.current_file_contents,
 		})
-	end, { buffer = M.time_machine_bufnr })
-	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
+	end)
 end
 
 local setup_time_machine_buffer = function()
@@ -183,7 +156,7 @@ M.close_time_machine = function()
 		M.time_machine_bufnr = nil
 	end
 	if M.viewed_file_bufnr then
-		reset_viewed_file(M.viewed_file_bufnr)
+		M.current_file_contents = nil
 		M.viewed_file_bufnr = nil
 		M.viewed_file_window = nil
 	end
@@ -195,10 +168,9 @@ M.toggle = function()
 	else
 		M.viewed_file_bufnr = vim.api.nvim_get_current_buf()
 		M.viewed_file_window = vim.api.nvim_get_current_win()
-		setup_viewed_file(M.viewed_file_bufnr)
+		M.current_file_contents = vim.api.nvim_buf_get_lines(M.viewed_file_bufnr, 0, -1, false)
 		local window_width = vim.api.nvim_win_get_width(0)
 		local split_width = math.floor(window_width * 0.25)
-		-- vim.cmd("bo " .. split_height .. " split " .. filename)
 		vim.cmd(split_width .. " vnew")
 		M.time_machine_bufnr = vim.api.nvim_get_current_buf()
 		load_time_machine_lines()
