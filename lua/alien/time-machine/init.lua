@@ -144,6 +144,7 @@ local setup_time_machine_buffer = function()
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("bufhidden", "hide", { buf = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("winfixwidth", true, { win = vim.api.nvim_get_current_win() })
+	vim.api.nvim_set_option_value("buflisted", false, { buf = M.time_machine_bufnr })
 	vim.cmd("setlocal nowrap")
 end
 
@@ -182,6 +183,18 @@ M.toggle = function()
 		M.time_machine_bufnr = vim.api.nvim_get_current_buf()
 		load_time_machine_lines()
 		setup_time_machine_buffer()
+
+		local alien_time_machine_group = vim.api.nvim_create_augroup("AlienTimeMachine", { clear = true })
+		vim.api.nvim_create_autocmd("BufWinLeave", {
+			desc = "Close time machine when time machine window is closed",
+			buffer = M.time_machine_bufnr,
+			callback = function()
+				vim.api.nvim_set_current_win(M.viewed_file_window)
+				vim.api.nvim_set_current_buf(M.viewed_file_bufnr)
+				buffer.close_all()
+			end,
+			group = alien_time_machine_group,
+		})
 	end
 end
 

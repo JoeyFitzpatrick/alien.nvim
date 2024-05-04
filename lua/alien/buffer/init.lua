@@ -48,6 +48,7 @@ end
 
 M.close_all = function()
 	for _, bufnr in pairs(buffers) do
+		print(bufnr)
 		vim.api.nvim_buf_delete(bufnr, { force = true })
 	end
 	buffers = {}
