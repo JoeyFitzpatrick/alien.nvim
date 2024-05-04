@@ -64,6 +64,9 @@ local get_lines = function()
 	return lines
 end
 
+-- We set these buffer-specfic mappings further down in the file
+local mappings = {}
+
 local load_file = function()
 	local buffer_name = get_current_commit_hash()
 	local filename = get_current_file()
@@ -75,6 +78,7 @@ local load_file = function()
 		post_switch = function()
 			set_current_line_highlight()
 		end,
+		mappings = mappings,
 	})
 end
 
@@ -97,6 +101,9 @@ local time_machine_next = function()
 		load_file()
 	end
 end
+
+mappings["<c-p>"] = time_machine_next
+mappings["<c-n>"] = time_machine_prev
 
 local set_keymaps = function()
 	local map = function(lhs, rhs)

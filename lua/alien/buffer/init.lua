@@ -12,7 +12,7 @@ local buffers = {}
 
 ---@param buf_name string
 ---@param get_lines function
----@param opts { filetype: string | nil, window: integer, post_switch: function | nil}
+---@param opts { filetype: string | nil, window: integer, post_switch: function | nil, mappings: table | nil}
 ---@return nil
 M.get_buffer = function(buf_name, get_lines, opts)
 	local function switch_to_buffer(buffer)
@@ -20,6 +20,9 @@ M.get_buffer = function(buf_name, get_lines, opts)
 		vim.api.nvim_set_current_buf(buffer)
 		if opts.post_switch then
 			opts.post_switch()
+		end
+		if opts.mappings then
+			require("alien.keymaps").set_buffer_keymaps(0, opts.mappings)
 		end
 	end
 

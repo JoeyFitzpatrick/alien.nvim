@@ -16,4 +16,10 @@ M.set_keymaps = function()
 	end
 end
 
+M.set_buffer_keymaps = function(bufnr, mappings)
+	for keys, fn in pairs(mappings) do
+		vim.keymap.set("n", keys, fn, { nowait = true, noremap = true, silent = true, buffer = bufnr })
+	end
+end
+
 return M
