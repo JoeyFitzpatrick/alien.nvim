@@ -35,7 +35,8 @@ M.branch_buffer_keymaps = function()
 			{ "delete local branch", "delete remote branch" },
 			{ prompt = "Delete branch: " },
 			function(choice)
-				local is_current_branch = require("alien.window.branch").is_current_branch(vim.api.nvim_get_current_line())
+				local is_current_branch =
+					require("alien.window.branch").is_current_branch(vim.api.nvim_get_current_line())
 				if choice == "delete local branch" and is_current_branch then
 					vim.notify("Cannot delete current branch")
 				elseif choice == "delete local branch" then

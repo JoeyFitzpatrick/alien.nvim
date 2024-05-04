@@ -1,11 +1,13 @@
 local commands = require("alien.commands")
 local diff = require("alien.diff")
+local buffer = require("alien.buffer")
 local CURRENT_CHANGES = "Current changes"
 
 local M = {}
 
 M.time_machine_bufnr = nil
 M.viewed_file_bufnr = nil
+M.viewed_file_window = nil
 M.current_file_contents = nil
 M.current_time_machine_line_num = nil
 
@@ -64,18 +66,43 @@ local get_current_commit_hash = function()
 	return commit_hash
 end
 
-local load_file = function()
+-- local load_file = function()
+-- 	local commit_hash = get_current_commit_hash()
+-- 	vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
+-- 	local lines = {}
+-- 	if commit_hash == CURRENT_CHANGES:gmatch("%S+")() then
+-- 		lines = M.current_file_contents
+-- 	else
+-- 		lines = vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
+-- 	end
+-- 	vim.api.nvim_buf_set_lines(M.viewed_file_bufnr, 0, -1, false, lines)
+-- 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
+-- 	set_current_line_highlight()
+-- end
+
+local get_lines = function()
 	local commit_hash = get_current_commit_hash()
-	vim.api.nvim_set_option_value("modifiable", true, { buf = M.viewed_file_bufnr })
 	local lines = {}
 	if commit_hash == CURRENT_CHANGES:gmatch("%S+")() then
 		lines = M.current_file_contents
 	else
 		lines = vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
 	end
-	vim.api.nvim_buf_set_lines(M.viewed_file_bufnr, 0, -1, false, lines)
-	vim.api.nvim_set_option_value("modifiable", false, { buf = M.viewed_file_bufnr })
-	set_current_line_highlight()
+	return lines
+end
+
+local load_file = function()
+	local buffer_name = get_current_commit_hash()
+	local filename = get_current_file()
+	buffer.get_buffer(buffer_name, function()
+		return get_lines()
+	end, {
+		filetype = vim.fn.fnamemodify(filename, ":e"),
+		window = M.viewed_file_window,
+		post_switch = function()
+			set_current_line_highlight()
+		end,
+	})
 end
 
 local time_machine_prev = function()
@@ -100,6 +127,9 @@ end
 
 local set_keymaps = function()
 	vim.keymap.set("n", "s", function()
+		if M.time_machine_bufnr == vim.api.nvim_get_current_buf() then
+			M.current_time_machine_line_num = vim.api.nvim_win_get_cursor(0)[1] - 1
+		end
 		if M.current_time_machine_line_num == nil then
 			M.current_time_machine_line_num = 0
 		else
@@ -155,13 +185,16 @@ M.close_time_machine = function()
 	if M.viewed_file_bufnr then
 		reset_viewed_file(M.viewed_file_bufnr)
 		M.viewed_file_bufnr = nil
+		M.viewed_file_window = nil
 	end
+	buffer.close_all()
 end
 M.toggle = function()
 	if M.time_machine_bufnr then
 		M.close_time_machine()
 	else
 		M.viewed_file_bufnr = vim.api.nvim_get_current_buf()
+		M.viewed_file_window = vim.api.nvim_get_current_win()
 		setup_viewed_file(M.viewed_file_bufnr)
 		local window_width = vim.api.nvim_win_get_width(0)
 		local split_width = math.floor(window_width * 0.25)
