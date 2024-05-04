@@ -54,7 +54,6 @@ end
 local get_current_file = function()
 	local filename = vim.api.nvim_buf_get_name(M.viewed_file_bufnr)
 	local relative_filename = vim.fn.fnamemodify(filename, ":.")
-	print("relative_filename: " .. relative_filename)
 	return relative_filename
 end
 
@@ -152,6 +151,8 @@ M.close_time_machine = function()
 	if M.time_machine_bufnr then
 		vim.cmd("bdelete " .. M.time_machine_bufnr)
 		M.time_machine_bufnr = nil
+	end
+	if M.viewed_file_bufnr then
 		reset_viewed_file(M.viewed_file_bufnr)
 		M.viewed_file_bufnr = nil
 	end
