@@ -2,6 +2,8 @@ local commands = require("alien.commands")
 local diff = require("alien.diff")
 local buffer = require("alien.buffer")
 local floating_window = require("alien.window.floating-window")
+local keymaps = require("alien.keymaps")
+
 local CURRENT_CHANGES = "Current changes"
 
 local M = {}
@@ -155,6 +157,7 @@ local set_keymaps = function()
 		end
 		floating_window.create(lines, post_render_callback)
 	end)
+	map("g?", keymaps.display_keymaps)
 end
 
 local setup_time_machine_buffer = function()
