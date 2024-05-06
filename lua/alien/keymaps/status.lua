@@ -66,7 +66,7 @@ M.set_status_buffer_keymaps = function()
 		vim.fn.system(commands.restore_file(file))
 		redraw_buffer(get_buffer_args())
 	end, "Restore file")
-	set_keymaps()
+	set_keymaps("window")
 end
 
 return M

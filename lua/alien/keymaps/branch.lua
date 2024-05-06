@@ -50,7 +50,7 @@ M.branch_buffer_keymaps = function()
 		)
 		redraw_buffer(get_buffer_args())
 	end, "Delete branch")
-	set_keymaps()
+	set_keymaps("window")
 end
 
 return M

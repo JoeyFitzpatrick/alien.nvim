@@ -3,6 +3,7 @@ local diff = require("alien.diff")
 local buffer = require("alien.buffer")
 local floating_window = require("alien.window.floating-window")
 local keymaps = require("alien.keymaps")
+local map = keymaps.map
 
 local CURRENT_CHANGES = "Current changes"
 
@@ -108,10 +109,7 @@ end
 mappings["<c-p>"] = time_machine_next
 mappings["<c-n>"] = time_machine_prev
 
-local set_keymaps = function()
-	local map = function(lhs, rhs)
-		vim.keymap.set("n", lhs, rhs, { buffer = M.time_machine_bufnr })
-	end
+local set_time_machine_keymaps = function()
 	map("s", function()
 		if M.time_machine_bufnr == vim.api.nvim_get_current_buf() then
 			M.current_time_machine_line_num = vim.api.nvim_win_get_cursor(0)[1] - 1
@@ -122,13 +120,13 @@ local set_keymaps = function()
 			M.current_time_machine_line_num = vim.api.nvim_win_get_cursor(0)[1] - 1
 		end
 		load_file()
-	end)
-	map("<c-p>", time_machine_next)
-	map("<c-n>", time_machine_prev)
-	map("q", M.close_time_machine)
+	end, "Switch to commit")
+	map("<c-p>", time_machine_next, "Previous commit")
+	map("<c-n>", time_machine_prev, "Next commit")
+	map("q", M.close_time_machine, "Close time machine")
 	map("o", function()
 		vim.fn.system(commands.open_commit_in_github(get_current_commit_hash()))
-	end)
+	end, "Open commit in GitHub")
 	map("d", function()
 		diff.alien_diff({
 			filename = get_current_file(),
@@ -137,7 +135,7 @@ local set_keymaps = function()
 			),
 			diff_right = M.current_file_contents,
 		})
-	end)
+	end, "Diff with current file")
 	map("i", function()
 		local lines = vim.fn.systemlist(commands.commit_metadata(get_current_commit_hash()))
 		local post_render_callback = function(bufnr)
@@ -156,12 +154,12 @@ local set_keymaps = function()
 			end
 		end
 		floating_window.create(lines, post_render_callback)
-	end)
-	map("g?", keymaps.display_keymaps)
+	end, "Commit metadata")
+	keymaps.set_keymaps("none")
 end
 
 local setup_time_machine_buffer = function()
-	set_keymaps()
+	set_time_machine_keymaps()
 	set_commit_highlights()
 	vim.api.nvim_set_option_value("modifiable", false, { buf = M.time_machine_bufnr })
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = M.time_machine_bufnr })
