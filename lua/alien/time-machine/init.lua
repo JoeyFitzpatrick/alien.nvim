@@ -1,6 +1,7 @@
 local commands = require("alien.commands")
 local diff = require("alien.diff")
 local buffer = require("alien.buffer")
+local floating_window = require("alien.window.floating-window")
 local CURRENT_CHANGES = "Current changes"
 
 local M = {}
@@ -134,6 +135,25 @@ local set_keymaps = function()
 			),
 			diff_right = M.current_file_contents,
 		})
+	end)
+	map("i", function()
+		local lines = vim.fn.systemlist(commands.commit_metadata(get_current_commit_hash()))
+		local post_render_callback = function(bufnr)
+			local first_word_length = function(line)
+				return string.find(line, "%s") or #line
+			end
+			for i = 0, 2, 1 do
+				vim.api.nvim_buf_add_highlight(
+					bufnr,
+					-1,
+					"AlienTimeMachineCommit",
+					i,
+					0,
+					first_word_length(lines[i + 1])
+				)
+			end
+		end
+		floating_window.create(lines, post_render_callback)
 	end)
 end
 

@@ -1,5 +1,6 @@
 local constants = require("alien.window.status.constants")
 local STATUSES = constants.STATUSES
+local DATE_FORMAT = "--date=format-local:'%A, %Y/%m/%d, %I:%M %p'" -- current user's timezone
 
 local M = {}
 
@@ -106,6 +107,10 @@ end
 
 M.file_contents_at_commit = function(commit, filename)
 	return "git show " .. commit .. ":" .. filename
+end
+
+M.commit_metadata = function(commit)
+	return "git show --no-patch " .. DATE_FORMAT .. " " .. commit
 end
 
 M.open_commit_in_github = function(commit_hash)
