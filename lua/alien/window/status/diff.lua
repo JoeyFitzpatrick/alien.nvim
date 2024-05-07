@@ -14,7 +14,6 @@ M.git_diff_current_buffer = function()
 	local current_window = vim.api.nvim_get_current_win()
 	local file = vim.api.nvim_get_current_line()
 	local filename = file:sub(4) -- Remove the first three characters (M, A, D, etc.)
-	local filetype = diff.utils.get_filetype(filename)
 	-- Read the file contents from the last commit
 	local last_commit_content = vim.fn.systemlist(commands.file_contents(filename))
 	if vim.v.shell_error ~= 0 then
@@ -24,6 +23,7 @@ M.git_diff_current_buffer = function()
 	local window_height = vim.api.nvim_win_get_height(0)
 	local split_height = math.floor(window_height * 0.65)
 	vim.cmd("bo " .. split_height .. " split " .. filename)
+	local filetype = vim.filetype.match({ buf = 0 })
 	M.diff_win_ids = { vim.api.nvim_get_current_win() }
 	-- Create a non-writable, non-file buffer with the file contents
 	vim.cmd("vnew")
