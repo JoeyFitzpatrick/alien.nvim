@@ -1,6 +1,7 @@
 local commands = require("alien.commands")
 local window_constants = require("alien.window.constants")
 local STATUSES = require("alien.window.status.constants").STATUSES
+local diff = require("alien.window.status.diff")
 
 local FIRST_STATUS_LINE_NUMBER = 4
 local get_status_prefix = function(str)

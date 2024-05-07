@@ -2,6 +2,7 @@ local status = require("alien.window.status")
 local branch = require("alien.window.branch")
 local helpers = require("alien.utils.helpers")
 local constants = require("alien.window.constants")
+local diff = require("alien.window.status.diff")
 
 local function to_hex(dec)
 	local hex = ""
@@ -108,6 +109,13 @@ end
 
 M.git_status = function()
 	M.open_alien_buffer(status.get_buffer_args())
+	local alien_status_group = vim.api.nvim_create_augroup("AlienStatus", { clear = true })
+	vim.api.nvim_create_autocmd("CursorMoved", {
+		desc = "Diff the file under the cursor",
+		buffer = 0,
+		callback = diff.git_diff_current_buffer,
+		group = alien_status_group,
+	})
 end
 
 M.git_branches = function()

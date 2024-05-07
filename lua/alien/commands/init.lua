@@ -59,7 +59,6 @@ M.num_commits = function(pull_or_push)
 	end
 	current_remote = current_remote:gsub("\n", "")
 	local pull_command = "git rev-list --count HEAD.." .. current_remote
-	print(pull_command)
 	local push_command = "git rev-list --count " .. current_remote .. "..HEAD"
 	local command = pull_or_push == "pull" and pull_command or push_command
 	local result = vim.fn.system(command)
@@ -94,7 +93,6 @@ end
 
 M.staged_stats = function()
 	local stats = vim.fn.systemlist("git diff --staged --shortstat")[1]
-	print(type(stats))
 	if not stats then
 		return "No staged changes"
 	end
