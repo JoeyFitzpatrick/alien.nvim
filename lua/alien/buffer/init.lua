@@ -36,7 +36,7 @@ M.get_buffer = function(buf_name, get_lines, opts)
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
 	vim.api.nvim_set_option_value("buflisted", false, { buf = bufnr })
-	vim.api.nvim_set_option_value("filetype", opts.filetype or "txt", { buf = bufnr })
+	vim.api.nvim_set_option_value("filetype", opts.filetype or "text", { buf = bufnr })
 
 	local lines = get_lines()
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)

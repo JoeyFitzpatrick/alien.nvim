@@ -4,6 +4,14 @@ local diff = require("alien.diff")
 local M = {}
 
 M.diff_win_ids = {}
+local diff_wins = function()
+	for _, win_id in ipairs(M.diff_win_ids) do
+		if vim.api.nvim_win_is_valid(win_id) then
+			vim.api.nvim_set_current_win(win_id)
+			vim.cmd("diffthis")
+		end
+	end
+end
 M.git_diff_current_buffer = function()
 	for _, win_id in ipairs(M.diff_win_ids) do
 		if vim.api.nvim_win_is_valid(win_id) then
@@ -33,12 +41,7 @@ M.git_diff_current_buffer = function()
 	vim.api.nvim_set_option_value("filetype", filetype, { scope = "local" })
 	vim.api.nvim_buf_set_lines(0, 0, -1, false, last_commit_content)
 
-	-- Set diff mode for both windows
-	vim.cmd("wincmd l") -- Move to the new (right) window
-	vim.cmd("diffthis")
-	vim.cmd("wincmd h") -- Move to the original (left) window
-	vim.cmd("diffthis")
-
+	diff_wins()
 	-- Restore the original state
 	vim.api.nvim_set_current_win(current_window)
 	vim.api.nvim_win_set_cursor(0, cursor_pos)
