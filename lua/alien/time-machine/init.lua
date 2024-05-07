@@ -19,8 +19,8 @@ local set_commit_highlights = function()
 	if M.time_machine_bufnr == nil then
 		return
 	end
-	local commit_hash_length = 7
-	for i = 0, vim.api.nvim_buf_line_count(M.time_machine_bufnr) - 1 do
+	local commit_hash_length = vim.api.nvim_buf_get_lines(M.time_machine_bufnr, 0, 1, false)[1]:find("%s") or 0
+	for i = 1, vim.api.nvim_buf_line_count(M.time_machine_bufnr) - 1 do
 		vim.api.nvim_buf_add_highlight(M.time_machine_bufnr, -1, "AlienTimeMachineCommit", i, 0, commit_hash_length)
 	end
 end
@@ -73,11 +73,10 @@ local mappings = {}
 
 local load_file = function()
 	local buffer_name = get_current_commit_hash()
-	local filename = get_current_file()
 	buffer.get_buffer(buffer_name, function()
 		return get_lines()
 	end, {
-		filetype = vim.fn.fnamemodify(filename, ":e"),
+		filetype = vim.filetype.match({ buf = M.viewed_file_bufnr }),
 		window = M.viewed_file_window,
 		post_switch = function()
 			set_current_line_highlight()
