@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local diff = require("alien.diff")
 
 local M = {}
 
@@ -13,8 +14,7 @@ M.git_diff_current_buffer = function()
 	local current_window = vim.api.nvim_get_current_win()
 	local file = vim.api.nvim_get_current_line()
 	local filename = file:sub(4) -- Remove the first three characters (M, A, D, etc.)
-	local filetype = vim.fn.fnamemodify(filename, ":e") -- Extract the file extension
-
+	local filetype = diff.utils.get_filetype(filename)
 	-- Read the file contents from the last commit
 	local last_commit_content = vim.fn.systemlist(commands.file_contents(filename))
 	if vim.v.shell_error ~= 0 then

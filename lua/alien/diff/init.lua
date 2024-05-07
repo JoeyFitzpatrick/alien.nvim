@@ -1,6 +1,7 @@
 local helpers = require("alien.utils.helpers")
 
 local M = {}
+M.utils = require("alien.diff.utils")
 
 M.diff_win_ids = {}
 M.close_diff = function()
