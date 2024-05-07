@@ -1,6 +1,5 @@
 local commands = require("alien.commands")
 local window = require("alien.window")
-local diff = require("alien.window.status.diff")
 local redraw_buffer = window.redraw_buffer
 local get_buffer_args = require("alien.window.status").get_buffer_args
 local map = require("alien.keymaps").map
@@ -57,6 +56,15 @@ M.set_status_buffer_keymaps = function()
 		end
 		vim.fn.system(commands.restore_file(file))
 		redraw_buffer(get_buffer_args())
+	end, "Restore file")
+	map("<enter>", function()
+		local file = window.get_file_name_from_tree()
+		if not file then
+			print("no file found")
+			return
+		end
+		window.close_tab()
+		vim.api.nvim_exec2("e " .. file.filename, {})
 	end, "Restore file")
 	set_keymaps("window")
 end
