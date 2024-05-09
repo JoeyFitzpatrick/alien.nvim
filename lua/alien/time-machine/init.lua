@@ -129,10 +129,14 @@ local set_time_machine_keymaps = function()
 	map("d", function()
 		diff.alien_diff({
 			filename = get_current_file(),
-			diff_left = vim.fn.systemlist(
-				commands.file_contents_at_commit(get_current_commit_hash(), get_current_file())
-			),
-			diff_right = M.current_file_contents,
+			diff_left = function()
+				return vim.fn.systemlist(
+					commands.file_contents_at_commit(get_current_commit_hash(), get_current_file())
+				)
+			end,
+			diff_right = function()
+				return M.current_file_contents
+			end,
 		})
 	end, "Diff with current file")
 	map("i", function()

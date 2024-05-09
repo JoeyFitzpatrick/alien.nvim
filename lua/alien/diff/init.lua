@@ -19,28 +19,24 @@ local close_diff_keymap = {
 		M.close_diff()
 	end,
 }
-M.alien_diff = function(params)
-	M.close_diff()
-	local filename = params.filename
-	local diff_left = params.diff_left
-	local diff_right = params.diff_right
-	local cursor_pos = vim.api.nvim_win_get_cursor(0)
-	local current_window = vim.api.nvim_get_current_win()
-	local filetype = vim.fn.fnamemodify(filename, ":e") -- Extract the file extension
-
+local split_bo = function()
 	local window_height = vim.api.nvim_win_get_height(0)
 	local split_height = math.floor(window_height * 0.65)
 
 	vim.cmd("bo " .. split_height .. " split")
-	buffer.get_buffer("diff-right-" .. filename, function()
-		return diff_right
-	end, { filetype = filetype, window = 0 })
+end
+M.alien_diff = function(params)
+	M.close_diff()
+	local filename = params.filename
+	local cursor_pos = vim.api.nvim_win_get_cursor(0)
+	local current_window = vim.api.nvim_get_current_win()
+
+	split_bo()
+	buffer.get_buffer("diff-right-" .. filename, params.diff_right, { window = 0 })
 	M.diff_win_ids = { vim.api.nvim_get_current_win() }
 	vim.cmd("vsplit")
 	M.diff_win_ids[2] = vim.api.nvim_get_current_win()
-	buffer.get_buffer("diff-left-" .. filename, function()
-		return diff_left
-	end, { filetype = filetype, window = 0 })
+	buffer.get_buffer("diff-left-" .. filename, params.diff_left, { window = 0 })
 
 	-- Set diff mode for both windows
 	vim.cmd("wincmd l") -- Move to the new (right) window
