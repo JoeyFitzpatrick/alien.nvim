@@ -1,5 +1,7 @@
 local commands = require("alien.commands")
 local diff = require("alien.diff")
+local buffer = require("alien.buffer")
+local helpers = require("alien.utils.helpers")
 
 local M = {}
 
@@ -30,16 +32,19 @@ M.git_diff_current_buffer = function()
 
 	local window_height = vim.api.nvim_win_get_height(0)
 	local split_height = math.floor(window_height * 0.65)
-	vim.cmd("bo " .. split_height .. " split " .. filename)
-	local filetype = vim.filetype.match({ buf = 0 })
+	vim.cmd("bo " .. split_height .. " new")
+	helpers.buf_set_temporary(vim.api.nvim_get_current_buf())
+	buffer.get_buffer("alien-status-" .. filename, function()
+		return vim.fn.systemlist("bat " .. filename)
+	end, { window = vim.api.nvim_get_current_win() })
 	M.diff_win_ids = { vim.api.nvim_get_current_win() }
 	-- Create a non-writable, non-file buffer with the file contents
 	vim.cmd("vnew")
+	helpers.buf_set_temporary(vim.api.nvim_get_current_buf())
 	M.diff_win_ids[2] = vim.api.nvim_get_current_win()
-	vim.api.nvim_set_option_value("buftype", "nofile", { scope = "local" })
-	vim.api.nvim_set_option_value("bufhidden", "wipe", { scope = "local" })
-	vim.api.nvim_set_option_value("filetype", filetype, { scope = "local" })
-	vim.api.nvim_buf_set_lines(0, 0, -1, false, last_commit_content)
+	buffer.get_buffer("alien-last-commit-" .. filename, function()
+		return last_commit_content
+	end, { window = vim.api.nvim_get_current_win() })
 
 	diff_wins()
 	-- Restore the original state

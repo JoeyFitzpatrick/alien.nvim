@@ -3,6 +3,7 @@ local branch = require("alien.window.branch")
 local helpers = require("alien.utils.helpers")
 local constants = require("alien.window.constants")
 local diff = require("alien.window.status.diff")
+local buffer = require("alien.buffer")
 
 local function to_hex(dec)
 	local hex = ""
@@ -51,6 +52,7 @@ M.close_tab = function()
 	if vim.api.nvim_get_current_tabpage() == current_tab then
 		vim.cmd("tabclose")
 	end
+	buffer.close_all()
 end
 M.open_next_buffer = function()
 	local buffer_type = vim.api.nvim_buf_get_var(0, require("alien.window.constants").ALIEN_BUFFER_TYPE)
