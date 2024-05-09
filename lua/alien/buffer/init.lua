@@ -10,6 +10,9 @@ local M = {}
 
 ---@type table<string, integer>
 local buffers = {}
+vim.keymap.set("n", "<leader>b", function()
+	print(vim.inspect(buffers))
+end)
 
 ---@param buf_name string
 ---@param get_lines function
@@ -17,10 +20,11 @@ local buffers = {}
 ---@return integer
 M.create_buffer = function(buf_name, get_lines, opts)
 	local bufnr = vim.api.nvim_create_buf(false, true)
+	print("buffer name: " .. buf_name)
 	vim.api.nvim_buf_set_name(bufnr, buf_name)
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
-	vim.api.nvim_set_option_value("buflisted", false, { buf = bufnr })
+	-- vim.api.nvim_set_option_value("buflisted", false, { buf = bufnr })
 	vim.api.nvim_set_option_value(
 		"filetype",
 		opts.filetype or require("plenary.filetype").detect_from_extension(buf_name),
@@ -32,6 +36,7 @@ M.create_buffer = function(buf_name, get_lines, opts)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 
 	buffers[buf_name] = bufnr
+	print(vim.inspect(buffers))
 	return bufnr
 end
 
@@ -42,12 +47,6 @@ end
 M.switch_to_buffer = function(bufnr, opts)
 	vim.api.nvim_set_current_win(opts.window)
 	vim.api.nvim_set_current_buf(bufnr)
-	if opts.post_switch then
-		opts.post_switch()
-	end
-	if opts.mappings then
-		require("alien.keymaps").set_buffer_keymaps(0, opts.mappings)
-	end
 end
 
 ---@param buf_name string
@@ -60,23 +59,14 @@ M.get_buffer = function(buf_name, get_lines, opts)
 		return
 	end
 
-	local bufnr = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_name(bufnr, buf_name)
-	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
-	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
-	vim.api.nvim_set_option_value("buflisted", false, { buf = bufnr })
-	vim.api.nvim_set_option_value(
-		"filetype",
-		opts.filetype or require("plenary.filetype").detect_from_extension(buf_name),
-		{ buf = bufnr }
-	)
-
-	local lines = get_lines()
-	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-
-	buffers[buf_name] = bufnr
+	local bufnr = M.create_buffer(buf_name, get_lines, opts)
 	M.switch_to_buffer(bufnr, opts)
+	if opts.post_switch then
+		opts.post_switch()
+	end
+	if opts.mappings then
+		require("alien.keymaps").set_buffer_keymaps(0, opts.mappings)
+	end
 end
 
 M.close_all = function()

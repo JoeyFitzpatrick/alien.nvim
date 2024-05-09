@@ -1,4 +1,5 @@
 local helpers = require("alien.utils.helpers")
+local buffer = require("alien.buffer")
 
 local M = {}
 M.utils = require("alien.diff.utils")
@@ -29,14 +30,17 @@ M.alien_diff = function(params)
 
 	local window_height = vim.api.nvim_win_get_height(0)
 	local split_height = math.floor(window_height * 0.65)
-	vim.cmd("bo " .. split_height .. " new")
-	vim.api.nvim_buf_set_lines(0, 0, -1, false, diff_right)
-	helpers.buf_set_temporary(0, { filetype = filetype, keymaps = { close_diff_keymap } })
+
+	vim.cmd("bo " .. split_height .. " split")
+	buffer.get_buffer("diff-right-" .. filename, function()
+		return diff_right
+	end, { filetype = filetype, window = 0 })
 	M.diff_win_ids = { vim.api.nvim_get_current_win() }
-	vim.cmd("vnew")
+	vim.cmd("vsplit")
 	M.diff_win_ids[2] = vim.api.nvim_get_current_win()
-	vim.api.nvim_buf_set_lines(0, 0, -1, false, diff_left)
-	helpers.buf_set_temporary(0, { filetype = filetype, keymaps = { close_diff_keymap } })
+	buffer.get_buffer("diff-left-" .. filename, function()
+		return diff_left
+	end, { filetype = filetype, window = 0 })
 
 	-- Set diff mode for both windows
 	vim.cmd("wincmd l") -- Move to the new (right) window
