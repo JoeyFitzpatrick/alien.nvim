@@ -57,6 +57,13 @@ local get_current_commit_hash = function()
 	return commit_hash
 end
 
+local get_commit_hash_at_line = function()
+	vim.api.nvim_set_current_buf(M.time_machine_bufnr)
+	local line = vim.api.nvim_get_current_line()
+	local commit_hash = line:gmatch("%S+")()
+	return commit_hash
+end
+
 local get_lines = function()
 	local commit_hash = get_current_commit_hash()
 	local lines = {}
@@ -128,10 +135,10 @@ local set_time_machine_keymaps = function()
 	end, "Open commit in GitHub")
 	map("d", function()
 		diff.alien_diff({
-			filename = get_current_file(),
+			filename = get_commit_hash_at_line() .. "-" .. get_current_file(),
 			diff_left = function()
 				return vim.fn.systemlist(
-					commands.file_contents_at_commit(get_current_commit_hash(), get_current_file())
+					commands.file_contents_at_commit(get_commit_hash_at_line(), get_current_file())
 				)
 			end,
 			diff_right = function()

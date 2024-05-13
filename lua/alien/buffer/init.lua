@@ -10,9 +10,6 @@ local M = {}
 
 ---@type table<string, integer>
 local buffers = {}
-vim.keymap.set("n", "<leader>b", function()
-	print(vim.inspect(buffers))
-end)
 
 ---@param buf_name string
 ---@param get_lines function
@@ -20,7 +17,6 @@ end)
 ---@return integer
 M.create_buffer = function(buf_name, get_lines, opts)
 	local bufnr = vim.api.nvim_create_buf(false, true)
-	print("buffer name: " .. buf_name)
 	vim.api.nvim_buf_set_name(bufnr, buf_name)
 	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
 	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
@@ -36,7 +32,6 @@ M.create_buffer = function(buf_name, get_lines, opts)
 	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 
 	buffers[buf_name] = bufnr
-	print(vim.inspect(buffers))
 	return bufnr
 end
 
