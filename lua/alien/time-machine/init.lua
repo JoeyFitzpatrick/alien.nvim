@@ -58,6 +58,7 @@ local get_current_commit_hash = function()
 end
 
 local get_commit_hash_at_line = function()
+	-- TODO: figure out why setting the current buffer is necessary
 	vim.api.nvim_set_current_buf(M.time_machine_bufnr)
 	local line = vim.api.nvim_get_current_line()
 	local commit_hash = line:gmatch("%S+")()
