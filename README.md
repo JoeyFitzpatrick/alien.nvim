@@ -34,3 +34,8 @@ You will probably also want to set up a keymap to call some of the commands:
 		require("alien").status()
     end, { desc = "Alien Status" })
 ```
+
+## Dependencies
+
+### Optional
+[Delta](https://github.com/dandavison/delta) - improved git diff output
