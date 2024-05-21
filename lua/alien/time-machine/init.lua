@@ -135,7 +135,7 @@ local set_time_machine_keymaps = function()
 		vim.fn.system(commands.open_commit_in_github(get_current_commit_hash()))
 	end, "Open commit in GitHub")
 	map("d", function()
-		diff.alien_diff({
+		diff.alien_diff_2({
 			filename = get_commit_hash_at_line() .. "-" .. get_current_file(),
 			diff_left = function()
 				return vim.fn.systemlist(

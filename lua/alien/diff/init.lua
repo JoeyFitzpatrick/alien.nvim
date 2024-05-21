@@ -25,7 +25,7 @@ local split_bo = function()
 
 	vim.cmd("bo " .. split_height .. " split")
 end
-M.alien_diff = function(params)
+M.alien_diff_2 = function(params)
 	M.close_diff()
 	local filename = params.filename
 	local cursor_pos = vim.api.nvim_win_get_cursor(0)
@@ -43,6 +43,23 @@ M.alien_diff = function(params)
 	vim.cmd("diffthis")
 	vim.cmd("wincmd h") -- Move to the original (left) window
 	vim.cmd("diffthis")
+
+	-- Restore the original state
+	vim.api.nvim_set_current_win(current_window)
+	vim.api.nvim_win_set_cursor(0, cursor_pos)
+end
+
+M.alien_diff_1 = function(params)
+	M.close_diff()
+	local cursor_pos = vim.api.nvim_win_get_cursor(0)
+	local current_window = vim.api.nvim_get_current_win()
+
+	local window_width = vim.api.nvim_win_get_width(0)
+	local split_width = math.floor(window_width * 0.65)
+	vim.cmd("bo " .. split_width .. " vsplit")
+
+	buffer.get_shell_buffer(params.cmd, { window = 0 })
+	M.diff_win_ids = { vim.api.nvim_get_current_win() }
 
 	-- Restore the original state
 	vim.api.nvim_set_current_win(current_window)
