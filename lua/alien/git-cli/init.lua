@@ -115,8 +115,4 @@ M.open_commit_in_github = function(commit_hash)
 	return "gh browse " .. commit_hash
 end
 
-M.diff_file = function(filename)
-	return "git diff -- '" .. filename .. "'"
-end
-
 return M

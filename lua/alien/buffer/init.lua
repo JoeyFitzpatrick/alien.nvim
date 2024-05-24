@@ -40,8 +40,16 @@ M.create_shell_buffer = function(cmd, opts)
 	local buf_name = create_shell_buf_name(cmd)
 	vim.api.nvim_buf_set_name(bufnr, buf_name)
 	vim.api.nvim_buf_call(bufnr, function()
-		vim.fn.termopen(cmd)
+		vim.fn.termopen(cmd, {
+			on_exit = function()
+				vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+				vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
+			end,
+		})
 	end)
+	if opts.callback then
+		opts.callback(bufnr)
+	end
 	buffers[buf_name] = bufnr
 	return bufnr
 end
