@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local git_cli = require("alien.git-cli")
 local window_constants = require("alien.window.constants")
 local STATUSES = require("alien.window.status.constants").STATUSES
 local diff = require("alien.window.status.diff")
@@ -92,8 +93,8 @@ end
 
 M.get_push_pull_string = function()
 	local push_pull_string = " "
-	local num_commits_to_pull = commands.num_commits("pull")
-	local num_commits_to_push = commands.num_commits("push")
+	local num_commits_to_pull = git_cli.num_commits("pull")
+	local num_commits_to_push = git_cli.num_commits("push")
 	if num_commits_to_pull ~= "0" then
 		push_pull_string = push_pull_string .. "↓" .. num_commits_to_pull
 	end

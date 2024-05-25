@@ -55,7 +55,7 @@ M.set_status_buffer_keymaps = function()
 			print("no file found")
 			return
 		end
-		vim.fn.system(commands.restore_file(file))
+		git_cli.restore_file(file)
 		redraw_buffer(get_buffer_args())
 	end, "Restore file")
 	map("<enter>", function()

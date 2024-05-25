@@ -68,9 +68,9 @@ end
 
 M.restore_file = function(file)
 	if file.status == STATUSES.UNTRACKED then
-		return run_cmd("git clean -f -- " .. file.filename)
+		return run_cmd("git clean -f -- " .. file.filename)()
 	end
-	return run_cmd("git restore -- " .. file.filename)
+	return run_cmd("git restore -- " .. file.filename)()
 end
 
 M.num_commits = function(pull_or_push)
