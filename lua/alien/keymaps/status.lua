@@ -19,7 +19,7 @@ M.set_status_buffer_keymaps = function()
 			return
 		end
 
-		vim.fn.system(commands.stage_or_unstage_file(file.status, file.filename))
+		git_cli.stage_or_unstage_file(file.status, file.filename)
 		redraw_buffer(get_buffer_args())
 	end, "Stage/unstage file")
 	map("p", function()
@@ -44,7 +44,7 @@ M.set_status_buffer_keymaps = function()
 
 	map("c", function()
 		vim.ui.input({ prompt = "Commit message: " }, function(input)
-			local result = "git commit: \n" .. vim.fn.system(commands.commit(input))
+			local result = "git commit: \n" .. git_cli.commit(input)
 			vim.notify(result)
 		end)
 		redraw_buffer(get_buffer_args())

@@ -18,7 +18,7 @@ local function run_cmd(command, output_mode)
 		if vim.v.shell_error == 0 then
 			return output
 		end
-		vim.notify(vim.v.shell_error, vim.log.levels.ERROR)
+		vim.notify("Error " .. tostring(vim.v.shell_error) .. " while running " .. command, vim.log.levels.ERROR)
 		return output_mode == "multiline" and { "" } or ""
 	end
 end
@@ -52,18 +52,18 @@ end
 
 M.stage_or_unstage_file = function(status, filename)
 	if status:sub(1, 1) == " " and status:sub(2, 2) ~= " " or status == STATUSES.UNTRACKED then
-		return run_cmd("git add -- " .. filename)
+		return run_cmd("git add -- " .. filename)()
 	else
-		return run_cmd("git reset HEAD -- " .. filename)
+		return run_cmd("git reset HEAD -- " .. filename)()
 	end
 end
 
 M.commit = function(message)
-	return run_cmd('git commit -m "' .. message .. '"')
+	return run_cmd('git commit -m "' .. message .. '"')()
 end
 
 M.file_contents = function(filename)
-	return run_cmd("git show HEAD:" .. filename, "multiline")
+	return run_cmd("git show HEAD:" .. filename, "multiline")()
 end
 
 M.restore_file = function(file)
