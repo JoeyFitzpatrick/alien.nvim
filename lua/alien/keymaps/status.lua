@@ -30,7 +30,7 @@ M.set_status_buffer_keymaps = function()
 	map("P", function()
 		local result = vim.fn.system(commands.push)
 		if result:find("fatal: The current branch fake has no upstream branch.") then
-			result = vim.fn.system(commands.push_branch_upstream())
+			result = git_cli.push_branch_upstream()
 		end
 		vim.notify(result)
 		redraw_buffer(get_buffer_args())

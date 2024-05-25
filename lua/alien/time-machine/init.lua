@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local git_cli = require("alien.git-cli")
 local diff = require("alien.diff")
 local buffer = require("alien.buffer")
 local floating_window = require("alien.window.floating-window")
@@ -71,7 +72,7 @@ local get_lines = function()
 	if commit_hash == CURRENT_CHANGES:gmatch("%S+")() then
 		lines = M.current_file_contents
 	else
-		lines = vim.fn.systemlist(commands.file_contents_at_commit(commit_hash, get_current_file()))
+		lines = git_cli.file_contents_at_commit(commit_hash, get_current_file())
 	end
 	return lines
 end
@@ -132,15 +133,13 @@ local set_time_machine_keymaps = function()
 	map("<c-n>", time_machine_prev, "Next commit")
 	map("q", M.close_time_machine, "Close time machine")
 	map("o", function()
-		vim.fn.system(commands.open_commit_in_github(get_current_commit_hash()))
+		git_cli.open_commit_in_github(get_current_commit_hash())
 	end, "Open commit in GitHub")
 	map("d", function()
 		diff.alien_diff({
 			filename = get_commit_hash_at_line() .. "-" .. get_current_file(),
 			diff_left = function()
-				return vim.fn.systemlist(
-					commands.file_contents_at_commit(get_commit_hash_at_line(), get_current_file())
-				)
+				return git_cli.file_contents_at_commit(get_commit_hash_at_line(), get_current_file())
 			end,
 			diff_right = function()
 				return M.current_file_contents
@@ -148,7 +147,7 @@ local set_time_machine_keymaps = function()
 		})
 	end, "Diff with current file")
 	map("i", function()
-		local lines = vim.fn.systemlist(commands.commit_metadata(get_current_commit_hash()))
+		local lines = git_cli.commit_metadata(get_current_commit_hash())
 		local post_render_callback = function(bufnr)
 			local first_word_length = function(line)
 				return string.find(line, "%s") or #line
@@ -182,7 +181,7 @@ end
 
 local load_time_machine_lines = function()
 	local relative_filename = get_current_file()
-	local commits = vim.fn.systemlist(commands.all_commits_for_file(relative_filename))
+	local commits = git_cli.all_commits_for_file(relative_filename)
 	if vim.v.shell_error ~= 0 then
 		commits = { "Error: no commits found" }
 	end

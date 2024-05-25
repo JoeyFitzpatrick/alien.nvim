@@ -90,30 +90,30 @@ M.num_commits = function(pull_or_push)
 end
 
 M.checkout_branch = function(branch)
-	return run_cmd("git switch " .. branch)
+	return run_cmd("git switch " .. branch)()
 end
 
 M.new_branch = function(existing_branch, new_branch)
-	return run_cmd("git switch --create " .. new_branch .. " " .. existing_branch)
+	return run_cmd("git switch --create " .. new_branch .. " " .. existing_branch)()
 end
 
 M.delete_remote_branch = function(branch)
-	return run_cmd("git push origin --delete " .. branch)
+	return run_cmd("git push origin --delete " .. branch)()
 end
 
 M.delete_local_branch = function(branch)
-	return run_cmd("git branch --delete " .. branch)
+	return run_cmd("git branch --delete " .. branch)()
 end
 
 M.push_branch_upstream = function()
 	local current_branch = M.current_branch()
 	--TODO: get the remote programatically
 	local current_remote = "origin"
-	return "git push --set-upstream " .. current_remote .. " " .. current_branch
+	return run_cmd("git push --set-upstream " .. current_remote .. " " .. current_branch)()
 end
 
 M.staged_stats = function()
-	local stats = vim.fn.systemlist("git diff --staged --shortstat")[1]
+	local stats = run_cmd("git diff --staged --shortstat", "multiline")()[1]
 	if not stats then
 		return "No staged changes"
 	end
@@ -121,19 +121,19 @@ M.staged_stats = function()
 end
 
 M.all_commits_for_file = function(filename)
-	return run_cmd("git log --oneline -- " .. filename, "multiline")
+	return run_cmd("git log --oneline -- " .. filename, "multiline")()
 end
 
 M.file_contents_at_commit = function(commit, filename)
-	return run_cmd("git show " .. commit .. ":" .. filename, "multiline")
+	return run_cmd("git show " .. commit .. ":" .. filename, "multiline")()
 end
 
 M.commit_metadata = function(commit)
-	return run_cmd("git show --no-patch " .. DATE_FORMAT .. " " .. commit, "multiline")
+	return run_cmd("git show --no-patch " .. DATE_FORMAT .. " " .. commit, "multiline")()
 end
 
 M.open_commit_in_github = function(commit_hash)
-	return run_cmd("gh browse " .. commit_hash)
+	return run_cmd("gh browse " .. commit_hash)()
 end
 
 return M
