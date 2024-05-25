@@ -1,4 +1,5 @@
 local commands = require("alien.commands")
+local git_cli = require("alien.git-cli")
 local window = require("alien.window")
 local redraw_buffer = window.redraw_buffer
 local get_buffer_args = require("alien.window.status").get_buffer_args
@@ -8,7 +9,7 @@ local set_keymaps = require("alien.keymaps").set_keymaps
 local M = {}
 M.set_status_buffer_keymaps = function()
 	map("a", function()
-		vim.fn.system(commands.stage_or_unstage_all())
+		git_cli.stage_or_unstage_all()
 		redraw_buffer(get_buffer_args())
 	end, "Stage all")
 	map("s", function()
