@@ -1,4 +1,3 @@
-local commands = require("alien.commands")
 local git_cli = require("alien.git-cli")
 local diff = require("alien.diff")
 local buffer = require("alien.buffer")

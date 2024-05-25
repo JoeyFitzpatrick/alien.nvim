@@ -13,7 +13,7 @@ local function run_cmd(command, output_mode)
 		if output_mode == "multiline" then
 			output = vim.fn.systemlist(command)
 		else
-			output = vim.fn.system(command)
+			output = vim.fn.system(command):gsub("\n$", "")
 		end
 		if vim.v.shell_error == 0 then
 			return output

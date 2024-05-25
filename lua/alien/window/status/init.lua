@@ -1,4 +1,3 @@
-local commands = require("alien.commands")
 local git_cli = require("alien.git-cli")
 local window_constants = require("alien.window.constants")
 local STATUSES = require("alien.window.status.constants").STATUSES
@@ -64,10 +63,10 @@ M.set_buffer_colors = function()
 end
 
 M.get_buffer_args = function()
-	local lines = vim.fn.systemlist(commands.status)
+	local lines = git_cli.status()
 	local buffer_type = window_constants.BUFFER_TYPES.STATUS
 
-	local current_branch = vim.fn.systemlist(commands.current_branch)[1] .. M.get_push_pull_string()
+	local current_branch = git_cli.current_branch() .. M.get_push_pull_string()
 	table.insert(lines, 1, git_cli.staged_stats())
 	table.insert(lines, 1, "Head:   " .. current_branch)
 	table.insert(lines, 1, window_constants.BUFFER_TYPE_STRING[buffer_type])

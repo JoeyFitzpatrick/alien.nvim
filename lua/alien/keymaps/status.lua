@@ -1,4 +1,3 @@
-local commands = require("alien.commands")
 local git_cli = require("alien.git-cli")
 local window = require("alien.window")
 local redraw_buffer = window.redraw_buffer
@@ -23,12 +22,12 @@ M.set_status_buffer_keymaps = function()
 		redraw_buffer(get_buffer_args())
 	end, "Stage/unstage file")
 	map("p", function()
-		local result = "git pull: \n" .. vim.fn.system(commands.pull)
+		local result = "git pull: \n" .. git_cli.pull()
 		vim.notify(result)
 		redraw_buffer(get_buffer_args())
 	end, "Pull")
 	map("P", function()
-		local result = vim.fn.system(commands.push)
+		local result = git_cli.push()
 		if result:find("fatal: The current branch fake has no upstream branch.") then
 			result = git_cli.push_branch_upstream()
 		end
@@ -37,7 +36,7 @@ M.set_status_buffer_keymaps = function()
 	end, "Push")
 
 	map("<leader>P", function()
-		local result = "git force push: \n" .. vim.fn.system(commands.force_push)
+		local result = "git force push: \n" .. git_cli.force_push()
 		vim.notify(result)
 		redraw_buffer(get_buffer_args())
 	end, "Force push")

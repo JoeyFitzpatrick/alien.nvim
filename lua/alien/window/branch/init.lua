@@ -1,4 +1,3 @@
-local commands = require("alien.commands")
 local git_cli = require("alien.git-cli")
 local window_constants = require("alien.window.constants")
 local helpers = require("alien.utils.helpers")
@@ -27,7 +26,7 @@ M.set_buffer_colors = function()
 end
 
 M.get_buffer_args = function()
-	local lines = vim.fn.systemlist(commands.local_branches)
+	local lines = git_cli.local_branches()
 	local buffer_type = window_constants.BUFFER_TYPES.BRANCHES
 	table.insert(lines, 1, window_constants.BUFFER_TYPE_STRING[buffer_type])
 	local set_lines = function()
@@ -58,7 +57,7 @@ M.display_branch_picker = function(opts)
 		.new(opts, {
 			prompt_title = "git branches",
 			finder = finders.new_table({
-				results = vim.fn.systemlist(commands.all_branches),
+				results = git_cli.all_branches(),
 			}),
 			sorter = conf.generic_sorter(opts),
 			attach_mappings = function(prompt_bufnr)
