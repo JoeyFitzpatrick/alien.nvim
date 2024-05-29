@@ -84,7 +84,7 @@ M.get_buffer_args = function()
 		set_lines = set_lines,
 		cursor_pos = cursor_pos,
 		post_open_hook = post_open_hook,
-		set_keymaps = require("alien.keymaps.status").set_status_buffer_keymaps,
+		set_keymaps = require("alien.window.status.keymaps").set_status_buffer_keymaps,
 		set_colors = M.set_buffer_colors,
 	}
 end

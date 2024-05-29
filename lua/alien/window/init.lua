@@ -1,6 +1,6 @@
 local status = require("alien.window.status")
 local branch = require("alien.window.branch")
-local helpers = require("alien.utils.helpers")
+local helpers = require("alien.helpers")
 local constants = require("alien.window.constants")
 local diff = require("alien.window.status.diff")
 local buffer = require("alien.buffer")

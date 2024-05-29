@@ -1,6 +1,6 @@
 local git_cli = require("alien.git-cli")
 local window_constants = require("alien.window.constants")
-local helpers = require("alien.utils.helpers")
+local helpers = require("alien.helpers")
 
 local FIRST_BRANCH_LINE_NUMBER = 2
 
@@ -36,7 +36,7 @@ M.get_buffer_args = function()
 		buffer_type = require("alien.window.constants").BUFFER_TYPES.BRANCHES,
 		set_lines = set_lines,
 		cursor_pos = { FIRST_BRANCH_LINE_NUMBER, 0 },
-		set_keymaps = require("alien.keymaps.branch").branch_buffer_keymaps,
+		set_keymaps = require("alien.window.branch.keymaps").branch_buffer_keymaps,
 		set_colors = M.set_buffer_colors,
 	}
 end

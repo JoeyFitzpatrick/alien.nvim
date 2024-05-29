@@ -1,6 +1,6 @@
 local window = require("alien.window")
 local floating_window = require("alien.window.floating-window")
-local helpers = require("alien.utils.helpers")
+local helpers = require("alien.helpers")
 
 local M = {}
 
