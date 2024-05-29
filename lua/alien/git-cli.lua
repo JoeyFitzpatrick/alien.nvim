@@ -6,7 +6,7 @@ local DATE_FORMAT = "--date=format-local:'%A, %Y/%m/%d, %I:%M %p'" -- current us
 --- Returns the output as a single string, unless output_mode is "multiline", in which case it is returned as a list of strings.
 ---@param command string
 ---@param output_mode "singleline" | "multiline" | nil
----@return fun(): string | fun(): string[]
+---@return (fun(): string) | (fun(): string[])
 local function run_cmd(command, output_mode)
 	return function()
 		local output = nil
@@ -42,6 +42,9 @@ M.all_branches = run_cmd(
 
 M.stage_or_unstage_all = function()
 	local status = M.status()
+	if type(status) ~= "table" then
+		return
+	end
 	for _, line in ipairs(status) do
 		if line:sub(1, 1) == " " and line:sub(2, 2) ~= " " then
 			return M.stage_all()

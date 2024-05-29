@@ -1,4 +1,3 @@
-local TERM_PREFIX = "term://"
 local create_shell_buf_name = function(cmd)
 	return cmd
 	-- return TERM_PREFIX .. cmd

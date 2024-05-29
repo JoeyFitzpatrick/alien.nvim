@@ -1,6 +1,7 @@
 local git_cli = require("alien.git-cli")
 local window_constants = require("alien.window.constants")
 local helpers = require("alien.helpers")
+local notify = require("alien.notify").notify
 
 local FIRST_BRANCH_LINE_NUMBER = 2
 
@@ -27,6 +28,9 @@ end
 
 M.get_buffer_args = function()
 	local lines = git_cli.local_branches()
+	if type(lines) ~= "table" then
+		return
+	end
 	local buffer_type = window_constants.BUFFER_TYPES.BRANCHES
 	table.insert(lines, 1, window_constants.BUFFER_TYPE_STRING[buffer_type])
 	local set_lines = function()
@@ -65,7 +69,7 @@ M.display_branch_picker = function(opts)
 					actions.close(prompt_bufnr)
 					local branch_name = action_state.get_selected_entry()[1]
 					local result = git_cli.checkout_branch(branch_name)
-					vim.notify(result)
+					notify(result)
 					require("alien.window").redraw_buffer(M.get_buffer_args())
 					helpers.reload_named_buffers()
 				end)

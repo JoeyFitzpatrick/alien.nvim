@@ -4,6 +4,7 @@ local redraw_buffer = window.redraw_buffer
 local get_buffer_args = require("alien.window.status").get_buffer_args
 local map = require("alien.keymaps").map
 local set_keymaps = require("alien.keymaps").set_keymaps
+local notify = require("alien.notify").notify
 
 local M = {}
 M.set_status_buffer_keymaps = function()
@@ -23,7 +24,7 @@ M.set_status_buffer_keymaps = function()
 	end, "Stage/unstage file")
 	map("p", function()
 		local result = "git pull: \n" .. git_cli.pull()
-		vim.notify(result)
+		notify(result)
 		redraw_buffer(get_buffer_args())
 	end, "Pull")
 	map("P", function()
@@ -31,20 +32,20 @@ M.set_status_buffer_keymaps = function()
 		if result:find("fatal: The current branch fake has no upstream branch.") then
 			result = git_cli.push_branch_upstream()
 		end
-		vim.notify(result)
+		notify(result)
 		redraw_buffer(get_buffer_args())
 	end, "Push")
 
 	map("<leader>P", function()
 		local result = "git force push: \n" .. git_cli.force_push()
-		vim.notify(result)
+		notify(result)
 		redraw_buffer(get_buffer_args())
 	end, "Force push")
 
 	map("c", function()
 		vim.ui.input({ prompt = "Commit message: " }, function(input)
 			local result = "git commit: \n" .. git_cli.commit(input)
-			vim.notify(result)
+			notify(result)
 		end)
 		redraw_buffer(get_buffer_args())
 	end, "Commit")
