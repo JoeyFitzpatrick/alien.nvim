@@ -7,13 +7,10 @@ local M = {}
 
 ---@type table<string, integer>
 local buffers = {}
-vim.keymap.set("n", "<leader>b", function()
-	print(vim.inspect(buffers))
-end)
 
 ---@param buf_name string
 ---@param get_lines function
----@param opts { filetype: string | nil, window: integer, post_switch: function | nil, mappings: table | nil, terminal: boolean | nil}
+---@param opts { filetype: string | nil, window: integer, post_switch: function | nil, highlight: function | nil, mappings: table | nil, terminal: boolean | nil}
 ---@return integer
 M.create_buffer = function(buf_name, get_lines, opts)
 	local bufnr = vim.api.nvim_create_buf(false, true)
@@ -28,6 +25,11 @@ M.create_buffer = function(buf_name, get_lines, opts)
 
 	local lines = get_lines()
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+	if opts.highlight then
+		opts.highlight(bufnr)
+	end
+	if not opts.highlight then
+	end
 	vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 
 	buffers[buf_name] = bufnr
@@ -64,7 +66,7 @@ end
 
 ---@param buf_name string
 ---@param get_lines function
----@param opts { filetype: string | nil, window: integer, post_switch: function | nil, mappings: table | nil, terminal: boolean | nil}
+---@param opts { filetype: string | nil, window: integer, post_switch: function | nil, highlight: function | nil, mappings: table | nil, terminal: boolean | nil}
 ---@return nil
 M.get_buffer = function(buf_name, get_lines, opts)
 	if buffers[buf_name] then

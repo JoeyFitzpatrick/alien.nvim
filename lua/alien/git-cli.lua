@@ -6,8 +6,9 @@ local DATE_FORMAT = "--date=format-local:'%A, %Y/%m/%d, %I:%M %p'" -- current us
 --- Returns the output as a single string, unless output_mode is "multiline", in which case it is returned as a list of strings.
 ---@param command string
 ---@param output_mode "singleline" | "multiline" | nil
+---@param err_handles { error_code: number, return_output: boolean } | nil
 ---@return (fun(): string) | (fun(): string[])
-local function run_cmd(command, output_mode)
+local function run_cmd(command, output_mode, err_handles)
 	return function()
 		local output = nil
 		if output_mode == "multiline" then
@@ -18,8 +19,14 @@ local function run_cmd(command, output_mode)
 		if vim.v.shell_error == 0 then
 			return output
 		end
+		local default_output = output_mode == "multiline" and { "" } or ""
+		if err_handles then
+			if err_handles.error_code == vim.v.shell_error then
+				return err_handles.return_output and output or default_output
+			end
+		end
 		vim.notify("Error " .. tostring(vim.v.shell_error) .. " while running " .. command, vim.log.levels.ERROR)
-		return output_mode == "multiline" and { "" } or ""
+		return default_output
 	end
 end
 
@@ -137,6 +144,22 @@ end
 
 M.open_commit_in_github = function(commit_hash)
 	return run_cmd("gh browse " .. commit_hash)()
+end
+
+--- Get the diff for a file. Also handles untracked files.
+---@param filename string
+---@param status string
+---@return fun(): string[] | fun(): string
+M.diff = function(filename, status)
+	-- note that we are returning the function itself, not the result of the function
+	if status == STATUSES.UNTRACKED then
+		return run_cmd(
+			"git diff --no-index /dev/null " .. filename,
+			"multiline",
+			{ error_code = 1, return_output = true }
+		)
+	end
+	return run_cmd("git diff " .. filename, "multiline", { error_code = 128, return_output = false })
 end
 
 return M

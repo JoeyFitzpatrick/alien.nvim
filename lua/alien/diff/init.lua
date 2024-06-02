@@ -1,7 +1,7 @@
 local buffer = require("alien.buffer")
 
 local M = {}
-M.utils = require("alien.diff.utils")
+M.highlight = require("alien.diff.highlight")
 
 M.diff_win_ids = {}
 M.close_diff = function()
@@ -11,11 +11,35 @@ M.close_diff = function()
 		end
 	end
 end
-local split_bo = function()
+
+local split_horizontal = function()
 	local window_height = vim.api.nvim_win_get_height(0)
 	local split_height = math.floor(window_height * 0.65)
 
 	vim.cmd("bo " .. split_height .. " split")
+end
+
+local split_vertical = function()
+	local window_width = vim.api.nvim_win_get_width(0)
+	local split_width = math.floor(window_width * 0.65)
+
+	vim.cmd("bo " .. split_width .. " vsplit")
+end
+---
+---@param filename string
+---@param diff_fn fun(): string[]
+M.alien_diff_new = function(filename, diff_fn)
+	M.close_diff()
+	local cursor_pos = vim.api.nvim_win_get_cursor(0)
+	local current_window = vim.api.nvim_get_current_win()
+
+	split_vertical()
+	M.diff_win_ids = { vim.api.nvim_get_current_win() }
+	buffer.get_buffer("diff-" .. filename, diff_fn, { window = 0, highlight = M.highlight.highight_diff_output })
+
+	-- Restore the original state
+	vim.api.nvim_set_current_win(current_window)
+	vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 M.alien_diff = function(params)
 	M.close_diff()
@@ -23,7 +47,7 @@ M.alien_diff = function(params)
 	local cursor_pos = vim.api.nvim_win_get_cursor(0)
 	local current_window = vim.api.nvim_get_current_win()
 
-	split_bo()
+	split_horizontal()
 	buffer.get_buffer("diff-right-" .. filename, params.diff_right, { window = 0 })
 	M.diff_win_ids = { vim.api.nvim_get_current_win() }
 	vim.cmd("vsplit")
