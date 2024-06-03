@@ -30,15 +30,6 @@ M.buf_set_temporary = function(bufnr, opts)
 		end
 	end
 end
---- Get the width of the current tab
----@return number
-M.get_tab_width = function()
-	local width = 0
-	for _, win_id in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-		width = width + vim.api.nvim_win_get_width(win_id)
-	end
-	return width
-end
 M.copy = function(obj, seen)
 	if type(obj) ~= "table" then
 		return obj

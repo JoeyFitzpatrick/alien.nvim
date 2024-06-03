@@ -1,4 +1,5 @@
 local constants = require("alien.window.status.constants")
+local notify = require("alien.notify")
 local STATUSES = constants.STATUSES
 local DATE_FORMAT = "--date=format-local:'%A, %Y/%m/%d, %I:%M %p'" -- current user's timezone
 
@@ -25,7 +26,15 @@ local function run_cmd(command, output_mode, err_handles)
 				return err_handles.return_output and output or default_output
 			end
 		end
-		vim.notify("Error " .. tostring(vim.v.shell_error) .. " while running " .. command, vim.log.levels.ERROR)
+		if type(output) == "string" then
+			output = { output }
+		end
+		table.insert(output, 1, "Error " .. tostring(vim.v.shell_error) .. " while running " .. command)
+		local error_output = {}
+		for _, line in ipairs(output) do
+			error_output[#error_output + 1] = line:gsub("\n", "")
+		end
+		notify.notify_error(error_output)
 		return default_output
 	end
 end
