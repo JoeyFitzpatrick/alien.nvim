@@ -1,5 +1,4 @@
 local buffer = require("alien.buffer")
-local helpers = require("alien.helpers")
 
 local M = {}
 M.highlight = require("alien.diff.highlight")
@@ -21,7 +20,7 @@ local split_horizontal = function()
 end
 
 local split_vertical = function()
-	local window_width = helpers.get_tab_width()
+	local window_width = vim.o.columns
 	local split_width = math.floor(window_width * 0.65)
 
 	vim.cmd("bo " .. split_width .. " vsplit")
