@@ -8,7 +8,7 @@ M.git_diff_current_buffer = function()
 	local file = vim.api.nvim_get_current_line()
 	local status = file:sub(1, 2)
 	local filename = file:sub(4) -- Remove the first three characters (M, A, D, etc.)
-	diff.alien_diff_new(filename, git_cli.diff(filename, status))
+	diff.alien_diff(filename, git_cli.diff(filename, status))
 end
 
 return M

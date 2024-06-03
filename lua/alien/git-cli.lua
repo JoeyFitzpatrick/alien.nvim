@@ -134,10 +134,6 @@ M.all_commits_for_file = function(filename)
 	return run_cmd("git log --oneline -- " .. filename, "multiline")()
 end
 
-M.file_contents_at_commit = function(commit, filename)
-	return run_cmd("git show " .. commit .. ":" .. filename, "multiline")()
-end
-
 M.commit_metadata = function(commit)
 	return run_cmd("git show --no-patch " .. DATE_FORMAT .. " " .. commit, "multiline")()
 end
@@ -160,6 +156,11 @@ M.diff = function(filename, status)
 		)
 	end
 	return run_cmd("git diff " .. filename, "multiline", { error_code = 128, return_output = false })
+end
+
+---@return fun(): string[]
+M.diff_from_commit = function(filename, commit)
+	return run_cmd("git diff " .. commit .. " -- " .. filename, "multiline")
 end
 
 return M

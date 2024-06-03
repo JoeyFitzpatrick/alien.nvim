@@ -71,7 +71,7 @@ local get_lines = function()
 	if commit_hash == CURRENT_CHANGES:gmatch("%S+")() then
 		lines = M.current_file_contents
 	else
-		lines = git_cli.file_contents_at_commit(commit_hash, get_current_file())
+		lines = git_cli.diff_from_commit(get_current_file(), commit_hash)()
 	end
 	return lines
 end
@@ -135,15 +135,10 @@ local set_time_machine_keymaps = function()
 		git_cli.open_commit_in_github(get_current_commit_hash())
 	end, "Open commit in GitHub")
 	map("d", function()
-		diff.alien_diff({
-			filename = get_commit_hash_at_line() .. "-" .. get_current_file(),
-			diff_left = function()
-				return git_cli.file_contents_at_commit(get_commit_hash_at_line(), get_current_file())
-			end,
-			diff_right = function()
-				return M.current_file_contents
-			end,
-		})
+		diff.alien_diff(
+			get_commit_hash_at_line() .. "-" .. get_current_file(),
+			git_cli.diff_from_commit(get_current_file(), get_commit_hash_at_line())
+		)
 	end, "Diff with current file")
 	map("i", function()
 		local lines = git_cli.commit_metadata(get_current_commit_hash())
