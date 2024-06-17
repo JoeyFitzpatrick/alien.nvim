@@ -38,4 +38,8 @@ M.buffer = function()
 	})
 end
 
+M.terminal = function()
+	require("alien.elements").terminal("ls -a")
+end
+
 return M

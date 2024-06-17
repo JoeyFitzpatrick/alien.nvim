@@ -78,4 +78,25 @@ M.buffer = function(action, opts)
 	return bufnr
 end
 
+--- Run a command in a new terminal
+---@param cmd string
+---@param opts vim.api.keyset.win_config | nil
+---@return number
+M.terminal = function(cmd, opts)
+	---@type vim.api.keyset.win_config
+	local default_terminal_opts = { split = "right" }
+	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts or {})
+	local bufnr = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_open_win(bufnr, true, terminal_opts)
+	vim.api.nvim_buf_call(bufnr, function()
+		vim.fn.termopen(cmd, {
+			on_exit = function()
+				vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+				vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
+			end,
+		})
+	end)
+	return bufnr
+end
+
 return M
