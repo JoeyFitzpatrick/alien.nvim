@@ -1,14 +1,15 @@
+local keymaps = require("alien.keymaps")
+
 local M = {}
 
----@alias Object "commit" | "local_file" | "commit_file" | nil
----@alias Action { get: fun(): string[], object_type: Object }
-
----@param get fun(): string[]
+---@param action Action
 ---@return number
-local function create(get)
-	local lines = get()
+local function create(action)
+	local result = action()
+	local lines = result.output
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+	keymaps.set_keymaps(bufnr, result.object_type)
 	return bufnr
 end
 
@@ -32,7 +33,7 @@ M.float = function(action, opts)
 		style = "minimal",
 	}
 	local float_opts = vim.tbl_extend("force", default_float_opts, opts or {})
-	local bufnr = create(action.get)
+	local bufnr = create(action)
 	vim.api.nvim_open_win(bufnr, true, float_opts)
 	return bufnr
 end
@@ -47,7 +48,7 @@ M.split = function(action, opts)
 		split = "right",
 	}
 	local float_opts = vim.tbl_extend("force", default_split_opts, opts or {})
-	local bufnr = create(action.get)
+	local bufnr = create(action)
 	vim.api.nvim_open_win(bufnr, true, float_opts)
 	return bufnr
 end
@@ -58,8 +59,8 @@ end
 ---@return number
 M.tab = function(action, opts)
 	opts = opts or {}
-	local bufnr = create(action.get)
-	vim.api.nvim_buf_set_name(bufnr, opts.title or "Alien")
+	local bufnr = create(action)
+	-- vim.api.nvim_buf_set_name(bufnr, opts.title or "Alien")
 	vim.cmd("tabnew")
 	local winnr = vim.api.nvim_get_current_win()
 	vim.api.nvim_win_set_buf(winnr, bufnr)
@@ -73,7 +74,7 @@ end
 M.buffer = function(action, opts)
 	local default_buffer_opts = { winnr = vim.api.nvim_get_current_win() }
 	local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
-	local bufnr = create(action.get)
+	local bufnr = create(action)
 	vim.api.nvim_win_set_buf(buffer_opts.winnr, bufnr)
 	return bufnr
 end
