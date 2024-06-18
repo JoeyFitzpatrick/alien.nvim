@@ -9,7 +9,10 @@ local function create(action)
 	local lines = result.output
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
-	keymaps.set_keymaps(bufnr, result.object_type)
+	local redraw = function()
+		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, action().output)
+	end
+	keymaps.set_keymaps(bufnr, result.object_type, redraw)
 	return bufnr
 end
 

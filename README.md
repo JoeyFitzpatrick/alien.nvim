@@ -1,7 +1,6 @@
 ## Todos
-* Create more local_file actions
 * Create highlighter for local_file object, should be extensible to other objects
-* Redraw status buffer after action runs
+* Create more local_file actions
 
 ## What is Alien?
 
