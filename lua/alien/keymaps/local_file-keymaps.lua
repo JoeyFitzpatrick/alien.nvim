@@ -18,7 +18,7 @@ M.set_keymaps = function(bufnr, redraw)
 	map("<enter>", local_file.navigate_to_file)
 	vim.keymap.set("n", "n", function()
 		elements.terminal(local_file.diff_native())
-	end)
+	end, { buffer = bufnr })
 	-- map("J", local_file.scroll_diff_down)
 	-- map("K", local_file.scroll_diff_up)
 end

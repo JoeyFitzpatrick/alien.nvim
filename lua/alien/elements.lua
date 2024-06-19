@@ -3,18 +3,29 @@ local constants = require("alien.constants")
 
 local M = {}
 
+---@alias Window {winnr: number, bufnr: number, object_type: AlienObject}
+
+---@type Window[]
+M.windows = {}
+
+---@return Window | nil
+local get_window_by_object_type = function(object_type)
+	if not object_type then
+		return nil
+	end
+	return vim.tbl_filter(function(window)
+		return window.object_type == object_type
+	end, M.windows)[1]
+end
+
 --- Create a new Element with the given action.
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param action Action
----@return number, number
+---@return number, AlienObject
 local function create(action)
 	local result = action()
 	local lines = result.output
-	local original_bufnr = vim.api.nvim_get_current_buf()
 	local new_bufnr = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_var(new_bufnr, constants.ORIGINAL_BUFNR, original_bufnr)
-	vim.api.nvim_buf_set_var(original_bufnr, constants.NEW_BUFNR, new_bufnr)
-
 	vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, lines)
 	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
 	highlight(new_bufnr)
@@ -23,7 +34,7 @@ local function create(action)
 		highlight(new_bufnr)
 	end
 	keymaps.set_keymaps(new_bufnr, result.object_type, redraw)
-	return new_bufnr, original_bufnr
+	return new_bufnr, result.object_type
 end
 
 --- Create a new buffer with the given action, and open it in a floating window
@@ -101,7 +112,14 @@ M.terminal = function(cmd, opts)
 	local default_terminal_opts = { split = "right" }
 	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts or {})
 	local bufnr = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_open_win(bufnr, true, terminal_opts)
+	local object_type = require("alien.objects").get_object_type(cmd)
+	local window = get_window_by_object_type(object_type)
+	if window then
+		vim.api.nvim_win_set_buf(window.winnr, bufnr)
+	else
+		local winnr = vim.api.nvim_open_win(bufnr, true, terminal_opts)
+		table.insert(M.windows, { winnr = winnr, bufnr = bufnr, object_type = object_type })
+	end
 	vim.api.nvim_buf_call(bufnr, function()
 		vim.fn.termopen(cmd, {
 			on_exit = function()
