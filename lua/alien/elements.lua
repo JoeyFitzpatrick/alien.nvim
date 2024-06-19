@@ -9,8 +9,11 @@ local function create(action)
 	local lines = result.output
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
+	highlight(bufnr)
 	local redraw = function()
 		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, action().output)
+		highlight(bufnr)
 	end
 	keymaps.set_keymaps(bufnr, result.object_type, redraw)
 	return bufnr

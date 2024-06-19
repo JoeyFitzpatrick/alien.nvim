@@ -11,7 +11,12 @@ M.translate = function(str)
 		return nil
 	end
 	local filename = str:sub(4)
-	return { filename = filename, file_status = file_status }
+	return {
+		filename = filename,
+		file_status = file_status,
+		filename_position = { start = 4, ending = #str },
+		file_status_position = { start = 1, ending = 2 },
+	}
 end
 
 return M
