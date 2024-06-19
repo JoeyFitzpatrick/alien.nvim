@@ -35,13 +35,13 @@ end
 M.get_palette = function()
 	local bg = get_colors("Normal")
 	local red = get_colors("Error")
-	local red_bg_dark = "290000"
+	local red_bg_dark = "4f1d21"
 	local red_bg_light = "620000"
 	local orange = get_colors("SpecialChar")
 	local yellow = "e9b770"
 	-- local yellow = get_colors("PreProc")
-	local green = get_colors("String")
-	local green_bg_dark = "002900"
+	local green = "66ff00"
+	local green_bg_dark = "27542a"
 	local green_bg_light = "006200"
 	local cyan = get_colors("Operator")
 	local blue = get_colors("Macro")
@@ -76,6 +76,8 @@ M.setup_colors = function()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPushPullString", colors.yellow))
 
 	-- background colors
+	vim.cmd(string.format("highlight %s guibg=%s", "AlienStagedBg", colors.green_bg_dark))
+	vim.cmd(string.format("highlight %s guibg=%s", "AlienUnstagedBg", colors.red_bg_dark))
 	vim.cmd(string.format("highlight %s guibg=%s", "AlienTimeMachineCurrentCommit", colors.orange))
 	vim.cmd(string.format("highlight %s guibg=%s", "AlienDiffNew", colors.green_bg_dark))
 	vim.cmd(string.format("highlight %s guibg=%s", "AlienDiffOld", colors.red_bg_dark))

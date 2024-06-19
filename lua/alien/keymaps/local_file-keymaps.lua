@@ -1,4 +1,4 @@
-local local_file = require("alien.objects.local-file")
+local local_file = require("alien.objects.local-file-object")
 
 local M = {}
 
