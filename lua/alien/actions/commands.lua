@@ -35,4 +35,14 @@ M.stage_or_unstage_file = function(local_file)
 	end
 end
 
+M.stage_or_unstage_all = function(local_files)
+	for _, local_file in ipairs(local_files) do
+		local status = local_file.file_status
+		if not is_staged(status) then
+			return "git add -A"
+		end
+	end
+	return "git reset"
+end
+
 return M
