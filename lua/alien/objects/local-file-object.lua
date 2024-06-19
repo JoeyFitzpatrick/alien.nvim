@@ -13,6 +13,7 @@ local get_args = function()
 end
 
 M.stage_or_unstage = create_action(create_command(commands.stage_or_unstage_file, get_args))
+
 M.stage_or_unstage_all = create_action(create_command(commands.stage_or_unstage_all, function()
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 	local local_files = {}
@@ -22,10 +23,13 @@ M.stage_or_unstage_all = create_action(create_command(commands.stage_or_unstage_
 	end
 	return local_files
 end))
+
 M.navigate_to_file = function()
 	local filename = get_args().filename
 	vim.api.nvim_win_close(0, true)
 	vim.api.nvim_exec2("e " .. filename, {})
 end
+
+M.diff_native = create_command(commands.diff_native, get_args)
 
 return M

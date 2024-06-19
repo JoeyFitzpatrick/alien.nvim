@@ -1,4 +1,5 @@
 local local_file = require("alien.objects.local-file-object")
+local elements = require("alien.elements")
 
 local M = {}
 
@@ -14,7 +15,12 @@ M.set_keymaps = function(bufnr, redraw)
 	end)
 	map("s", local_file.stage_or_unstage)
 	map("a", local_file.stage_or_unstage_all)
-	vim.keymap.set("n", "<enter>", local_file.navigate_to_file, { noremap = true, silent = true, buffer = bufnr })
+	map("<enter>", local_file.navigate_to_file)
+	vim.keymap.set("n", "n", function()
+		elements.terminal(local_file.diff_native())
+	end)
+	-- map("J", local_file.scroll_diff_down)
+	-- map("K", local_file.scroll_diff_up)
 end
 
 return M

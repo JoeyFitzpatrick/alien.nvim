@@ -1,4 +1,5 @@
 local is_staged = require("alien.status").is_staged
+local STATUSES = require("alien.status").STATUSES
 
 local M = {}
 
@@ -43,6 +44,15 @@ M.stage_or_unstage_all = function(local_files)
 		end
 	end
 	return "git reset"
+end
+
+M.diff_native = function(local_file)
+	local status = local_file.file_status
+	local filename = local_file.filename
+	if status == STATUSES.UNTRACKED then
+		return "git diff --no-index /dev/null " .. filename
+	end
+	return "git diff " .. filename
 end
 
 return M

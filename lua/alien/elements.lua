@@ -1,22 +1,29 @@
 local keymaps = require("alien.keymaps")
+local constants = require("alien.constants")
 
 local M = {}
 
+--- Create a new Element with the given action.
+--- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param action Action
----@return number
+---@return number, number
 local function create(action)
 	local result = action()
 	local lines = result.output
-	local bufnr = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+	local original_bufnr = vim.api.nvim_get_current_buf()
+	local new_bufnr = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_var(new_bufnr, constants.ORIGINAL_BUFNR, original_bufnr)
+	vim.api.nvim_buf_set_var(original_bufnr, constants.NEW_BUFNR, new_bufnr)
+
+	vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, lines)
 	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
-	highlight(bufnr)
+	highlight(new_bufnr)
 	local redraw = function()
-		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, action().output)
-		highlight(bufnr)
+		vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, action().output)
+		highlight(new_bufnr)
 	end
-	keymaps.set_keymaps(bufnr, result.object_type, redraw)
-	return bufnr
+	keymaps.set_keymaps(new_bufnr, result.object_type, redraw)
+	return new_bufnr, original_bufnr
 end
 
 --- Create a new buffer with the given action, and open it in a floating window

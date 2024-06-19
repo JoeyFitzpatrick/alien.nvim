@@ -4,7 +4,11 @@ local highlight = require("alien.highlight")
 
 local M = {}
 
-M.config = { test = "test" }
+M.config = {
+	local_file = {
+		display_diff = true,
+	},
+}
 
 M.setup = function(opts)
 	M.config = vim.tbl_deep_extend("force", M.config, opts or {})
