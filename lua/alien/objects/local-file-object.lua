@@ -30,6 +30,8 @@ M.navigate_to_file = function()
 	vim.api.nvim_exec2("e " .. filename, {})
 end
 
+M.restore_file = create_action(create_command(commands.restore_file, get_args))
+
 M.diff_native = create_command(commands.diff_native, get_args)
 
 return M

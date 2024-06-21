@@ -46,6 +46,15 @@ M.stage_or_unstage_all = function(local_files)
 	return "git reset"
 end
 
+M.restore_file = function(local_file)
+	local filename = local_file.filename
+	local status = local_file.file_status
+	if status == STATUSES.UNTRACKED then
+		return "git clean -f -- " .. filename
+	end
+	return "git restore -- " .. filename
+end
+
 M.diff_native = function(local_file)
 	local status = local_file.file_status
 	local filename = local_file.filename
