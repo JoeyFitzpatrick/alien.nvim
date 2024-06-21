@@ -27,13 +27,13 @@ M.set_keymaps = function(bufnr, redraw)
 		if window and window.channel_id then
 			vim.api.nvim_chan_send(window.channel_id, "j")
 		end
-	end)
+	end, opts)
 	vim.keymap.set("n", "K", function()
 		local window = elements.get_window_by_object_type(objects.OBJECT_TYPES.DIFF)
 		if window and window.channel_id then
 			vim.api.nvim_chan_send(window.channel_id, "k")
 		end
-	end)
+	end, opts)
 end
 
 return M

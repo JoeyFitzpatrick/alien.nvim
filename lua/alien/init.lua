@@ -16,7 +16,7 @@ M.setup = function(opts)
 end
 
 M.status = function()
-	elements.tab(actions.status, { title = "AlienStatus" })
+	elements.tab(actions.stats_and_status, { title = "AlienStatus" })
 end
 
 return M

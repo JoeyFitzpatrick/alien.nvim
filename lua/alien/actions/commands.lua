@@ -23,7 +23,12 @@ M.create_command = function(cmd, get_args)
 	end
 end
 
+-- output stats for staged files, or a message if no files are staged
+M.stats = "git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.status = "git status --porcelain --untracked=all | sort -k1.4"
+
+M.stats_and_status =
+	[[ { (git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'); git status --porcelain --untracked=all | sort -k1.4 } 2>/dev/null ]]
 
 ---@param local_file LocalFile
 M.stage_or_unstage_file = function(local_file)
