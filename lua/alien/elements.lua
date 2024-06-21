@@ -3,19 +3,31 @@ local constants = require("alien.constants")
 
 local M = {}
 
----@alias Window {winnr: number, bufnr: number, object_type: AlienObject}
+---@alias Window {winnr: number, bufnr: number, channel_id: number | nil, object_type: AlienObject}
 
 ---@type Window[]
 M.windows = {}
 
 ---@return Window | nil
-local get_window_by_object_type = function(object_type)
+M.get_window_by_object_type = function(object_type)
 	if not object_type then
 		return nil
 	end
-	return vim.tbl_filter(function(window)
+	local window = vim.tbl_filter(function(window)
 		return window.object_type == object_type
 	end, M.windows)[1]
+	if not window then
+		return nil
+	end
+	local winnr = vim.tbl_contains(vim.api.nvim_list_wins(), window.winnr)
+	if winnr then
+		return window
+	end
+end
+
+local set_buf_options = function(bufnr)
+	vim.api.nvim_set_option_value("buftype", "nofile", { buf = bufnr })
+	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
 end
 
 --- Create a new Element with the given action.
@@ -27,6 +39,7 @@ local function create(action)
 	local lines = result.output
 	local new_bufnr = vim.api.nvim_create_buf(false, true)
 	vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, lines)
+	set_buf_options(new_bufnr)
 	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
 	highlight(new_bufnr)
 	local redraw = function()
@@ -113,21 +126,22 @@ M.terminal = function(cmd, opts)
 	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts or {})
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	local object_type = require("alien.objects").get_object_type(cmd)
-	local window = get_window_by_object_type(object_type)
+	local window = M.get_window_by_object_type(object_type)
 	if window then
 		vim.api.nvim_win_set_buf(window.winnr, bufnr)
 	else
-		local winnr = vim.api.nvim_open_win(bufnr, true, terminal_opts)
-		table.insert(M.windows, { winnr = winnr, bufnr = bufnr, object_type = object_type })
+		local winnr = vim.api.nvim_open_win(bufnr, false, terminal_opts)
+		local channel_id = nil
+		vim.api.nvim_buf_call(bufnr, function()
+			channel_id = vim.fn.termopen(cmd, {
+				on_exit = function()
+					-- vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+					vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
+				end,
+			})
+		end)
+		table.insert(M.windows, { winnr = winnr, bufnr = bufnr, channel_id = channel_id, object_type = object_type })
 	end
-	vim.api.nvim_buf_call(bufnr, function()
-		vim.fn.termopen(cmd, {
-			on_exit = function()
-				vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-				vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
-			end,
-		})
-	end)
 	return bufnr
 end
 
