@@ -3,10 +3,27 @@ local constants = require("alien.constants")
 
 local M = {}
 
----@alias Window {winnr: number, bufnr: number, channel_id: number | nil, object_type: AlienObject}
+---@alias Window {winnr: number, bufnr: number, channel_id: number | nil, object_type: AlienObject, children: Window[] | nil}
+---@alias Buffer { bufnr: number, channel_id: number | nil, object_type: AlienObject }
 
 ---@type Window[]
 M.windows = {}
+
+---@alias Tab { tabnr: number, child_buffers: integer[] }
+---@type { [number]: Tab }
+M.tabs = {}
+
+local register_tab = function()
+	local tabnr = vim.api.nvim_get_current_tabpage()
+	M.tabs[tabnr] = { child_buffers = {} }
+end
+
+local register_tab_buffer = function(bufnr)
+	local tabnr = vim.api.nvim_get_current_tabpage()
+	if M.tabs[tabnr] then
+		table.insert(M.tabs[tabnr].child_buffers, bufnr)
+	end
+end
 
 ---@return Window | nil
 M.get_window_by_object_type = function(object_type)
@@ -30,16 +47,21 @@ local set_buf_options = function(bufnr)
 	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
 end
 
+local setup_buf = function(lines)
+	local bufnr = vim.api.nvim_create_buf(false, true)
+	register_tab_buffer(bufnr)
+	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+	set_buf_options(bufnr)
+	return bufnr
+end
+
 --- Create a new Element with the given action.
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param action Action
 ---@return number, AlienObject
 local function create(action)
 	local result = action()
-	local lines = result.output
-	local new_bufnr = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, lines)
-	set_buf_options(new_bufnr)
+	local new_bufnr = setup_buf(result.output)
 	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
 	highlight(new_bufnr)
 	local redraw = function()
@@ -97,8 +119,10 @@ end
 M.tab = function(action, opts)
 	opts = opts or {}
 	local bufnr = create(action)
-	-- vim.api.nvim_buf_set_name(bufnr, opts.title or "Alien")
 	vim.cmd("tabnew")
+	register_tab()
+	register_tab_buffer(bufnr)
+	require("alien.keymaps.tab-keymaps").set_tab_keymaps(bufnr)
 	local winnr = vim.api.nvim_get_current_win()
 	vim.api.nvim_win_set_buf(winnr, bufnr)
 	return bufnr
@@ -125,6 +149,7 @@ M.terminal = function(cmd, opts)
 	local default_terminal_opts = { split = "right" }
 	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts or {})
 	local bufnr = vim.api.nvim_create_buf(false, true)
+	register_tab_buffer(bufnr)
 	local object_type = require("alien.objects").get_object_type(cmd)
 	local window = M.get_window_by_object_type(object_type)
 	if window then
