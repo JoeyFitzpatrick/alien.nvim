@@ -119,6 +119,7 @@ end
 M.tab = function(action, opts)
 	opts = opts or {}
 	local bufnr = create(action)
+	vim.api.nvim_buf_set_name(bufnr, opts.title or constants.DEFAULT_TAB_NAME)
 	vim.cmd("tabnew")
 	register_tab()
 	register_tab_buffer(bufnr)
