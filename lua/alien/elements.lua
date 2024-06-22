@@ -1,11 +1,10 @@
 local keymaps = require("alien.keymaps")
 local constants = require("alien.constants")
+local get_object_type = require("alien.objects").get_object_type
 
 local M = {}
 
 ---@alias Window {winnr: number, bufnr: number, channel_id: number | nil, object_type: AlienObject, children: Window[] | nil}
----@alias Buffer { bufnr: number, channel_id: number | nil, object_type: AlienObject }
-
 ---@type Window[]
 M.windows = {}
 
@@ -22,6 +21,59 @@ local register_tab_buffer = function(bufnr)
 	local tabnr = vim.api.nvim_get_current_tabpage()
 	if M.tabs[tabnr] then
 		table.insert(M.tabs[tabnr].child_buffers, bufnr)
+	end
+end
+
+---@alias Buffer { bufnr: number, channel_id: number | nil, object_type: AlienObject, child_buffers: Buffer[] }
+---@type Buffer[]
+M.buffers = {}
+---@return Buffer | nil
+M.get_current_buffer = function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	return vim.tbl_filter(function(buffer)
+		return buffer.bufnr == bufnr
+	end, M.buffers)[1]
+end
+
+---@param object_type AlienObject
+M.get_child_buffers_of_type = function(object_type)
+	local current_buffer = M.get_current_buffer()
+	if current_buffer then
+		return vim.tbl_filter(function(buffer)
+			return buffer.object_type == object_type
+		end, current_buffer.child_buffers)
+	end
+	return {}
+end
+
+---@param object_type AlienObject
+M.close_child_buffers_of_type = function(object_type)
+	local current_buffer = M.get_current_buffer()
+	if current_buffer then
+		for _, buffer in ipairs(current_buffer.child_buffers) do
+			if buffer.object_type == object_type then
+				vim.api.nvim_buf_delete(buffer.bufnr, { force = true })
+			end
+		end
+		current_buffer.child_buffers = vim.tbl_filter(function(buffer)
+			return buffer.object_type ~= object_type
+		end, current_buffer.child_buffers)
+	end
+end
+
+local register_buffer = function(bufnr, object_type, channel_id)
+	table.insert(M.buffers, { bufnr = bufnr, object_type = object_type, channel_id = channel_id, child_buffers = {} })
+end
+
+local register_child_buffer = function(parent_bufnr, child_bufnr, child_object_type, child_channel_id)
+	local parent_buffer = vim.tbl_filter(function(buffer)
+		return buffer.bufnr == parent_bufnr
+	end, M.buffers)[1]
+	if parent_buffer then
+		table.insert(
+			parent_buffer.child_buffers,
+			{ bufnr = child_bufnr, object_type = child_object_type, channel_id = child_channel_id }
+		)
 	end
 end
 
@@ -50,6 +102,8 @@ end
 local setup_buf = function(lines)
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	register_tab_buffer(bufnr)
+	register_buffer(bufnr)
+	register_child_buffer(vim.api.nvim_get_current_buf(), bufnr)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 	set_buf_options(bufnr)
 	return bufnr
@@ -142,32 +196,31 @@ M.buffer = function(action, opts)
 end
 
 --- Run a command in a new terminal
----@param cmd string
+---@param cmd string | nil
 ---@param opts vim.api.keyset.win_config | nil
----@return number
+---@return number | nil
 M.terminal = function(cmd, opts)
+	if not cmd then
+		return
+	end
 	---@type vim.api.keyset.win_config
 	local default_terminal_opts = { split = "right" }
 	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts or {})
 	local bufnr = vim.api.nvim_create_buf(false, true)
+	local channel_id = nil
+	vim.api.nvim_buf_call(bufnr, function()
+		channel_id = vim.fn.termopen(cmd, {
+			on_exit = function()
+				-- vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+				vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
+			end,
+		})
+	end)
 	register_tab_buffer(bufnr)
-	local object_type = require("alien.objects").get_object_type(cmd)
-	local window = M.get_window_by_object_type(object_type)
-	if window then
-		vim.api.nvim_win_set_buf(window.winnr, bufnr)
-	else
-		local winnr = vim.api.nvim_open_win(bufnr, false, terminal_opts)
-		local channel_id = nil
-		vim.api.nvim_buf_call(bufnr, function()
-			channel_id = vim.fn.termopen(cmd, {
-				on_exit = function()
-					-- vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-					vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
-				end,
-			})
-		end)
-		table.insert(M.windows, { winnr = winnr, bufnr = bufnr, channel_id = channel_id, object_type = object_type })
-	end
+	local object_type = get_object_type(cmd)
+	register_buffer(bufnr, object_type)
+	register_child_buffer(vim.api.nvim_get_current_buf(), bufnr, object_type, channel_id)
+	vim.api.nvim_open_win(bufnr, false, terminal_opts)
 	return bufnr
 end
 

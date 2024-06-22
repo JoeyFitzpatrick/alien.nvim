@@ -7,7 +7,9 @@ local close_tab = function(tabnr)
 		return
 	end
 	for _, bufnr in ipairs(tab.child_buffers) do
-		vim.api.nvim_buf_delete(bufnr, { force = true })
+		if vim.api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_buf_delete(bufnr, { force = true })
+		end
 	end
 	tabs[tabnr] = nil
 end

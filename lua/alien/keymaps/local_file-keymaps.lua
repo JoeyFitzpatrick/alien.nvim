@@ -1,6 +1,5 @@
 local local_file = require("alien.objects.local-file-object")
 local elements = require("alien.elements")
-local objects = require("alien.objects")
 
 local M = {}
 
@@ -20,17 +19,30 @@ M.set_keymaps = function(bufnr, redraw)
 		elements.terminal(local_file.diff_native())
 	end, opts)
 	vim.keymap.set("n", "J", function()
-		local window = elements.get_window_by_object_type(objects.OBJECT_TYPES.DIFF)
-		if window and window.channel_id then
-			vim.api.nvim_chan_send(window.channel_id, "j")
+		local buffers = elements.get_child_buffers_of_type("diff")
+		local buffer = buffers[1]
+		if #buffers == 1 and buffer.channel_id then
+			vim.api.nvim_chan_send(buffer.channel_id, "j")
 		end
 	end, opts)
 	vim.keymap.set("n", "K", function()
-		local window = elements.get_window_by_object_type(objects.OBJECT_TYPES.DIFF)
-		if window and window.channel_id then
-			vim.api.nvim_chan_send(window.channel_id, "k")
+		local buffers = elements.get_child_buffers_of_type("diff")
+		local buffer = buffers[1]
+		if #buffers == 1 and buffer.channel_id then
+			vim.api.nvim_chan_send(buffer.channel_id, "k")
 		end
 	end, opts)
+
+	local alien_status_group = vim.api.nvim_create_augroup("AlienStatus", { clear = true })
+	vim.api.nvim_create_autocmd("CursorMoved", {
+		desc = "Diff the file under the cursor",
+		buffer = bufnr,
+		callback = function()
+			elements.close_child_buffers_of_type("diff")
+			elements.terminal(local_file.diff_native())
+		end,
+		group = alien_status_group,
+	})
 end
 
 return M
