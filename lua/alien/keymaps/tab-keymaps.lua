@@ -1,17 +1,16 @@
+local elements = require("alien.elements")
+
 local M = {}
 
 local close_tab = function(tabnr)
-	local tabs = require("alien.elements").tabs
-	local tab = tabs[tabnr]
-	if not tab or not tab.child_buffers then
+	local tabs = elements.register.get_elements({ element_type = "tab" })
+	local tab = vim.tbl_filter(function(tab)
+		return tab.tabnr == tabnr
+	end, tabs)[1]
+	if not tab then
 		return
 	end
-	for _, bufnr in ipairs(tab.child_buffers) do
-		if vim.api.nvim_buf_is_valid(bufnr) then
-			vim.api.nvim_buf_delete(bufnr, { force = true })
-		end
-	end
-	tabs[tabnr] = nil
+	elements.register.close_element(tab.bufnr)
 end
 
 M.set_tab_keymaps = function(bufnr)

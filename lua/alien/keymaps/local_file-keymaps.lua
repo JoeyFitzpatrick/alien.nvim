@@ -19,14 +19,14 @@ M.set_keymaps = function(bufnr, redraw)
 		elements.terminal(local_file.diff_native())
 	end, opts)
 	vim.keymap.set("n", "J", function()
-		local buffers = elements.get_child_buffers_of_type("diff")
+		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
 			vim.api.nvim_chan_send(buffer.channel_id, "j")
 		end
 	end, opts)
 	vim.keymap.set("n", "K", function()
-		local buffers = elements.get_child_buffers_of_type("diff")
+		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
 			vim.api.nvim_chan_send(buffer.channel_id, "k")
@@ -38,7 +38,7 @@ M.set_keymaps = function(bufnr, redraw)
 		desc = "Diff the file under the cursor",
 		buffer = bufnr,
 		callback = function()
-			elements.close_child_buffers_of_type("diff")
+			elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
 			elements.terminal(local_file.diff_native())
 		end,
 		group = alien_status_group,
