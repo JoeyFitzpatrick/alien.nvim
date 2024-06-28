@@ -3,6 +3,7 @@ local constants = require("alien.constants")
 local get_object_type = require("alien.objects").get_object_type
 local register = require("alien.elements.register")
 local autocmds = require("alien.elements.element-autocmds")
+-- someth
 
 local M = {}
 
@@ -126,12 +127,7 @@ M.terminal = function(cmd, opts)
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	local channel_id = nil
 	vim.api.nvim_buf_call(bufnr, function()
-		channel_id = vim.fn.termopen(cmd, {
-			on_exit = function()
-				-- vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-				vim.cmd(string.format([[silent! %dwindo wincmd p]], bufnr))
-			end,
-		})
+		channel_id = vim.fn.termopen(cmd)
 	end)
 	local object_type = get_object_type(cmd)
 	if not channel_id then

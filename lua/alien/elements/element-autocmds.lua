@@ -6,7 +6,7 @@ M.set_element_autocmds = function(bufnr)
 		desc = "Deregister element",
 		buffer = bufnr,
 		callback = function()
-			require("alien.elements.register").deregister_element(bufnr, true)
+			require("alien.elements.register").deregister_element(bufnr)
 		end,
 		group = element_group,
 	})

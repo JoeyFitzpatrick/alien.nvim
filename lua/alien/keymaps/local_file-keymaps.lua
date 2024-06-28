@@ -22,14 +22,14 @@ M.set_keymaps = function(bufnr, redraw)
 		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
-			vim.api.nvim_chan_send(buffer.channel_id, "j")
+			pcall(vim.api.nvim_chan_send, buffer.channel_id, "j")
 		end
 	end, opts)
 	vim.keymap.set("n", "K", function()
 		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
-			vim.api.nvim_chan_send(buffer.channel_id, "k")
+			pcall(vim.api.nvim_chan_send, buffer.channel_id, "k")
 		end
 	end, opts)
 
