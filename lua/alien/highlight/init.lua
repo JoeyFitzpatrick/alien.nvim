@@ -85,10 +85,12 @@ end
 
 --- Get the highlight group by object type
 ---@param object_type AlienObject
+---@return function
 M.get_highlight_by_object = function(object_type)
 	if object_type == "local_file" then
 		return require("alien.highlight.local-file-highlight").highlight
 	end
+	return function() end
 end
 
 return M

@@ -1,5 +1,6 @@
 local is_staged = require("alien.status").is_staged
 local STATUSES = require("alien.status").STATUSES
+local ERROR_CODES = require("alien.actions.error-codes")
 
 local M = {}
 
@@ -29,6 +30,21 @@ M.status = "git status --porcelain --untracked=all | sort -k1.4"
 
 M.stats_and_status =
 	[[ { (git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'); git status --porcelain --untracked=all | sort -k1.4 } 2>/dev/null ]]
+
+--- Get the number of commits to pull or push
+---@param pull_or_push "pull" | "push"
+---@return string
+M.num_commits = function(pull_or_push)
+	local current_remote = vim.fn.system("git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}")
+	if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
+		return "0"
+	end
+	current_remote = current_remote:gsub("\n", "")
+	local pull_command = "git rev-list --count HEAD.." .. current_remote
+	local push_command = "git rev-list --count " .. current_remote .. "..HEAD"
+	local command = pull_or_push == "pull" and pull_command or push_command
+	return command
+end
 
 ---@param local_file LocalFile
 M.stage_or_unstage_file = function(local_file)

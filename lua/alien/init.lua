@@ -17,6 +17,7 @@ end
 
 M.status = function()
 	elements.tab(actions.stats_and_status, { title = "AlienStatus" })
+	elements.split({ actions.stats, actions.stats }, { split = "above", height = 3 })
 end
 
 return M
