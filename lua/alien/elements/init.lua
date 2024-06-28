@@ -3,7 +3,6 @@ local constants = require("alien.constants")
 local get_object_type = require("alien.objects").get_object_type
 local register = require("alien.elements.register")
 local autocmds = require("alien.elements.element-autocmds")
--- someth
 
 local M = {}
 
@@ -42,7 +41,8 @@ local function create(action, element_params)
 		vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, action().output)
 		highlight(new_bufnr)
 	end
-	keymaps.set_keymaps(new_bufnr, result.object_type, redraw)
+	keymaps.set_object_keymaps(new_bufnr, result.object_type, redraw)
+	keymaps.set_element_keymaps(new_bufnr, element_params.element_type)
 	return new_bufnr, result.object_type
 end
 
@@ -95,7 +95,6 @@ M.tab = function(action, opts)
 	vim.cmd("tabnew")
 	local bufnr = create(action, { element_type = "tab" })
 	vim.api.nvim_buf_set_name(bufnr, opts.title or constants.DEFAULT_TAB_NAME)
-	require("alien.keymaps.tab-keymaps").set_tab_keymaps(bufnr)
 	local winnr = vim.api.nvim_get_current_win()
 	vim.api.nvim_win_set_buf(winnr, bufnr)
 	return bufnr
@@ -140,6 +139,7 @@ M.terminal = function(cmd, opts)
 		object_type = object_type,
 	})
 	autocmds.set_element_autocmds(bufnr)
+	keymaps.set_element_keymaps(bufnr, "terminal")
 	vim.api.nvim_open_win(bufnr, false, terminal_opts)
 	return bufnr
 end
