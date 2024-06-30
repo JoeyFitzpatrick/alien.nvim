@@ -46,7 +46,7 @@ M.num_commits = function(pull_or_push)
 	if result == "0" then
 		return ""
 	end
-	local str = pull_or_push == "pull" and "↑" .. result or "↓" .. result
+	local str = pull_or_push == "pull" and "↓" .. result or "↑" .. result
 	return "echo " .. str
 end
 
