@@ -42,7 +42,12 @@ M.num_commits = function(pull_or_push)
 	local pull_command = "git rev-list --count HEAD.." .. current_remote
 	local push_command = "git rev-list --count " .. current_remote .. "..HEAD"
 	local command = pull_or_push == "pull" and pull_command or push_command
-	return command
+	local result = vim.fn.system(command):gsub("\n", "")
+	if result == "0" then
+		return ""
+	end
+	local str = pull_or_push == "pull" and "↑" .. result or "↓" .. result
+	return "echo " .. str
 end
 
 ---@param local_file LocalFile
