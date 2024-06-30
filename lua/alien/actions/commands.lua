@@ -24,12 +24,11 @@ M.create_command = function(cmd, get_args)
 	end
 end
 
--- output stats for staged files, or a message if no files are staged
-M.stats = "git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.status = "git status --porcelain --untracked=all | sort -k1.4"
-
-M.stats_and_status =
-	[[ { (git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'); git status --porcelain --untracked=all | sort -k1.4 } 2>/dev/null ]]
+-- output stats for staged files, or a message if no files are staged
+M.staged_stats =
+	"git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
+M.current_head = "printf 'HEAD: %s\n' $(git rev-parse --abbrev-ref HEAD)"
 
 --- Get the number of commits to pull or push
 ---@param pull_or_push "pull" | "push"
