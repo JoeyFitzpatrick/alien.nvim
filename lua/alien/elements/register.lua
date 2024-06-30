@@ -78,10 +78,22 @@ M.deregister_element = function(bufnr)
 	local filter = function(element)
 		return element.bufnr ~= bufnr
 	end
+	-- comment
 	for _, element in ipairs(M.elements) do
 		element.child_elements = vim.tbl_filter(filter, element.child_elements)
 	end
 	M.elements = vim.tbl_filter(filter, M.elements)
+end
+
+---@param element Element
+local function close_element_and_children(element)
+	if #element.child_elements > 0 then
+		for _, child_element in ipairs(element.child_elements) do
+			close_element_and_children(child_element)
+		end
+	end
+	M.deregister_element(element.bufnr)
+	vim.api.nvim_buf_delete(element.bufnr, { force = true })
 end
 
 ---@param bufnr integer
@@ -92,12 +104,7 @@ M.close_element = function(bufnr)
 	if not element then
 		return nil
 	end
-	for _, buffer in ipairs(element.child_elements) do
-		M.deregister_element(buffer.bufnr)
-		vim.api.nvim_buf_delete(buffer.bufnr, { force = true })
-	end
-	M.deregister_element(bufnr)
-	vim.api.nvim_buf_delete(bufnr, { force = true })
+	close_element_and_children(element)
 end
 
 ---@param opts { object_type: AlienObject | nil, element_type: ElementType | nil }
