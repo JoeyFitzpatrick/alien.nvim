@@ -13,37 +13,34 @@ local set_buf_options = function(bufnr)
 	vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
 end
 
----@param lines string[]
+---@param action Action
 ---@param element_params Element
----@return integer
-local setup_element = function(lines, element_params)
+---@return integer, AlienObject
+local setup_element = function(action, element_params)
 	local bufnr = vim.api.nvim_create_buf(false, true)
+	local result = action()
+	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
 	element_params.bufnr = bufnr
+	element_params.action = action
+	element_params.highlight = highlight
 	register.register_element(element_params)
-	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, result.output)
+	highlight(bufnr)
 	set_buf_options(bufnr)
 	autocmds.set_element_autocmds(bufnr)
-	return bufnr
+	return bufnr, result.object_type
 end
 
 --- Create a new Element with the given action.
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param action Action
 ---@param element_params Element
----@return number, AlienObject
+---@return number
 local function create(action, element_params)
-	local result = action()
-	element_params.object_type = result.object_type
-	local new_bufnr = setup_element(result.output, element_params)
-	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
-	highlight(new_bufnr)
-	local redraw = function()
-		vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, action().output)
-		highlight(new_bufnr)
-	end
-	keymaps.set_object_keymaps(new_bufnr, result.object_type, redraw)
+	local new_bufnr, object_type = setup_element(action, element_params)
+	keymaps.set_object_keymaps(new_bufnr, object_type)
 	keymaps.set_element_keymaps(new_bufnr, element_params.element_type)
-	return new_bufnr, result.object_type
+	return new_bufnr
 end
 
 --- Create a new buffer with the given action, and open it in a floating window

@@ -2,7 +2,7 @@
 local M = {}
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
----@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, object_type: AlienObject, child_elements: BaseElement[]}
+---@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, object_type: AlienObject, child_elements: BaseElement[], action: Action, highlight: fun(bufnr: integer): nil}
 ---@alias TabElement {element_type: "tab", tabnr: integer, bufnr: integer, object_type: AlienObject, child_elements: BaseElement[]}
 ---@alias TerminalElement {element_type: "terminal", channel_id: integer, bufnr: integer, object_type: AlienObject}
 ---@alias Element BaseElement | TabElement | TerminalElement
@@ -118,6 +118,17 @@ M.close_child_elements = function(opts)
 	for _, buffer in ipairs(elements) do
 		M.deregister_element(buffer.bufnr)
 		vim.api.nvim_buf_delete(buffer.bufnr, { force = true })
+	end
+end
+
+M.redraw_elements = function()
+	for _, element in ipairs(M.elements) do
+		-- some elements (like terminals) don't have actions
+		if not element.action then
+			return
+		end
+		vim.api.nvim_buf_set_lines(element.bufnr, 0, -1, false, element.action().output)
+		element.highlight(element.bufnr)
 	end
 end
 

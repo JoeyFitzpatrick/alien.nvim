@@ -5,10 +5,9 @@ local M = {}
 --- Set keymaps by object type for the given buffer
 ---@param bufnr integer
 ---@param object_type AlienObject
----@param redraw fun(): nil
-M.set_object_keymaps = function(bufnr, object_type, redraw)
+M.set_object_keymaps = function(bufnr, object_type)
 	if object_type == "local_file" then
-		require("alien.keymaps.local_file-keymaps").set_keymaps(bufnr, redraw)
+		require("alien.keymaps.local_file-keymaps").set_keymaps(bufnr)
 	end
 end
 

@@ -12,17 +12,20 @@ local get_args = function()
 	return translate(vim.api.nvim_get_current_line())
 end
 
-M.stage_or_unstage = create_action(create_command(commands.stage_or_unstage_file, get_args))
+M.stage_or_unstage = create_action(create_command(commands.stage_or_unstage_file, get_args), { trigger_redraw = true })
 
-M.stage_or_unstage_all = create_action(create_command(commands.stage_or_unstage_all, function()
-	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-	local local_files = {}
-	for _, line in ipairs(lines) do
-		local local_file = translate(line)
-		table.insert(local_files, local_file)
-	end
-	return local_files
-end))
+M.stage_or_unstage_all = create_action(
+	create_command(commands.stage_or_unstage_all, function()
+		local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+		local local_files = {}
+		for _, line in ipairs(lines) do
+			local local_file = translate(line)
+			table.insert(local_files, local_file)
+		end
+		return local_files
+	end),
+	{ trigger_redraw = true }
+)
 
 M.navigate_to_file = function()
 	local filename = get_args().filename
@@ -30,7 +33,7 @@ M.navigate_to_file = function()
 	vim.api.nvim_exec2("e " .. filename, {})
 end
 
-M.restore_file = create_action(create_command(commands.restore_file, get_args))
+M.restore_file = create_action(create_command(commands.restore_file, get_args), { trigger_redraw = true })
 
 M.diff_native = create_command(commands.diff_native, get_args)
 

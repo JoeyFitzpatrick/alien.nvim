@@ -3,12 +3,11 @@ local elements = require("alien.elements")
 
 local M = {}
 
-M.set_keymaps = function(bufnr, redraw)
+M.set_keymaps = function(bufnr)
 	local opts = { noremap = true, silent = true, buffer = bufnr }
 	local map = function(keys, fn)
 		vim.keymap.set("n", keys, function()
 			fn()
-			redraw()
 		end, opts)
 	end
 	map("s", local_file.stage_or_unstage)
