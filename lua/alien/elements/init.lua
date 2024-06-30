@@ -28,20 +28,11 @@ end
 
 --- Create a new Element with the given action.
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
----@param action Action | Action[]
+---@param action Action
 ---@param element_params Element
 ---@return number, AlienObject
 local function create(action, element_params)
-	local result = { output = {} }
-	if type(action) == "table" then
-		for _, act in ipairs(action) do
-			for _, line in ipairs(act().output) do
-				table.insert(result.output, line)
-			end
-		end
-	else
-		result = action()
-	end
+	local result = action()
 	element_params.object_type = result.object_type
 	local new_bufnr = setup_element(result.output, element_params)
 	local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
@@ -56,7 +47,7 @@ local function create(action, element_params)
 end
 
 --- Create a new buffer with the given action, and open it in a floating window
----@param action Action | Action[]
+---@param action Action
 ---@param opts vim.api.keyset.win_config | nil
 ---@return number
 M.float = function(action, opts)
@@ -81,7 +72,7 @@ M.float = function(action, opts)
 end
 
 --- Create a new buffer with the given action, and open it in a new split
----@param action Action | Action[]
+---@param action Action
 ---@param opts vim.api.keyset.win_config | nil
 ---@return number
 M.split = function(action, opts)
@@ -96,7 +87,7 @@ M.split = function(action, opts)
 end
 
 --- Create a new buffer with the given action, and open it in a new tab
----@param action Action | Action[]
+---@param action Action
 ---@param opts { title: string | nil } | nil
 ---@return number
 M.tab = function(action, opts)
@@ -110,7 +101,7 @@ M.tab = function(action, opts)
 end
 
 --- Create a new buffer with the given action, and open it in a target window
----@param action Action | Action[]
+---@param action Action
 ---@param opts { winnr: number | nil} | nil
 ---@return number
 M.buffer = function(action, opts)
