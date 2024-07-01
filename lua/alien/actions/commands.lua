@@ -29,25 +29,28 @@ M.status = "git status --porcelain --untracked=all | sort -k1.4"
 M.staged_stats =
 	"git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.current_head = "printf 'HEAD: %s\n' $(git rev-parse --abbrev-ref HEAD)"
+M.current_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
 
---- Get the number of commits to pull or push
----@param pull_or_push "pull" | "push"
+--- Get the number of commits to pull
 ---@return string
-M.num_commits = function(pull_or_push)
-	local current_remote = vim.fn.system("git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}")
+M.num_commits_to_pull = function()
+	local current_remote = vim.fn.system(M.current_remote)
 	if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
 		return "0"
 	end
 	current_remote = current_remote:gsub("\n", "")
-	local pull_command = "git rev-list --count HEAD.." .. current_remote
-	local push_command = "git rev-list --count " .. current_remote .. "..HEAD"
-	local command = pull_or_push == "pull" and pull_command or push_command
-	local result = vim.fn.system(command):gsub("\n", "")
-	if result == "0" then
-		return ""
+	return "git rev-list --count HEAD.." .. current_remote
+end
+
+--- Get the number of commits to push
+---@return string
+M.num_commits_to_push = function()
+	local current_remote = vim.fn.system(M.current_remote)
+	if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
+		return "0"
 	end
-	local str = pull_or_push == "pull" and "↓" .. result or "↑" .. result
-	return "echo " .. str
+	current_remote = current_remote:gsub("\n", "")
+	return "git rev-list --count " .. current_remote .. "..HEAD"
 end
 
 ---@param local_file LocalFile
