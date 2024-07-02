@@ -21,14 +21,14 @@ M.set_keymaps = function(bufnr)
 		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
-			pcall(vim.api.nvim_chan_send, buffer.channel_id, "j")
+			pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
 		end
 	end, opts)
 	vim.keymap.set("n", "K", function()
 		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
-			pcall(vim.api.nvim_chan_send, buffer.channel_id, "k")
+			pcall(vim.api.nvim_chan_send, buffer.channel_id, "kk")
 		end
 	end, opts)
 
@@ -38,7 +38,8 @@ M.set_keymaps = function(bufnr)
 		buffer = bufnr,
 		callback = function()
 			elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
-			elements.terminal(local_file.diff_native())
+			local width = math.floor(vim.o.columns * 0.67)
+			elements.terminal(local_file.diff_native(), { width = width })
 		end,
 		group = alien_status_group,
 	})
