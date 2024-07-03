@@ -1,6 +1,6 @@
 local local_file = require("alien.objects.local-file-object")
 local elements = require("alien.elements")
-local keymaps = require("alien").config.keymaps.local_file
+local keymaps = require("alien.config").keymaps.local_file
 
 local M = {}
 

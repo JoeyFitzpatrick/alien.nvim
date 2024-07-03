@@ -31,4 +31,6 @@ M.set_element_keymaps = function(bufnr, element_type)
 	end, { noremap = true, silent = true, buffer = bufnr })
 end
 
+M.set_global_keymaps = require("alien.keymaps.global-keymaps").set_global_keymaps
+
 return M
