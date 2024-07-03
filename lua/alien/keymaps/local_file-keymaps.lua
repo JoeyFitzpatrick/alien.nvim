@@ -1,5 +1,6 @@
 local local_file = require("alien.objects.local-file-object")
 local elements = require("alien.elements")
+local keymaps = require("alien").config.keymaps.local_file
 
 local M = {}
 
@@ -10,26 +11,26 @@ M.set_keymaps = function(bufnr)
 			fn()
 		end, opts)
 	end
-	map("s", local_file.stage_or_unstage)
-	map("a", local_file.stage_or_unstage_all)
-	map("d", local_file.restore_file)
-	map("p", local_file.pull)
-	map("<leader>p", local_file.push)
-	map("c", function()
+	map(keymaps.stage_or_unstage, local_file.stage_or_unstage)
+	map(keymaps.stage_or_unstage_all, local_file.stage_or_unstage_all)
+	map(keymaps.restore_file, local_file.restore_file)
+	map(keymaps.pull, local_file.pull)
+	map(keymaps.push, local_file.push)
+	map(keymaps.commit, function()
 		elements.terminal("git commit")
 	end)
-	map("<enter>", local_file.navigate_to_file)
-	vim.keymap.set("n", "n", function()
+	map(keymaps.navigate_to_file, local_file.navigate_to_file)
+	vim.keymap.set("n", keymaps.diff, function()
 		elements.terminal(local_file.diff_native())
 	end, opts)
-	vim.keymap.set("n", "J", function()
+	vim.keymap.set("n", keymaps.scroll_diff_down, function()
 		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
 			pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
 		end
 	end, opts)
-	vim.keymap.set("n", "K", function()
+	vim.keymap.set("n", keymaps.scroll_diff_up, function()
 		local buffers = elements.register.get_child_elements({ object_type = "diff" })
 		local buffer = buffers[1]
 		if #buffers == 1 and buffer.channel_id then
@@ -37,7 +38,7 @@ M.set_keymaps = function(bufnr)
 		end
 	end, opts)
 
-	local alien_status_group = vim.api.nvim_create_augroup("AlienStatus", { clear = true })
+	local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = false })
 	vim.api.nvim_create_autocmd("CursorMoved", {
 		desc = "Diff the file under the cursor",
 		buffer = bufnr,
