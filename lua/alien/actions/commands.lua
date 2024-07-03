@@ -30,6 +30,9 @@ M.staged_stats =
 	"git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.current_head = "printf 'HEAD: %s\n' $(git rev-parse --abbrev-ref HEAD)"
 M.current_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
+M.pull = "git pull"
+M.push = "git push"
+M.commit = "git commit"
 
 --- Get the number of commits to pull
 ---@return string
