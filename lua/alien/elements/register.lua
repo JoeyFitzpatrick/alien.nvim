@@ -70,15 +70,12 @@ M.register_element = function(params)
 end
 
 --- Deregsiter an element.
---- Note that child elements are only deregistered one level deep.
---- TODO: make this recursive
 ---@param bufnr integer
 ---@return nil
 M.deregister_element = function(bufnr)
 	local filter = function(element)
 		return element.bufnr ~= bufnr
 	end
-	-- comment
 	for _, element in ipairs(M.elements) do
 		element.child_elements = vim.tbl_filter(filter, element.child_elements)
 	end
@@ -93,7 +90,9 @@ local function close_element_and_children(element)
 		end
 	end
 	M.deregister_element(element.bufnr)
-	vim.api.nvim_buf_delete(element.bufnr, { force = true })
+	if vim.api.nvim_buf_is_valid(element.bufnr) then
+		vim.api.nvim_buf_delete(element.bufnr, { force = true })
+	end
 end
 
 ---@param bufnr integer

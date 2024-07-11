@@ -113,15 +113,16 @@ end
 
 --- Run a command in a new terminal
 ---@param cmd string | nil
----@param opts vim.api.keyset.win_config | nil
+---@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil } | nil
 ---@return number | nil
 M.terminal = function(cmd, opts)
 	if not cmd then
 		return
 	end
-	---@type vim.api.keyset.win_config
+	opts = opts or {}
+	---@type vim.api.keyset.win_config | { enter: boolean | nil }
 	local default_terminal_opts = { split = "right" }
-	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts or {})
+	local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts.window or {})
 	local bufnr = vim.api.nvim_create_buf(false, true)
 	local channel_id = nil
 	vim.api.nvim_buf_call(bufnr, function()
@@ -139,7 +140,7 @@ M.terminal = function(cmd, opts)
 	})
 	autocmds.set_element_autocmds(bufnr)
 	keymaps.set_element_keymaps(bufnr, "terminal")
-	vim.api.nvim_open_win(bufnr, false, terminal_opts)
+	vim.api.nvim_open_win(bufnr, opts.enter, terminal_opts)
 	return bufnr
 end
 

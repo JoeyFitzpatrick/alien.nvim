@@ -5,7 +5,7 @@ local keymaps = require("alien.config").keymaps.local_file
 local M = {}
 
 M.set_keymaps = function(bufnr)
-	local opts = { noremap = true, silent = true, buffer = bufnr }
+	local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
 	local map = function(keys, fn)
 		vim.keymap.set("n", keys, function()
 			fn()
@@ -17,7 +17,9 @@ M.set_keymaps = function(bufnr)
 	map(keymaps.pull, local_file.pull)
 	map(keymaps.push, local_file.push)
 	map(keymaps.commit, function()
-		elements.terminal("git commit")
+		elements.terminal("git commit", { enter = true })
+		vim.api.nvim_set_option_value("number", false, { win = 0 })
+		vim.api.nvim_set_option_value("relativenumber", false, { win = 0 })
 	end)
 	map(keymaps.navigate_to_file, local_file.navigate_to_file)
 	vim.keymap.set("n", keymaps.diff, function()
@@ -45,7 +47,9 @@ M.set_keymaps = function(bufnr)
 		callback = function()
 			elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
 			local width = math.floor(vim.o.columns * 0.67)
-			elements.terminal(local_file.diff_native(), { width = width })
+			if vim.api.nvim_get_current_buf() == bufnr then
+				elements.terminal(local_file.diff_native(), { window = { width = width } })
+			end
 		end,
 		group = alien_status_group,
 	})
