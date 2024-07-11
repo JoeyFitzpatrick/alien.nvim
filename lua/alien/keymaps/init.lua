@@ -11,23 +11,12 @@ M.set_object_keymaps = function(bufnr, object_type)
 	end
 end
 
-local close_tab = function(tabnr)
-	local tabs = register.get_elements({ element_type = "tab" })
-	local tab = vim.tbl_filter(function(tab)
-		return tab.tabnr == tabnr
-	end, tabs)[1]
-	if not tab then
-		return
-	end
-	register.close_element(tab.bufnr)
-end
-
 --- Set keymaps by element type for the given buffer
 ---@param bufnr integer
 ---@param element_type ElementType
 M.set_element_keymaps = function(bufnr, element_type)
 	vim.keymap.set("n", "q", function()
-		close_tab(vim.api.nvim_get_current_tabpage())
+		register.close_element(bufnr)
 	end, { noremap = true, silent = true, buffer = bufnr })
 end
 

@@ -83,22 +83,6 @@ M.split = function(action, opts)
 	return bufnr
 end
 
---- Create a new buffer with the given action, and open it in a new tab
----@param action Action
----@param opts { title: string | nil } | nil
----@return number
-M.tab = function(action, opts)
-	opts = opts or {}
-	vim.cmd("tabnew")
-	local temp_bufnr = vim.api.nvim_get_current_buf()
-	local bufnr = create(action, { element_type = "tab" })
-	vim.api.nvim_buf_set_name(bufnr, opts.title or constants.DEFAULT_TAB_NAME)
-	local winnr = vim.api.nvim_get_current_win()
-	vim.api.nvim_win_set_buf(winnr, bufnr)
-	vim.api.nvim_buf_delete(temp_bufnr, { force = true })
-	return bufnr
-end
-
 --- Create a new buffer with the given action, and open it in a target window
 ---@param action Action
 ---@param opts { winnr: number | nil} | nil

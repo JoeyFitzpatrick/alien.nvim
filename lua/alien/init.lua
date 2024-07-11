@@ -12,7 +12,7 @@ M.setup = function(opts)
 end
 
 M.status = function()
-	elements.tab(actions.stats_and_status, { title = "AlienStatus" })
+	elements.buffer(actions.stats_and_status, { title = "AlienStatus" })
 end
 
 return M
