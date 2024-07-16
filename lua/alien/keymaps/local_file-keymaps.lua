@@ -17,18 +17,9 @@ M.set_keymaps = function(bufnr)
 	map(keymaps.pull, local_file.pull)
 	map(keymaps.push, local_file.push)
 	map(keymaps.commit, function()
-		vim.api.nvim_exec2("split .git/COMMIT_EDITMSG", {})
-		local commit_msg_bufnr = vim.api.nvim_get_current_buf()
-		local element_group = vim.api.nvim_create_augroup("Alien", { clear = true })
-		vim.api.nvim_create_autocmd("WinClosed", {
-			desc = "Run git commit",
-			buffer = commit_msg_bufnr,
-			callback = function()
-				vim.api.nvim_buf_delete(commit_msg_bufnr, { force = true })
-				elements.terminal("git commit -F .git/COMMIT_EDITMSG --cleanup=strip", { window = { split = "right" } })
-			end,
-			group = element_group,
-		})
+		vim.ui.input({ prompt = "Commit message: " }, function(input)
+			elements.terminal("git commit --cleanup=whitespace -m " .. input, { window = { split = "right" } })
+		end)
 	end)
 	map(keymaps.navigate_to_file, local_file.navigate_to_file)
 	vim.keymap.set("n", keymaps.diff, function()
