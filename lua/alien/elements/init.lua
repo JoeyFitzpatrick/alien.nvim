@@ -35,7 +35,7 @@ end
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param action Action
 ---@param element_params Element
----@return number
+---@return integer
 local function create(action, element_params)
 	local new_bufnr, object_type = setup_element(action, element_params)
 	keymaps.set_object_keymaps(new_bufnr, object_type)
@@ -46,7 +46,7 @@ end
 --- Create a new buffer with the given action, and open it in a floating window
 ---@param action Action
 ---@param opts vim.api.keyset.win_config | nil
----@return number
+---@return integer
 M.float = function(action, opts)
 	local width = math.floor(vim.o.columns * 0.8)
 	local height = math.floor(vim.o.lines * 0.8)
@@ -71,7 +71,7 @@ end
 --- Create a new buffer with the given action, and open it in a new split
 ---@param action Action
 ---@param opts vim.api.keyset.win_config | nil
----@return number
+---@return integer
 M.split = function(action, opts)
 	---@type vim.api.keyset.win_config
 	local default_split_opts = {
@@ -85,8 +85,8 @@ end
 
 --- Create a new buffer with the given action, and open it in a target window
 ---@param action Action
----@param opts { winnr: number | nil} | nil
----@return number
+---@param opts { winnr: integer | nil} | nil
+---@return integer
 M.buffer = function(action, opts)
 	local default_buffer_opts = { winnr = vim.api.nvim_get_current_win() }
 	local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
@@ -98,7 +98,7 @@ end
 --- Run a command in a new terminal
 ---@param cmd string | nil
 ---@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil } | nil
----@return number | nil
+---@return integer | nil
 M.terminal = function(cmd, opts)
 	if not cmd then
 		return
