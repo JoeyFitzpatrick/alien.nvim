@@ -24,6 +24,25 @@ M.create_command = function(cmd, get_args)
 	end
 end
 
+--- add flags via a UI to a command
+---@param cmd string
+---@return string
+M.add_flags = function(cmd)
+	local cmd_with_flags = ""
+	local git_verb = cmd:match("%S+%s+(%S+)")
+	vim.ui.input({ prompt = git_verb .. " flags: " }, function(input)
+		local count = 1
+		for w in string.gmatch(cmd, "%a+") do
+			cmd_with_flags = cmd_with_flags .. " " .. w
+			if count == 2 then
+				cmd_with_flags = cmd_with_flags .. " " .. input
+			end
+			count = count + 1
+		end
+	end)
+	return cmd_with_flags
+end
+
 M.status = "git status --porcelain --untracked=all | sort -k1.4"
 -- output stats for staged files, or a message if no files are staged
 M.staged_stats =

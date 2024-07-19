@@ -13,6 +13,7 @@ local M = {
 			pull = "p",
 			push = "<leader>p",
 			commit = "c",
+			commit_with_flags = "C",
 			navigate_to_file = "<enter>",
 			diff = "n",
 			scroll_diff_down = "J",

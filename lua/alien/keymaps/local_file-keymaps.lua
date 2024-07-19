@@ -1,6 +1,7 @@
 local local_file = require("alien.objects.local-file-object")
 local elements = require("alien.elements")
 local keymaps = require("alien.config").keymaps.local_file
+local commands = require("alien.actions.commands")
 
 local M = {}
 
@@ -18,8 +19,12 @@ M.set_keymaps = function(bufnr)
 	map(keymaps.push, local_file.push)
 	map(keymaps.commit, function()
 		vim.ui.input({ prompt = "Commit message: " }, function(input)
-			elements.terminal("git commit --cleanup=whitespace -m " .. input, { window = { split = "right" } })
+			elements.terminal("git commit -m '" .. input .. "'", { window = { split = "right" } })
 		end)
+	end)
+	map(keymaps.commit_with_flags, function()
+		local cmd = commands.add_flags("git commit")
+		elements.terminal(cmd, { window = { split = "right" } })
 	end)
 	map(keymaps.navigate_to_file, local_file.navigate_to_file)
 	vim.keymap.set("n", keymaps.diff, function()
