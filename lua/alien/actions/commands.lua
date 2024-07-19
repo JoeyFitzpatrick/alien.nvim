@@ -24,21 +24,35 @@ M.create_command = function(cmd, get_args)
 	end
 end
 
+--- Logic to add flags to a command string
+---@param cmd string
+---@param flags string
+---@return string
+M.add_flags = function(cmd, flags)
+	local cmd_with_flags = ""
+	local count = 1
+	for w in string.gmatch(cmd, "%a+") do
+		if count == 1 then
+			cmd_with_flags = w
+		else
+			cmd_with_flags = cmd_with_flags .. " " .. w
+		end
+		if count == 2 and flags and #flags > 0 then
+			cmd_with_flags = cmd_with_flags .. " " .. flags
+		end
+		count = count + 1
+	end
+	return cmd_with_flags
+end
+
 --- add flags via a UI to a command
 ---@param cmd string
 ---@return string
-M.add_flags = function(cmd)
-	local cmd_with_flags = ""
+M.add_flags_input = function(cmd)
 	local git_verb = cmd:match("%S+%s+(%S+)")
+	local cmd_with_flags = ""
 	vim.ui.input({ prompt = git_verb .. " flags: " }, function(input)
-		local count = 1
-		for w in string.gmatch(cmd, "%a+") do
-			cmd_with_flags = cmd_with_flags .. " " .. w
-			if count == 2 then
-				cmd_with_flags = cmd_with_flags .. " " .. input
-			end
-			count = count + 1
-		end
+		cmd_with_flags = M.add_flags(cmd, input)
 	end)
 	return cmd_with_flags
 end

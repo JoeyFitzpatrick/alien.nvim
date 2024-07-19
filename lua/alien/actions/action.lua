@@ -40,7 +40,7 @@ M.parse_command = function(alien_command, add_flags)
 		cmd = alien_command
 	end
 	if add_flags then
-		cmd = commands.add_flags(cmd)
+		cmd = commands.add_flags_input(cmd)
 	end
 	return cmd
 end
