@@ -1,4 +1,5 @@
 local get_object_type = require("alien.objects").get_object_type
+local commands = require("alien.actions.commands")
 
 local M = {}
 
@@ -29,7 +30,7 @@ end
 
 --- Takes a command and returns an Action function
 ---@param cmd AlienCommand | AlienCommand[]
----@param opts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, output_handler: nil | fun(output: string[]): string[] } | nil }
+---@param opts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, output_handler: nil | fun(output: string[]): string[] } | nil }
 ---@return Action
 M.create_action = function(cmd, opts)
 	opts = opts or {}
@@ -54,13 +55,20 @@ M.create_action = function(cmd, opts)
 		end
 		if type(cmd) == "function" then
 			local fn = function()
+				local cmd_fn_result = cmd()
+				if opts.add_flags then
+					cmd_fn_result = commands.add_flags(cmd_fn_result)
+				end
 				return {
-					output = { handle_output(vim.fn.systemlist(cmd())) },
+					output = { handle_output(vim.fn.systemlist(cmd_fn_result)) },
 					object_type = object_type or get_object_type(cmd()),
 				}
 			end
 			redraw()
 			return fn()
+		end
+		if opts.add_flags then
+			cmd = commands.add_flags(cmd)
 		end
 		local output = vim.fn.systemlist(cmd)
 		redraw()

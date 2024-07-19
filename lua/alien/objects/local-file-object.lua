@@ -36,7 +36,9 @@ end
 M.restore_file = create_action(create_command(commands.restore_file, get_args), { trigger_redraw = true })
 
 M.pull = create_action(create_command(commands.pull, get_args), { trigger_redraw = true })
+M.pull_with_flags = create_action(create_command(commands.pull, get_args), { trigger_redraw = true, add_flags = true })
 M.push = create_action(create_command(commands.push, get_args), { trigger_redraw = true })
+M.push_with_flags = create_action(create_command(commands.push, get_args), { trigger_redraw = true, add_flags = true })
 M.commit = create_action(create_command(commands.commit, get_args), { trigger_redraw = true })
 
 M.diff_native = create_command(commands.diff_native, get_args)
