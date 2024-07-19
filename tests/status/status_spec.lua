@@ -18,35 +18,3 @@ describe("some basics", function()
 		assert.equals(0, bounter)
 	end)
 end)
-
--- a comment
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
--- another comment

@@ -5,7 +5,7 @@ local M = {}
 
 ---@alias Action fun(): { output: string[], object_type: AlienObject }
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
----@alias AlienCommand string | string[] | fun(): string
+---@alias AlienCommand string | fun(): string
 
 --- Return the output of multiple commands
 --- If one of the commands is itself an array, the outputs of the commands in the array will be concatenated on a single line
@@ -26,6 +26,23 @@ local function get_multiple_outputs(cmds)
 		end
 	end
 	return output
+end
+
+--- Parses a command from an AlienCommand, which is a very lenient data type
+---@param alien_command AlienCommand
+---@param add_flags boolean | nil
+---@return string
+M.parse_command = function(alien_command, add_flags)
+	local cmd = nil
+	if type(alien_command) == "function" then
+		cmd = alien_command()
+	else
+		cmd = alien_command
+	end
+	if add_flags then
+		cmd = commands.add_flags(cmd)
+	end
+	return cmd
 end
 
 --- Takes a command and returns an Action function
@@ -55,10 +72,7 @@ M.create_action = function(cmd, opts)
 		end
 		if type(cmd) == "function" then
 			local fn = function()
-				local cmd_fn_result = cmd()
-				if opts.add_flags then
-					cmd_fn_result = commands.add_flags(cmd_fn_result)
-				end
+				local cmd_fn_result = M.parse_command(cmd, opts.add_flags)
 				return {
 					output = { handle_output(vim.fn.systemlist(cmd_fn_result)) },
 					object_type = object_type or get_object_type(cmd()),
@@ -67,10 +81,7 @@ M.create_action = function(cmd, opts)
 			redraw()
 			return fn()
 		end
-		if opts.add_flags then
-			cmd = commands.add_flags(cmd)
-		end
-		local output = vim.fn.systemlist(cmd)
+		local output = vim.fn.systemlist(M.parse_command(cmd, opts.add_flags))
 		redraw()
 		return { output = handle_output(output), object_type = object_type or get_object_type(cmd) }
 	end
