@@ -1,9 +1,10 @@
----@alias AlienObject "commit" | "local_file" | "commit_file" | "status" | "diff" | nil
+---@alias AlienObject "commit" | "local_file" | "local_branch" | "commit_file" | "status" | "diff" | nil
 
 local M = {}
 
 M.OBJECT_TYPES = {
 	LOCAL_FILE = "local_file",
+	LOCAL_BRANCH = "local_branch",
 	COMMIT_FILE = "commit_file",
 	COMMIT = "commit",
 	STATUS = "status",
@@ -25,6 +26,8 @@ M.get_object_type = function(cmd)
 		return M.OBJECT_TYPES.COMMIT
 	elseif git_verb == "diff" then
 		return M.OBJECT_TYPES.DIFF
+	elseif git_verb == "branch" then
+		return M.OBJECT_TYPES.LOCAL_BRANCH
 	end
 	return nil
 end

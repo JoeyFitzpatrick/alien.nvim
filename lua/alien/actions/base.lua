@@ -28,4 +28,6 @@ M.stats_and_status = create_action({
 	output_handler = handle_status_output,
 })
 
+M.local_branches = create_action({ commands.local_branches }, { object_type = "local_branch" })
+
 return M

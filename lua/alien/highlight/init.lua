@@ -90,6 +90,8 @@ end
 M.get_highlight_by_object = function(object_type)
 	if object_type == "local_file" then
 		return require("alien.highlight.local-file-highlight").highlight
+	elseif object_type == "local_branch" then
+		return require("alien.highlight.local-branch-highlight").highlight
 	end
 	return function() end
 end

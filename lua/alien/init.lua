@@ -15,4 +15,8 @@ M.status = function()
 	elements.buffer(actions.stats_and_status, { title = "AlienStatus" })
 end
 
+M.local_branches = function()
+	elements.buffer(actions.local_branches, { title = "AlienBranches" })
+end
+
 return M

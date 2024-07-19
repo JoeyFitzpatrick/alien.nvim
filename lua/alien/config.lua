@@ -4,7 +4,7 @@ local M = {
 	},
 	keymaps = {
 		global = {
-			branch_picker = "<leader>b",
+			branch_picker = "<leader>B",
 		},
 		local_file = {
 			stage_or_unstage = "s",

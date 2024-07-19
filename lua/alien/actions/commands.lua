@@ -128,4 +128,7 @@ M.diff_native = function(local_file)
 	return "git diff " .. filename
 end
 
+-- Branch commands
+M.local_branches = "git branch"
+
 return M
