@@ -100,16 +100,14 @@ M.create_action = function(cmd, opts)
 			return { output = handle_output(output), object_type = object_type }
 		end
 		if type(cmd) == "function" then
-			local fn = function()
-				local cmd_fn_result = M.parse_command(cmd, opts.add_flags)
-				vim.print(cmd_fn_result)
-				return {
-					output = { handle_output(run_cmd(cmd_fn_result)) },
-					object_type = object_type or get_object_type(cmd()),
-				}
-			end
+			local cmd_fn_result = M.parse_command(cmd, opts.add_flags)
+			local output = { handle_output(run_cmd(cmd_fn_result)) }
+			local type = object_type or get_object_type(cmd_fn_result)
 			redraw()
-			return fn()
+			return {
+				output = output,
+				object_type = type,
+			}
 		end
 		local output = run_cmd(M.parse_command(cmd, opts.add_flags))
 		redraw()

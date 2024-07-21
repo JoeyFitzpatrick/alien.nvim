@@ -1,0 +1,25 @@
+local create_command = require("alien.actions.commands").create_command
+
+describe("create command", function()
+	it("creates command from a string by returning the string", function()
+		assert.equals("test command", create_command("test command"))
+	end)
+	it("creates command function from a function by passing arg to the function", function()
+		local cmd_fn = function(arg)
+			return "command with " .. arg
+		end
+		local result = create_command(cmd_fn, function()
+			return "arg"
+		end)()
+		assert.equals("command with arg", result)
+	end)
+	it("passes multiple arguments to command function", function()
+		local cmd_fn = function(arg1, arg2)
+			return "command with " .. arg1 .. " " .. arg2
+		end
+		local result = create_command(cmd_fn, function()
+			return "arg1", "arg2"
+		end)()
+		assert.equals("command with arg1 arg2", result)
+	end)
+end)

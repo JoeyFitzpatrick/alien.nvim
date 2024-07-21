@@ -23,6 +23,7 @@ local M = {
 		},
 		local_branch = {
 			switch = "s",
+			new_branch = "n",
 		},
 	},
 }

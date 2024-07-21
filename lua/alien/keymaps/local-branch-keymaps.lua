@@ -13,6 +13,7 @@ M.set_keymaps = function(bufnr)
 		end, opts)
 	end
 	map(keymaps.switch, local_branch.switch)
+	map(keymaps.new_branch, local_branch.new_branch)
 end
 
 return M

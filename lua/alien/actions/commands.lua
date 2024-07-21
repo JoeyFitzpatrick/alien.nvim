@@ -2,11 +2,13 @@ local is_staged = require("alien.status").is_staged
 local STATUSES = require("alien.status").STATUSES
 local ERROR_CODES = require("alien.actions.error-codes")
 
+---@alias CommandArgs LocalFile | LocalBranch
+
 local M = {}
 
 --- Create a command string or function that returns a command string.
 --- If the command is a function, pass a get_args fn that returns the arguments to the command.
----@param cmd string | (fun(args: LocalFile): string | nil)
+---@param cmd string | (fun(args: CommandArgs): string | nil)
 ---@param get_args function | nil
 M.create_command = function(cmd, get_args)
 	if type(cmd) == "string" then
@@ -16,11 +18,11 @@ M.create_command = function(cmd, get_args)
 		return nil
 	end
 	return function()
-		local args = get_args()
+		local args = { get_args() }
 		if not args then
 			return nil
 		end
-		return cmd(args)
+		return cmd(unpack(args))
 	end
 end
 
@@ -135,6 +137,16 @@ M.local_branches = "git branch"
 ---@return string
 M.switch = function(branch)
 	return "git switch " .. branch.branch_name
+end
+
+--- Switch to a local branch
+---@param branch LocalBranch
+---@param new_branch_name string
+---@return string
+M.new_branch = function(branch, new_branch_name)
+	vim.print(branch)
+	vim.print(new_branch_name)
+	return "git switch --create " .. new_branch_name .. " " .. branch.branch_name
 end
 
 return M

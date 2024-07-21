@@ -113,7 +113,6 @@ M.close_child_elements = function(opts)
 		return {}
 	end
 	local elements = M.get_child_elements(opts)
-	vim.print(vim.inspect(elements))
 	for _, buffer in ipairs(elements) do
 		M.deregister_element(buffer.bufnr)
 		vim.api.nvim_buf_delete(buffer.bufnr, { force = true })
