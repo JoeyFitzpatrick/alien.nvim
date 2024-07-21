@@ -7,6 +7,35 @@ local M = {}
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
 
+--- Run a command, with side effects, such as displaying errors
+---@param cmd string
+---@return string[]
+local run_cmd = function(cmd)
+	local output = vim.fn.systemlist(cmd)
+	if vim.v.shell_error ~= 0 then
+		local bufnr = vim.api.nvim_create_buf(false, true)
+		vim.keymap.set("n", "q", function()
+			vim.api.nvim_buf_delete(bufnr, { force = true })
+		end, { buffer = bufnr })
+		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, output)
+		local width = math.floor(vim.o.columns * 0.8)
+		local height = math.floor(vim.o.lines * 0.8)
+		local col = math.floor((vim.o.columns - width) / 2)
+		local row = math.floor((vim.o.lines - height) / 2)
+		vim.api.nvim_open_win(bufnr, true, {
+			relative = "editor",
+			width = width,
+			height = height,
+			row = row,
+			col = col,
+			style = "minimal",
+			border = "rounded",
+			title = "Alien error",
+		})
+	end
+	return output
+end
+
 --- Return the output of multiple commands
 --- If one of the commands is itself an array, the outputs of the commands in the array will be concatenated on a single line
 ---@param cmds AlienCommand[]
@@ -15,12 +44,12 @@ local function get_multiple_outputs(cmds)
 	local output = {}
 	for _, c in ipairs(cmds) do
 		if type(c) == "string" then
-			for _, line in ipairs(vim.fn.systemlist(c)) do
+			for _, line in ipairs(run_cmd(c)) do
 				table.insert(output, line)
 			end
 		end
 		if type(c) == "function" then
-			for _, line in ipairs(vim.fn.systemlist(c())) do
+			for _, line in ipairs(run_cmd(c())) do
 				table.insert(output, line)
 			end
 		end
@@ -73,15 +102,16 @@ M.create_action = function(cmd, opts)
 		if type(cmd) == "function" then
 			local fn = function()
 				local cmd_fn_result = M.parse_command(cmd, opts.add_flags)
+				vim.print(cmd_fn_result)
 				return {
-					output = { handle_output(vim.fn.systemlist(cmd_fn_result)) },
+					output = { handle_output(run_cmd(cmd_fn_result)) },
 					object_type = object_type or get_object_type(cmd()),
 				}
 			end
 			redraw()
 			return fn()
 		end
-		local output = vim.fn.systemlist(M.parse_command(cmd, opts.add_flags))
+		local output = run_cmd(M.parse_command(cmd, opts.add_flags))
 		redraw()
 		return { output = handle_output(output), object_type = object_type or get_object_type(cmd) }
 	end

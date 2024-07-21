@@ -8,6 +8,8 @@ local M = {}
 M.set_object_keymaps = function(bufnr, object_type)
 	if object_type == "local_file" then
 		require("alien.keymaps.local_file-keymaps").set_keymaps(bufnr)
+	elseif object_type == "local_branch" then
+		require("alien.keymaps.local-branch-keymaps").set_keymaps(bufnr)
 	end
 end
 

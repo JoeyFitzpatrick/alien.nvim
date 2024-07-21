@@ -21,6 +21,9 @@ local M = {
 			scroll_diff_down = "J",
 			scroll_diff_up = "K",
 		},
+		local_branch = {
+			switch = "s",
+		},
 	},
 }
 

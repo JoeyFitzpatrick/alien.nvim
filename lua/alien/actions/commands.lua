@@ -130,5 +130,11 @@ end
 
 -- Branch commands
 M.local_branches = "git branch"
+--- Switch to a local branch
+---@param branch LocalBranch
+---@return string
+M.switch = function(branch)
+	return "git switch " .. branch.branch_name
+end
 
 return M
