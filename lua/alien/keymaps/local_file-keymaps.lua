@@ -47,7 +47,7 @@ M.set_keymaps = function(bufnr)
 		end
 	end, opts)
 
-	local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = false })
+	local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
 	vim.api.nvim_create_autocmd("CursorMoved", {
 		desc = "Diff the file under the cursor",
 		buffer = bufnr,
@@ -55,7 +55,10 @@ M.set_keymaps = function(bufnr)
 			elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
 			local width = math.floor(vim.o.columns * 0.67)
 			if vim.api.nvim_get_current_buf() == bufnr then
-				elements.terminal(local_file.diff_native(), { window = { width = width } })
+				local ok, cmd = pcall(local_file.diff_native)
+				if ok then
+					elements.terminal(cmd, { window = { width = width } })
+				end
 			end
 		end,
 		group = alien_status_group,

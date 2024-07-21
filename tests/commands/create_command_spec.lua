@@ -22,4 +22,22 @@ describe("create command", function()
 		end)()
 		assert.equals("command with arg1 arg2", result)
 	end)
+	it("throws an error if get_args returns nil", function()
+		local cmd_fn = function(arg)
+			return "command with " .. arg
+		end
+		local get_args = function()
+			return nil
+		end
+		local command_fn = create_command(cmd_fn, get_args)
+		local ok = pcall(command_fn)
+		assert.equals(false, ok)
+	end)
+	it("throws an error if get_args is not passed for function command", function()
+		local cmd_fn = function(arg)
+			return "command with " .. arg
+		end
+		local ok = pcall(create_command, cmd_fn)
+		assert.equals(false, ok)
+	end)
 end)
