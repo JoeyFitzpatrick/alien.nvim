@@ -24,6 +24,10 @@ local M = {
 		local_branch = {
 			switch = "s",
 			new_branch = "n",
+			delete = "d",
+			rename = "R",
+			merge = "m",
+			rebase = "r",
 		},
 	},
 }
