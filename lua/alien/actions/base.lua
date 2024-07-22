@@ -4,6 +4,7 @@ local create_action = require("alien.actions.action").create_action
 local M = {}
 
 local function handle_status_output(output)
+	vim.print(vim.inspect(output))
 	local head = output[1]
 	local num_commits_to_pull = output[2]
 	local num_commits_to_push = output[3]

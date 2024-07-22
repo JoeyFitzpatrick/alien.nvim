@@ -74,7 +74,7 @@ M.commit = "git commit"
 M.num_commits_to_pull = function()
 	local current_remote = vim.fn.system(M.current_remote)
 	if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
-		return "0"
+		return "echo 0"
 	end
 	current_remote = current_remote:gsub("\n", "")
 	return "git rev-list --count HEAD.." .. current_remote
@@ -85,7 +85,7 @@ end
 M.num_commits_to_push = function()
 	local current_remote = vim.fn.system(M.current_remote)
 	if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
-		return "0"
+		return "echo 0"
 	end
 	current_remote = current_remote:gsub("\n", "")
 	return "git rev-list --count " .. current_remote .. "..HEAD"
