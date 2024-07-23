@@ -22,6 +22,7 @@ M.create_command = function(cmd, get_args)
 		if not args or #args == 0 then
 			error("Could not get args to create command")
 		end
+		local unpack = unpack and unpack or table.unpack
 		return cmd(unpack(args))
 	end
 end

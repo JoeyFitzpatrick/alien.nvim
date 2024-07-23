@@ -6,9 +6,9 @@ describe("parse_command", function()
 		return cmd
 	end
 	it("returns the command if it's a string", function()
-		assert.equals(cmd, parse_command(cmd))
+		assert.equal(cmd, parse_command(cmd))
 	end)
 	it("returns the command if it's a function", function()
-		assert.equals(cmd, parse_command(cmd_fn))
+		assert.equal(cmd, parse_command(cmd_fn))
 	end)
 end)
