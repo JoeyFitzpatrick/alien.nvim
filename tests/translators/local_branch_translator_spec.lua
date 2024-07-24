@@ -8,7 +8,7 @@ describe("local branch translator", function()
 	end)
 	it("should return the branch name and status for non checked out branch", function()
 		local expected =
-			{ branch_name = "main", is_current_branch = false, branch_name_position = { start = 3, ending = 6 } }
-		assert.are.same(expected, translate("  main"))
+			{ branch_name = "test", is_current_branch = false, branch_name_position = { start = 3, ending = 6 } }
+		assert.are.same(expected, translate("  test"))
 	end)
 end)

@@ -150,4 +150,19 @@ M.new_branch = function(branch, new_branch_name)
 	return "git switch --create " .. new_branch_name .. " " .. branch.branch_name
 end
 
+---@param branch LocalBranch
+---@param location "local" | "remote"
+M.delete_branch = function(branch, location)
+	if location == "remote" then
+		return "git push origin --delete " .. branch.branch_name
+	elseif location == "local" then
+		return "git branch --delete " .. branch.branch_name
+	end
+end
+
+---@param branch LocalBranch
+M.rename_branch = function(branch, new_branch_name)
+	return "git branch -m " .. branch.branch_name .. " " .. new_branch_name
+end
+
 return M
