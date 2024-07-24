@@ -16,6 +16,8 @@ M.set_keymaps = function(bufnr)
 	map(keymaps.new_branch, local_branch.new_branch)
 	map(keymaps.delete, local_branch.delete)
 	map(keymaps.rename, local_branch.rename)
+	map(keymaps.merge, local_branch.merge)
+	map(keymaps.rebase, local_branch.rebase)
 end
 
 return M
