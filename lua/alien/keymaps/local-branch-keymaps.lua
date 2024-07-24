@@ -1,7 +1,5 @@
 local local_branch = require("alien.objects.local-branch-object")
-local elements = require("alien.elements")
 local keymaps = require("alien.config").keymaps.local_branch
-local commands = require("alien.actions.commands")
 
 local M = {}
 
