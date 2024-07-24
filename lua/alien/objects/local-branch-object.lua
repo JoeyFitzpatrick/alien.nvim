@@ -8,7 +8,13 @@ local translate = require("alien.translators.local-branch-translator").translate
 
 local M = {}
 
-local get_args = function()
+---@param input string | nil
+local get_args = function(input)
+	if input then
+		return function()
+			return translate(vim.api.nvim_get_current_line()), input
+		end
+	end
 	return translate(vim.api.nvim_get_current_line())
 end
 
@@ -28,22 +34,11 @@ local new_branch_cmd = function()
 end
 M.new_branch = create_action(new_branch_cmd, { trigger_redraw = true })
 
-local delete_branch_cmd = function()
-	local branch = get_args()
-	local branch_location = ""
-	vim.ui.select({ "local", "remote" }, {
-		prompt = "Delete local or remote: ",
-	}, function(choice)
-		vim.print(choice)
-		if choice == "remote" then
-			branch_location = "remote"
-		elseif choice == "local" then
-			branch_location = "local"
-		end
+M.delete = function()
+	vim.ui.select({ "local", "remote" }, "Delete local or remote: ", function(choice)
+		create_action(create_command(commands.delete_branch, get_args(choice)), { trigger_redraw = true })()
 	end)
-	return commands.delete_branch(branch, branch_location)
 end
-M.delete = create_action(delete_branch_cmd, { trigger_redraw = true })
 
 local rename_branch_cmd = function()
 	local branch = get_args()
