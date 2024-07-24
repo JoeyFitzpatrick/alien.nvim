@@ -165,4 +165,14 @@ M.rename_branch = function(branch, new_branch_name)
 	return "git branch -m " .. branch.branch_name .. " " .. new_branch_name
 end
 
+---@param branch LocalBranch
+M.merge_branch = function(branch)
+	return "git merge " .. branch.branch_name
+end
+
+---@param branch LocalBranch
+M.rebase_branch = function(branch)
+	return "git rebase " .. branch.branch_name
+end
+
 return M

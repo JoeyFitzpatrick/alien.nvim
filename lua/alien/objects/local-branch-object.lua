@@ -24,15 +24,11 @@ end
 
 M.switch = create_simple_action(commands.switch, { trigger_redraw = true })
 
-local new_branch_cmd = function()
-	local branch = get_args()
-	local new_branch_name = ""
-	vim.ui.input({ prompt = "new branch name: " }, function(ui_input)
-		new_branch_name = ui_input
+M.new_branch = function()
+	vim.ui.input({ prompt = "New branch name: " }, function(input)
+		create_action(create_command(commands.new_branch, get_args(input)), { trigger_redraw = true })()
 	end)
-	return commands.new_branch(branch, new_branch_name)
 end
-M.new_branch = create_action(new_branch_cmd, { trigger_redraw = true })
 
 M.delete = function()
 	vim.ui.select({ "local", "remote" }, "Delete local or remote: ", function(choice)
@@ -40,19 +36,12 @@ M.delete = function()
 	end)
 end
 
-local rename_branch_cmd = function()
-	local branch = get_args()
-	local new_branch_name = ""
-	vim.ui.input({ prompt = "rename branch: " }, function(ui_input)
-		new_branch_name = ui_input
+M.rename = function()
+	vim.ui.input({ prompt = "Rename branch: " }, function(input)
+		create_action(create_command(commands.rename_branch, get_args(input)), { trigger_redraw = true })()
 	end)
-	return commands.rename_branch(branch, new_branch_name)
 end
-M.rename = create_action(rename_branch_cmd, { trigger_redraw = true })
-
--- delete = "d",
--- rename = "R",
--- merge = "m",
--- rebase = "r",
+M.merge = create_simple_action(commands.merge_branch)
+M.rebase = create_simple_action(commands.rebase_branch)
 
 return M
