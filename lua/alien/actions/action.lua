@@ -99,19 +99,10 @@ M.create_action = function(cmd, opts)
 			redraw()
 			return { output = handle_output(output), object_type = object_type }
 		end
-		if type(cmd) == "function" then
-			local cmd_fn_result = M.parse_command(cmd, opts.add_flags)
-			local output = { handle_output(run_cmd(cmd_fn_result)) }
-			local type = object_type or get_object_type(cmd_fn_result)
-			redraw()
-			return {
-				output = output,
-				object_type = type,
-			}
-		end
-		local output = run_cmd(M.parse_command(cmd, opts.add_flags))
+		local parsed_command = M.parse_command(cmd, opts.add_flags)
+		local output = handle_output(run_cmd(parsed_command))
 		redraw()
-		return { output = handle_output(output), object_type = object_type or get_object_type(cmd) }
+		return { output = output, object_type = object_type or get_object_type(parsed_command) }
 	end
 end
 
