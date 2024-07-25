@@ -2,6 +2,12 @@ local register = require("alien.elements.register")
 
 local M = {}
 
+M.map = function(keys, fn, opts)
+	vim.keymap.set("n", keys, function()
+		fn()
+	end, opts)
+end
+
 --- Set keymaps by object type for the given buffer
 ---@param bufnr integer
 ---@param object_type AlienObject
