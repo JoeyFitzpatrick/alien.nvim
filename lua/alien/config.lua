@@ -28,6 +28,14 @@ local M = {
 			rename = "R",
 			merge = "m",
 			rebase = "r",
+			log = "l",
+		},
+		commit = {
+			display_files = "s",
+			drop = "d",
+			reword = "rw",
+			revert = "rv",
+			open_in_browser = "o",
 		},
 	},
 }

@@ -1,5 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 local commands = require("alien.actions.commands")
+local elements = require("alien.elements")
 local create_command = commands.create_command
 local create_action = require("alien.actions.action").create_action
 local translate = require("alien.translators.local-branch-translator").translate
@@ -35,5 +36,8 @@ M.rename = function()
 end
 M.merge = create_simple_action(commands.merge_branch)
 M.rebase = create_simple_action(commands.rebase_branch)
+M.log = function()
+	elements.buffer(create_simple_action(commands.log))
+end
 
 return M

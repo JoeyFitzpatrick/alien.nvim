@@ -1,5 +1,4 @@
 local keymaps = require("alien.keymaps")
-local constants = require("alien.constants")
 local get_object_type = require("alien.objects").get_object_type
 local register = require("alien.elements.register")
 local autocmds = require("alien.elements.element-autocmds")

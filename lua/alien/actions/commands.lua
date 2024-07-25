@@ -146,6 +146,7 @@ M.diff_native = function(local_file)
 end
 
 -- Branch commands
+
 M.local_branches = "git branch"
 --- Switch to a local branch
 ---@param branch LocalBranch
@@ -188,5 +189,22 @@ end
 M.rebase_branch = function(branch)
 	return "git rebase " .. branch.branch_name
 end
+
+---@param branch LocalBranch
+M.log = function(branch)
+	return "git log " .. branch.branch_name .. " --oneline"
+end
+
+-- End branch commands
+
+-- Commit commands
+
+--- Rewords a commit message
+---@param commit Commit
+M.revert = function(commit)
+	return "git revert " .. commit.hash
+end
+
+-- End commit commands
 
 return M
