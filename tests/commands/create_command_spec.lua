@@ -22,6 +22,15 @@ describe("create command", function()
 		end)()
 		assert.are.equal("command with arg1 arg2", result)
 	end)
+	it("optionally accepts an input arg after the get_args fn", function()
+		local cmd_fn = function(arg1, arg2)
+			return "command with " .. arg1 .. " " .. arg2
+		end
+		local result = create_command(cmd_fn, function()
+			return "arg1"
+		end, "some input")()
+		assert.are.equal("command with arg1 some input", result)
+	end)
 	it("throws an error if get_args returns nil", function()
 		local cmd_fn = function(arg)
 			return "command with " .. arg

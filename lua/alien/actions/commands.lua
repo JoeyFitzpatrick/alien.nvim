@@ -10,7 +10,7 @@ local M = {}
 --- If the command is a function, pass a get_args fn that returns the arguments to the command.
 ---@param cmd string | (fun(args: CommandArgs): string)
 ---@param get_args function | nil
-M.create_command = function(cmd, get_args)
+M.create_command = function(cmd, get_args, input)
 	if type(cmd) == "string" then
 		return cmd
 	end
@@ -22,6 +22,7 @@ M.create_command = function(cmd, get_args)
 		if not args or #args == 0 then
 			error("Could not get args to create command")
 		end
+		table.insert(args, input)
 		local unpack = unpack and unpack or table.unpack
 		return cmd(unpack(args))
 	end
