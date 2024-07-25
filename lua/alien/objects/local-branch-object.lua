@@ -8,15 +8,7 @@ local translate = require("alien.translators.local-branch-translator").translate
 
 local M = {}
 
----@param input string | nil
-local get_args = function(input)
-	if input then
-		return function()
-			return translate(vim.api.nvim_get_current_line()), input
-		end
-	end
-	return translate(vim.api.nvim_get_current_line())
-end
+local get_args = commands.get_args(translate)
 
 local create_simple_action = function(cmd, opts)
 	return create_action(create_command(cmd, get_args), opts)

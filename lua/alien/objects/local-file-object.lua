@@ -8,9 +8,7 @@ local translate = require("alien.translators.local-file-translator").translate
 
 local M = {}
 
-local get_args = function()
-	return translate(vim.api.nvim_get_current_line())
-end
+local get_args = commands.get_args(translate)
 
 M.stage_or_unstage = create_action(create_command(commands.stage_or_unstage_file, get_args), { trigger_redraw = true })
 

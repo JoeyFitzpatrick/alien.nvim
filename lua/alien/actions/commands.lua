@@ -60,6 +60,20 @@ M.add_flags_input = function(cmd)
 	return cmd_with_flags
 end
 
+--- Get the arguments to pass to create_command
+---@param translate fun(string): table
+---@return fun(input: string | nil): (table | fun(): table)
+M.get_args = function(translate)
+	return function(input)
+		if input then
+			return function()
+				return translate(vim.api.nvim_get_current_line()), input
+			end
+		end
+		return translate(vim.api.nvim_get_current_line())
+	end
+end
+
 M.status = "git status --porcelain --untracked=all | sort -k1.4"
 -- output stats for staged files, or a message if no files are staged
 M.staged_stats =
