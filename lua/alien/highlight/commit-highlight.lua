@@ -7,7 +7,6 @@ M.highlight = function(bufnr)
 	for i, line in ipairs(lines) do
 		local commit = translate(line)
 		if commit then
-			print("hello")
 			vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienCommitHash", i - 1, commit.start, commit.ending)
 		end
 	end

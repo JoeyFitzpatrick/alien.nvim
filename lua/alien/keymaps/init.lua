@@ -16,6 +16,8 @@ M.set_object_keymaps = function(bufnr, object_type)
 		require("alien.keymaps.local_file-keymaps").set_keymaps(bufnr)
 	elseif object_type == "local_branch" then
 		require("alien.keymaps.local-branch-keymaps").set_keymaps(bufnr)
+	elseif object_type == "commit" then
+		require("alien.keymaps.commit-keymaps").set_keymaps(bufnr)
 	end
 end
 

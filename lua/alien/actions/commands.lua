@@ -106,6 +106,8 @@ M.num_commits_to_push = function()
 	return "git rev-list --count " .. current_remote .. "..HEAD"
 end
 
+-- Local file commands
+
 ---@param local_file LocalFile
 M.stage_or_unstage_file = function(local_file)
 	local filename = local_file.filename
@@ -203,6 +205,12 @@ end
 ---@param commit Commit
 M.revert = function(commit)
 	return "git revert " .. commit.hash
+end
+
+--- Show more commit info
+---@param commit Commit
+M.commit_info = function(commit)
+	return "git log -n 1 " .. commit.hash
 end
 
 -- End commit commands

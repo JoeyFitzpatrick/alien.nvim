@@ -36,6 +36,7 @@ local M = {
 			reword = "rw",
 			revert = "rv",
 			open_in_browser = "o",
+			commit_info = "i",
 		},
 	},
 }
