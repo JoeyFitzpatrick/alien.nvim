@@ -7,7 +7,7 @@ local M = {}
 ---@alias Action fun(): { output: string[], object_type: AlienObject }
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
----@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil, element: function | nil }
+---@alias AlienOpts { object_type: AlienObject | nil, current_object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, element: function | nil, element_opts: { object_type: AlienObject }, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
@@ -113,15 +113,13 @@ end
 ---@param opts AlienOpts
 M.action = function(cmd, opts)
 	return function(input)
-		local translate = get_translator(opts.object_type)
-		local get_args = function()
-			return commands.get_args(translate), input
-		end
-		local action_fn = M.create_action(commands.create_command(cmd, get_args(), input), opts)
+		local translate = get_translator(opts.current_object_type)
+		local get_args = commands.get_args(translate)
+		local action_fn = M.create_action(commands.create_command(cmd, get_args, input), opts)
 		if opts.element then
 			return opts.element(action_fn)
 		end
-		return action_fn
+		return action_fn()
 	end
 end
 
