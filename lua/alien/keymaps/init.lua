@@ -1,10 +1,35 @@
 local register = require("alien.elements.register")
+local action = require("alien.actions.action").action
 
 local M = {}
 
 M.map = function(keys, fn, opts)
 	vim.keymap.set("n", keys, function()
 		fn()
+	end, opts)
+end
+
+M.map_action = function(keys, cmd_fn, alien_opts, opts)
+	M.map(keys, action(cmd_fn, alien_opts), opts)
+end
+M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
+	if input_opts.items then
+		M.map(keys, function()
+			vim.ui.select(input_opts.items, { prompt = input_opts.prompt }, function(input)
+				action(cmd_fn, alien_opts)(input)
+			end)
+		end, opts)
+	else
+		M.map(keys, function()
+			vim.ui.input({ prompt = input_opts.prompt }, function(input)
+				action(cmd_fn, alien_opts)(input)
+			end)
+		end, opts)
+	end
+end
+M.map_action_with_element = function(keys, cmd_fn, action_opts, alien_opts, opts)
+	M.map(keys, function()
+		action(cmd_fn, vim.tbl_extend("force", alien_opts, action_opts))()
 	end, opts)
 end
 
