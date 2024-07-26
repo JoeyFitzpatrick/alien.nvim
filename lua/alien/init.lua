@@ -1,5 +1,6 @@
 local elements = require("alien.elements")
 local actions = require("alien.actions")
+local action = require("alien.actions.action").action
 local highlight = require("alien.highlight")
 local config = require("alien.config")
 
