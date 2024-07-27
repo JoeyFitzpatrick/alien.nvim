@@ -41,7 +41,7 @@ M.set_keymaps = function(bufnr)
 
 	map(keymaps.log, function()
 		elements.buffer(action(function(branch)
-			return "git log " .. branch.branch_name .. " --oneline"
+			return "git log " .. branch.branch_name .. " --pretty=format:'%h %cr %an ◯ %s'"
 		end))
 	end, opts)
 end
