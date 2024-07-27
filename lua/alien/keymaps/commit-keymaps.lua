@@ -15,6 +15,14 @@ M.set_keymaps = function(bufnr)
 			return "git log -n 1 " .. commit.hash
 		end))
 	end, opts)
+
+	map_action(keymaps.revert, function(commit)
+		return "git revert " .. commit.hash .. " --no-commit"
+	end, alien_opts, opts)
+
+	map_action_with_input(keymaps.reword, function(commit, new_message)
+		return "git rebase -i --autosquash -x \"git commit --amend -m '" .. new_message .. "'\" " .. commit.hash .. "^"
+	end, { prompt = "Updated commit message: " }, alien_opts, opts)
 end
 
 return M

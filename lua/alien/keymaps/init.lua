@@ -5,7 +5,7 @@ local M = {}
 
 ---@param keys string
 ---@param fn function
----@param opts vim.keymap.set.Opts
+---@param opts? vim.keymap.set.Opts
 M.map = function(keys, fn, opts)
 	vim.keymap.set("n", keys, function()
 		fn()
@@ -15,8 +15,8 @@ end
 --- Cleaner way to map an action to a keymap
 ---@param keys string
 ---@param cmd_fn function
----@param alien_opts AlienOpts
----@param opts vim.keymap.set.Opts
+---@param alien_opts? AlienOpts
+---@param opts? vim.keymap.set.Opts
 M.map_action = function(keys, cmd_fn, alien_opts, opts)
 	M.map(keys, action(cmd_fn, alien_opts), opts)
 end

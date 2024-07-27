@@ -32,7 +32,6 @@ local M = {
 		},
 		commit = {
 			display_files = "s",
-			drop = "d",
 			reword = "rw",
 			revert = "rv",
 			open_in_browser = "o",
