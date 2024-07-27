@@ -1,5 +1,6 @@
 local get_object_type = require("alien.objects").get_object_type
 local commands = require("alien.actions.commands")
+local register = require("alien.elements.register")
 local get_translator = require("alien.translators").get_translator
 
 local M = {}
@@ -7,7 +8,7 @@ local M = {}
 ---@alias Action fun(): { output: string[], object_type: AlienObject }
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
----@alias AlienOpts { object_type: AlienObject | nil, current_object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, element: function | nil, element_opts: { object_type: AlienObject }, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
+---@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
@@ -110,15 +111,13 @@ end
 
 --- Create an action with just a command (string or function)
 ---@param cmd string | fun(object: table, input: string | nil): string
----@param opts AlienOpts
+---@param opts AlienOpts | nil
 M.action = function(cmd, opts)
 	return function(input)
-		local translate = get_translator(opts.current_object_type)
+		local current_object_type = register.get_current_element().object_type
+		local translate = get_translator(current_object_type)
 		local get_args = commands.get_args(translate)
 		local action_fn = M.create_action(commands.create_command(cmd, get_args, input), opts)
-		if opts.element then
-			return opts.element(action_fn)
-		end
 		return action_fn()
 	end
 end

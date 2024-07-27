@@ -18,7 +18,7 @@ M.GIT_VERBS = {
 }
 
 ---
----@param cmd string
+---@param cmd string | fun(obj: table, input: string | nil): string
 ---@return AlienObject
 M.get_object_type = function(cmd)
 	local first_word = cmd:match("%w+")

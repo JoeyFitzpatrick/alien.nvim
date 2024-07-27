@@ -22,6 +22,9 @@ local setup_element = function(action, element_params)
 	element_params.bufnr = bufnr
 	element_params.action = action
 	element_params.highlight = highlight
+	if not element_params.object_type then
+		element_params.object_type = result.object_type
+	end
 	register.register_element(element_params)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, result.output)
 	highlight(bufnr)

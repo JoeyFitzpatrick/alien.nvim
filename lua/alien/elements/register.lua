@@ -49,11 +49,7 @@ end
 M.register_element = function(params)
 	params.child_elements = {}
 	local current_element = M.get_current_element()
-	if params.element_type == "tab" then
-		local tabnr = vim.api.nvim_get_current_tabpage()
-		params.tabnr = tabnr
-		table.insert(M.elements, params)
-	elseif params.element_type == "terminal" then
+	if params.element_type == "terminal" then
 		if not params.channel_id then
 			error("channel_id is required for terminal elements")
 		end

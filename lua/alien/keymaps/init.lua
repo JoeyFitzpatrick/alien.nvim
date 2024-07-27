@@ -3,15 +3,29 @@ local action = require("alien.actions.action").action
 
 local M = {}
 
+---@param keys string
+---@param fn function
+---@param opts vim.keymap.set.Opts
 M.map = function(keys, fn, opts)
 	vim.keymap.set("n", keys, function()
 		fn()
 	end, opts)
 end
 
+--- Cleaner way to map an action to a keymap
+---@param keys string
+---@param cmd_fn function
+---@param alien_opts AlienOpts
+---@param opts vim.keymap.set.Opts
 M.map_action = function(keys, cmd_fn, alien_opts, opts)
 	M.map(keys, action(cmd_fn, alien_opts), opts)
 end
+
+---@param keys string
+---@param cmd_fn function
+---@param input_opts { prompt: string, items: any[] | nil }
+---@param alien_opts AlienOpts
+---@param opts vim.keymap.set.Opts
 M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
 	if input_opts.items then
 		M.map(keys, function()
@@ -26,11 +40,6 @@ M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
 			end)
 		end, opts)
 	end
-end
-M.map_action_with_element = function(keys, cmd_fn, action_opts, alien_opts, opts)
-	M.map(keys, function()
-		action(cmd_fn, vim.tbl_extend("force", alien_opts, action_opts))()
-	end, opts)
 end
 
 --- Set keymaps by object type for the given buffer
