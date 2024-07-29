@@ -1,4 +1,5 @@
 ---@alias AlienObject "commit" | "local_file" | "local_branch" | "commit_file" | "status" | "diff" | nil
+---@alias AlienVerb "log" | "status" | "diff" | "branch" | "diff-tree"
 
 local M = {}
 
@@ -15,6 +16,15 @@ M.GIT_VERBS = {
 	STATUS = "status",
 	DIFF = "diff",
 	BRANCH = "branch",
+	DIFF_TREE = "diff-tree",
+}
+
+local verb_to_status = {
+	[M.GIT_VERBS.STATUS] = M.OBJECT_TYPES.LOCAL_FILE,
+	[M.GIT_VERBS.LOG] = M.OBJECT_TYPES.COMMIT,
+	[M.GIT_VERBS.DIFF] = M.OBJECT_TYPES.DIFF,
+	[M.GIT_VERBS.BRANCH] = M.OBJECT_TYPES.LOCAL_BRANCH,
+	[M.GIT_VERBS.DIFF_TREE] = M.OBJECT_TYPES.COMMIT_FILE,
 }
 
 ---
@@ -27,16 +37,7 @@ M.get_object_type = function(cmd)
 	end
 	local word = cmd:match("%s[^%-]%S+")
 	local git_verb = word:match("%S+")
-	if git_verb == M.GIT_VERBS.STATUS then
-		return M.OBJECT_TYPES.LOCAL_FILE
-	elseif git_verb == M.GIT_VERBS.LOG then
-		return M.OBJECT_TYPES.COMMIT
-	elseif git_verb == M.GIT_VERBS.DIFF then
-		return M.OBJECT_TYPES.DIFF
-	elseif git_verb == M.GIT_VERBS.BRANCH then
-		return M.OBJECT_TYPES.LOCAL_BRANCH
-	end
-	return nil
+	return verb_to_status[git_verb]
 end
 
 return M

@@ -7,8 +7,6 @@ local M = {}
 ---@return Commit | nil
 M.translate = function(str)
 	local first_word = str:match("%S+")
-	vim.print(str)
-	vim.print(first_word)
 	if not first_word then
 		return nil
 	end

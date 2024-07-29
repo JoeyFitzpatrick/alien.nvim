@@ -5,6 +5,8 @@ local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
 
+---@alias LocalBranch { branch_name: string }
+
 local M = {}
 
 M.set_keymaps = function(bufnr)

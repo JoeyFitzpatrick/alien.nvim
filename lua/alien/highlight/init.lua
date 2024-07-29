@@ -76,6 +76,7 @@ M.setup_colors = function()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienHead", colors.purple))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienPushPullString", colors.yellow))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitHash", colors.yellow))
+	vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitFile", colors.yellow))
 
 	-- background colors
 	vim.cmd(string.format("highlight %s guibg=%s", "AlienStagedBg", colors.green_bg_dark))
@@ -95,6 +96,8 @@ M.get_highlight_by_object = function(object_type)
 		return require("alien.highlight.local-branch-highlight").highlight
 	elseif object_type == "commit" then
 		return require("alien.highlight.commit-highlight").highlight
+	elseif object_type == "commit_file" then
+		return require("alien.highlight.commit-file-highlight").highlight
 	end
 	return function() end
 end

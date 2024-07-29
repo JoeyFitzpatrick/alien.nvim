@@ -37,6 +37,9 @@ local M = {
 			open_in_browser = "o",
 			commit_info = "i",
 		},
+		commit_file = {
+			open = "s",
+		},
 	},
 }
 

@@ -2,7 +2,7 @@ local is_staged = require("alien.status").is_staged
 local STATUSES = require("alien.status").STATUSES
 local ERROR_CODES = require("alien.actions.error-codes")
 
----@alias CommandArgs LocalFile | LocalBranch
+---@alias CommandArgs LocalFile | LocalBranch | Commit
 
 local M = {}
 
@@ -24,7 +24,6 @@ M.create_command = function(cmd, get_args, input)
 			error("Could not get args to create command")
 		end
 		table.insert(args, input)
-		vim.print(vim.inspect(args))
 		local unpack = unpack and unpack or table.unpack
 		return cmd(unpack(args))
 	end
