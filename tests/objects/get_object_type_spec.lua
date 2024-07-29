@@ -23,6 +23,7 @@ describe("get_object_type", function()
 			{ verb = GIT_VERBS.DIFF, object = OBJECT_TYPES.DIFF },
 			{ verb = GIT_VERBS.BRANCH, object = OBJECT_TYPES.LOCAL_BRANCH },
 			{ verb = GIT_VERBS.DIFF_TREE, object = OBJECT_TYPES.COMMIT_FILE },
+			{ verb = GIT_VERBS.SHOW, object = OBJECT_TYPES.DIFF },
 		}
 		for _, pair in pairs(verb_object_pairs) do
 			assert.equal(pair.object, get_object_type("git -f --flag --flag='something' " .. pair.verb .. " --flag -f"))

@@ -9,6 +9,8 @@ M.get_translator = function(object_type)
 		return require("alien.translators.local-branch-translator").translate
 	elseif object_type == "commit" then
 		return require("alien.translators.commit-translator").translate
+	elseif object_type == "commit_file" then
+		return require("alien.translators.commit-file-translator").translate
 	end
 end
 

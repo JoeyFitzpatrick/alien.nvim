@@ -39,6 +39,8 @@ local M = {
 		},
 		commit_file = {
 			open = "s",
+			scroll_diff_down = "J",
+			scroll_diff_up = "K",
 		},
 	},
 }

@@ -8,7 +8,7 @@ local M = {}
 
 --- Create a command string or function that returns a command string.
 --- If the command is a function, pass a get_args fn that returns the arguments to the command.
----@param cmd string | (fun(args: CommandArgs): string)
+---@param cmd string | (fun(args?: CommandArgs): string)
 ---@param get_args function | nil
 ---@param input string | nil
 M.create_command = function(cmd, get_args, input)
@@ -16,7 +16,7 @@ M.create_command = function(cmd, get_args, input)
 		return cmd
 	end
 	if not get_args then
-		error("Could not get args to create command")
+		return cmd()
 	end
 	return function()
 		local args = { get_args() }
