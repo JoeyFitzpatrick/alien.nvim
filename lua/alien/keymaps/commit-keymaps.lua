@@ -1,6 +1,7 @@
 local keymaps = require("alien.config").keymaps.commit
 local elements = require("alien.elements")
 local action = require("alien.actions.action").action
+local multi_action = require("alien.actions.action").multi_action
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
@@ -21,9 +22,14 @@ M.set_keymaps = function(bufnr)
 	end, alien_opts, opts)
 
 	map(keymaps.display_files, function()
-		elements.buffer(action(function(commit)
-			return "git diff-tree --no-commit-id --name-only " .. commit.hash .. " -r"
-		end))
+		elements.buffer(multi_action({
+			function(commit)
+				return "git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'"
+			end,
+			function(commit)
+				return "git diff-tree --no-commit-id --name-only " .. commit.hash .. " -r"
+			end,
+		}))
 	end, opts)
 end
 
