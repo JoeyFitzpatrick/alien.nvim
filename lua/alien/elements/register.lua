@@ -65,17 +65,25 @@ M.register_element = function(params)
 	end
 end
 
+---@param elements Element[]
+---@param target_bufnr integer
+local function remove_bufnr(elements, target_bufnr)
+	for i = #elements, 1, -1 do
+		if elements[i].bufnr == target_bufnr then
+			table.remove(elements, i)
+		else
+			if elements[i].child_elements then
+				remove_bufnr(elements[i].child_elements, target_bufnr)
+			end
+		end
+	end
+end
+
 --- Deregsiter an element.
 ---@param bufnr integer
 ---@return nil
 M.deregister_element = function(bufnr)
-	local filter = function(element)
-		return element.bufnr ~= bufnr
-	end
-	for _, element in ipairs(M.elements) do
-		element.child_elements = vim.tbl_filter(filter, element.child_elements)
-	end
-	M.elements = vim.tbl_filter(filter, M.elements)
+	remove_bufnr(M.elements, bufnr)
 end
 
 ---@param element Element

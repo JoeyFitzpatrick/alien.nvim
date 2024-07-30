@@ -1,6 +1,6 @@
 local M = {}
 
-local element_group = vim.api.nvim_create_augroup("Alien", { clear = false })
+local element_group = vim.api.nvim_create_augroup("Alien", { clear = true })
 M.set_element_autocmds = function(bufnr)
 	vim.api.nvim_create_autocmd("BufDelete", {
 		desc = "Deregister element",
