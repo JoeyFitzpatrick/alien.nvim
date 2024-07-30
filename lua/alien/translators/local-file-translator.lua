@@ -1,5 +1,7 @@
 local status = require("alien.status")
 
+---@alias LocalFile { filename: string, file_status: string }
+
 local M = {}
 
 --- Takes a line of text and attempts to return the file name and status

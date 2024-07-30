@@ -116,13 +116,16 @@ M.close_child_elements = function(opts)
 end
 
 M.redraw_elements = function()
+	vim.print(vim.inspect(M.elements))
 	for _, element in ipairs(M.elements) do
 		-- some elements (like terminals) don't have actions
-		if not element.action then
-			return
+		local ok, result = pcall(element.action)
+		if not ok then
+			goto continue
 		end
-		vim.api.nvim_buf_set_lines(element.bufnr, 0, -1, false, element.action().output)
+		vim.api.nvim_buf_set_lines(element.bufnr, 0, -1, false, result.output)
 		element.highlight(element.bufnr)
+		::continue::
 	end
 end
 

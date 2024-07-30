@@ -86,7 +86,7 @@ M.create_action = function(cmd, opts)
 	local object_type = opts.object_type
 	local redraw = function()
 		if opts.trigger_redraw then
-			vim.schedule(require("alien.elements.register").redraw_elements)
+			require("alien.elements.register").redraw_elements()
 		end
 	end
 	local handle_output = function(output)
