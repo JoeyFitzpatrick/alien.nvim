@@ -32,7 +32,7 @@ M.set_keymaps = function(bufnr)
 	-- Autocmds
 	local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
 	vim.api.nvim_create_autocmd("CursorMoved", {
-		desc = "Diff the file under the cursor",
+		desc = "Diff the commit file under the cursor",
 		buffer = bufnr,
 		callback = function()
 			elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })

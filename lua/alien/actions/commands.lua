@@ -2,7 +2,7 @@ local is_staged = require("alien.status").is_staged
 local STATUSES = require("alien.status").STATUSES
 local ERROR_CODES = require("alien.actions.error-codes")
 
----@alias CommandArgs LocalFile | LocalBranch | Commit
+---@alias CommandArgs LocalBranch | Commit
 
 local M = {}
 
@@ -21,7 +21,7 @@ M.create_command = function(cmd, get_args, input)
 	return function()
 		local args = { get_args() }
 		if not args or #args == 0 then
-			error("Could not get args to create command")
+			return cmd()
 		end
 		table.insert(args, input)
 		local unpack = unpack and unpack or table.unpack
@@ -82,9 +82,6 @@ M.staged_stats =
 	"git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.current_head = "printf 'HEAD: %s\n' $(git rev-parse --abbrev-ref HEAD)"
 M.current_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
-M.pull = "git pull"
-M.push = "git push"
-M.commit = "git commit"
 
 --- Get the number of commits to pull
 ---@return string
@@ -106,47 +103,6 @@ M.num_commits_to_push = function()
 	end
 	current_remote = current_remote:gsub("\n", "")
 	return "git rev-list --count " .. current_remote .. "..HEAD"
-end
-
--- Local file commands
-
----@param local_file LocalFile
-M.stage_or_unstage_file = function(local_file)
-	local filename = local_file.filename
-	local status = local_file.file_status
-	if not is_staged(status) then
-		return "git add -- " .. filename
-	else
-		return "git reset HEAD -- " .. filename
-	end
-end
-
-M.stage_or_unstage_all = function(local_files)
-	for _, local_file in ipairs(local_files) do
-		local status = local_file.file_status
-		if not is_staged(status) then
-			return "git add -A"
-		end
-	end
-	return "git reset"
-end
-
-M.restore_file = function(local_file)
-	local filename = local_file.filename
-	local status = local_file.file_status
-	if status == STATUSES.UNTRACKED then
-		return "git clean -f -- " .. filename
-	end
-	return "git restore -- " .. filename
-end
-
-M.diff_native = function(local_file)
-	local status = local_file.file_status
-	local filename = local_file.filename
-	if status == STATUSES.UNTRACKED then
-		return "git diff --no-index /dev/null " .. filename
-	end
-	return "git diff " .. filename
 end
 
 return M
