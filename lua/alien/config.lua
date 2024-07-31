@@ -34,6 +34,7 @@ local M = {
 			display_files = "s",
 			reword = "rw",
 			revert = "rv",
+			reset = "rs",
 			open_in_browser = "o",
 			commit_info = "i",
 		},

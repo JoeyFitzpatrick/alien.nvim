@@ -31,6 +31,10 @@ M.set_keymaps = function(bufnr)
 			end,
 		}))
 	end, opts)
+
+	map_action_with_input(keymaps.reset, function(commit, reset_type)
+		return "git reset --" .. reset_type .. " " .. commit.hash
+	end, { prompt = "Git reset type", items = { "mixed", "soft", "hard" } }, alien_opts, opts)
 end
 
 return M
