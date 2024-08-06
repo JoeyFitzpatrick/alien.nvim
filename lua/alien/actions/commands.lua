@@ -11,7 +11,8 @@ local M = {}
 ---@param cmd string | (fun(args?: CommandArgs): string)
 ---@param get_args function | nil
 ---@param input string | nil
-M.create_command = function(cmd, get_args, input)
+---@param element Element | nil
+M.create_command = function(cmd, get_args, input, element)
 	if type(cmd) == "string" then
 		return cmd
 	end
@@ -25,7 +26,12 @@ M.create_command = function(cmd, get_args, input)
 		end
 		table.insert(args, input)
 		local unpack = unpack and unpack or table.unpack
-		return cmd(unpack(args))
+		local ok, result = pcall(cmd, unpack(args))
+		if ok then
+			return result
+		elseif element and element.action_args then
+			return cmd(element.action_args)
+		end
 	end
 end
 

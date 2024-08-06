@@ -22,6 +22,7 @@ local setup_element = function(action, element_params)
 	element_params.bufnr = bufnr
 	element_params.action = action
 	element_params.highlight = highlight
+	element_params.action_args = result.action_args
 	if not element_params.object_type then
 		element_params.object_type = result.object_type
 	end

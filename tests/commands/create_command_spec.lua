@@ -49,4 +49,13 @@ describe("create command", function()
 		local ok = pcall(create_command, cmd_fn)
 		assert.are.equal(false, ok)
 	end)
+	it("returns args as well as command", function()
+		local cmd_fn = function(arg)
+			return "command with " .. arg
+		end
+		local _, args = create_command(cmd_fn, function()
+			return "arg"
+		end)()
+		assert.are.same({ "arg" }, args)
+	end)
 end)

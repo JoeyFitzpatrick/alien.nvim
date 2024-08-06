@@ -5,10 +5,10 @@ local get_translator = require("alien.translators").get_translator
 
 local M = {}
 
----@alias Action fun(): { output: string[], object_type: AlienObject }
+---@alias Action fun(): { output: string[], object_type: AlienObject, action_args: table }
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
----@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
+---@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, action_args: table, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
@@ -100,12 +100,16 @@ M.create_action = function(cmd, opts)
 			---@type string[]
 			local output = get_multiple_outputs(cmd)
 			redraw()
-			return { output = handle_output(output), object_type = object_type }
+			return { output = handle_output(output), object_type = object_type, action_args = opts.action_args }
 		end
 		local parsed_command = M.parse_command(cmd, opts.add_flags)
 		local output = handle_output(run_cmd(parsed_command))
 		redraw()
-		return { output = output, object_type = object_type or get_object_type(parsed_command) }
+		return {
+			output = output,
+			object_type = object_type or get_object_type(parsed_command),
+			action_args = opts.action_args,
+		}
 	end
 end
 
@@ -114,10 +118,19 @@ end
 ---@param opts AlienOpts | nil
 M.action = function(cmd, opts)
 	return function(input)
-		local current_object_type = register.get_current_element().object_type
+		opts = opts or {}
+		local current_element = register.get_current_element()
+		local current_object_type = current_element and current_element.object_type or nil
 		local translate = get_translator(current_object_type)
 		local get_args = commands.get_args(translate)
-		local action_fn = M.create_action(commands.create_command(cmd, get_args, input), opts)
+		local command = commands.create_command(cmd, get_args, input, current_element)
+		local action_args = get_args(input)
+		if type(action_args) == "function" then
+			action_args = action_args()
+		end
+		local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args)
+		opts.action_args = combined_args
+		local action_fn = M.create_action(command, opts)
 		return action_fn()
 	end
 end
@@ -130,10 +143,11 @@ M.multi_action = function(cmds, opts)
 		local output = {}
 		local object_type = nil
 		for _, cmd in ipairs(cmds) do
-			local current_object_type = register.get_current_element().object_type
+			local current_object = register.get_current_element() or {}
+			local current_object_type = current_object.object_type
 			local translate = get_translator(current_object_type)
 			local get_args = commands.get_args(translate)
-			local action_fn = M.create_action(commands.create_command(cmd, get_args), opts)
+			local action_fn = M.create_action(commands.create_command(cmd, get_args, nil, current_object), opts)
 			local result = action_fn()
 			for _, line in ipairs(result.output) do
 				table.insert(output, line)
