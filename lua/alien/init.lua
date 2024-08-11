@@ -33,7 +33,9 @@ end
 M.blame = function()
 	elements.split(
 		action(function()
-			return "git blame '" .. vim.api.nvim_buf_get_name(0) .. "'"
+			return "git blame '"
+				.. vim.api.nvim_buf_get_name(0)
+				.. "' --date=format-local:'%Y/%m/%d %I:%M %p' | sed -E 's/ +[0-9]+\\)/)/'"
 		end),
 		{ split = "left" },
 		function(win)

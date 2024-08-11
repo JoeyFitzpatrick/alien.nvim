@@ -1,3 +1,5 @@
+local DATE_FORMAT = "--date=format-local:'%A, %Y/%m/%d, %I:%M %p'" -- current user's timezone
+
 local M = {}
 
 --- convert a commit hash to a hex color to color the hash
