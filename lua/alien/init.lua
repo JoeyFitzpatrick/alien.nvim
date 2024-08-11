@@ -27,6 +27,7 @@ end
 -- Set new buf and old buf to have synced line nums, using syncbind and scrollbind
 -- Set autocmd such that when the blame buffer is closed, the original buffer has wrap set back to what it was, and scrollbind and syncbind are turned off (if needed)
 -- Highlight fn should parse commit hash into hex, and make that the color for the hash
+-- Also color the date
 -- Format the date
 -- Add some actions
 M.blame = function()

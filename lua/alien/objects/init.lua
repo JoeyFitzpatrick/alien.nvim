@@ -1,5 +1,5 @@
----@alias AlienObject "commit" | "local_file" | "local_branch" | "commit_file" | "status" | "diff" | nil
----@alias AlienVerb "log" | "status" | "diff" | "branch" | "diff-tree"
+---@alias AlienObject "commit" | "local_file" | "local_branch" | "commit_file" | "status" | "diff" | "blame" | nil
+---@alias AlienVerb "log" | "status" | "diff" | "branch" | "diff-tree" | "blame"
 
 local M = {}
 
@@ -9,6 +9,7 @@ M.OBJECT_TYPES = {
 	COMMIT_FILE = "commit_file",
 	COMMIT = "commit",
 	DIFF = "diff",
+	BLAME = "blame",
 }
 
 M.GIT_VERBS = {
@@ -18,6 +19,7 @@ M.GIT_VERBS = {
 	BRANCH = "branch",
 	DIFF_TREE = "diff-tree",
 	SHOW = "show",
+	BLAME = "blame",
 }
 
 local verb_to_status = {
@@ -27,11 +29,9 @@ local verb_to_status = {
 	[M.GIT_VERBS.BRANCH] = M.OBJECT_TYPES.LOCAL_BRANCH,
 	[M.GIT_VERBS.DIFF_TREE] = M.OBJECT_TYPES.COMMIT_FILE,
 	[M.GIT_VERBS.SHOW] = M.OBJECT_TYPES.DIFF,
+	[M.GIT_VERBS.BLAME] = M.OBJECT_TYPES.BLAME,
 }
 
-local pattern_to_status = {}
-
----
 ---@param cmd string | fun(obj: table, input: string | nil): string
 ---@return AlienObject
 M.get_object_type = function(cmd)

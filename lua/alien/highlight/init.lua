@@ -90,16 +90,15 @@ end
 ---@param object_type AlienObject
 ---@return function
 M.get_highlight_by_object = function(object_type)
-	if object_type == "local_file" then
-		return require("alien.highlight.local-file-highlight").highlight
-	elseif object_type == "local_branch" then
-		return require("alien.highlight.local-branch-highlight").highlight
-	elseif object_type == "commit" then
-		return require("alien.highlight.commit-highlight").highlight
-	elseif object_type == "commit_file" then
-		return require("alien.highlight.commit-file-highlight").highlight
-	end
-	return function() end
+	---@type table<AlienObject, function>
+	local object_highlight_map = {
+		local_file = require("alien.highlight.local-file-highlight").highlight,
+		local_branch = require("alien.highlight.local-branch-highlight").highlight,
+		commit = require("alien.highlight.commit-highlight").highlight,
+		commit_file = require("alien.highlight.commit-file-highlight").highlight,
+		blame = require("alien.highlight.blame-highlight").highlight,
+	}
+	return object_highlight_map[object_type]
 end
 
 return M
