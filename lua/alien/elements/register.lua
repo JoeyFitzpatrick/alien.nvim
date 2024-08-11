@@ -2,7 +2,7 @@
 local M = {}
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
----@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, object_type: AlienObject, child_elements: BaseElement[], action_args: table, action: Action, highlight: fun(bufnr: integer): nil}
+---@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, object_type: AlienObject, child_elements: BaseElement[], action_args: table, action: Action, post_render: fun(bufnr: integer) | nil, highlight: fun(bufnr: integer): nil}
 ---@alias TabElement {element_type: "tab", tabnr: integer, bufnr: integer, object_type: AlienObject, child_elements: BaseElement[]}
 ---@alias TerminalElement {element_type: "terminal", channel_id: integer, bufnr: integer, object_type: AlienObject}
 ---@alias Element BaseElement | TabElement | TerminalElement

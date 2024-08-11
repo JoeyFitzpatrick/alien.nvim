@@ -122,14 +122,19 @@ M.action = function(cmd, opts)
 		local current_element = register.get_current_element()
 		local current_object_type = current_element and current_element.object_type or nil
 		local translate = get_translator(current_object_type)
-		local get_args = commands.get_args(translate)
-		local command = commands.create_command(cmd, get_args, input, current_element)
-		local action_args = get_args(input)
-		if type(action_args) == "function" then
-			action_args = action_args()
+		local get_args = nil
+		if translate then
+			get_args = commands.get_args(translate)
 		end
-		local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args)
-		opts.action_args = combined_args
+		local command = commands.create_command(cmd, get_args, input, current_element)
+		if get_args then
+			local action_args = get_args(input)
+			if type(action_args) == "function" then
+				action_args = action_args()
+			end
+			local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args)
+			opts.action_args = combined_args
+		end
 		local action_fn = M.create_action(command, opts)
 		return action_fn()
 	end
@@ -146,7 +151,10 @@ M.multi_action = function(cmds, opts)
 			local current_object = register.get_current_element() or {}
 			local current_object_type = current_object.object_type
 			local translate = get_translator(current_object_type)
-			local get_args = commands.get_args(translate)
+			local get_args = nil
+			if translate then
+				get_args = commands.get_args(translate)
+			end
 			local action_fn = M.create_action(commands.create_command(cmd, get_args, nil, current_object), opts)
 			local result = action_fn()
 			for _, line in ipairs(result.output) do

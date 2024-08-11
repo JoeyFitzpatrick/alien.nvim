@@ -43,6 +43,9 @@ local function create(action, element_params)
 	local new_bufnr, object_type = setup_element(action, element_params)
 	keymaps.set_object_keymaps(new_bufnr, object_type)
 	keymaps.set_element_keymaps(new_bufnr, element_params.element_type)
+	if element_params.post_render then
+		element_params.post_render(new_bufnr)
+	end
 	return new_bufnr
 end
 
@@ -74,15 +77,19 @@ end
 --- Create a new buffer with the given action, and open it in a new split
 ---@param action Action
 ---@param opts vim.api.keyset.win_config | nil
+---@param post_render fun(win: integer) | nil
 ---@return integer
-M.split = function(action, opts)
+M.split = function(action, opts, post_render)
 	---@type vim.api.keyset.win_config
 	local default_split_opts = {
 		split = "right",
 	}
 	local float_opts = vim.tbl_extend("force", default_split_opts, opts or {})
 	local bufnr = create(action, { element_type = "split" })
-	vim.api.nvim_open_win(bufnr, true, float_opts)
+	local win = vim.api.nvim_open_win(bufnr, true, float_opts)
+	if post_render then
+		post_render(win)
+	end
 	return bufnr
 end
 
