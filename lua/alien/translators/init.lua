@@ -3,15 +3,14 @@ local M = {}
 --- Get the translator for a given object type
 ---@param object_type AlienObject
 M.get_translator = function(object_type)
-	if object_type == "local_file" then
-		return require("alien.translators.local-file-translator").translate
-	elseif object_type == "local_branch" then
-		return require("alien.translators.local-branch-translator").translate
-	elseif object_type == "commit" then
-		return require("alien.translators.commit-translator").translate
-	elseif object_type == "commit_file" then
-		return require("alien.translators.commit-file-translator").translate
-	end
+	local object_translate_map = {
+		local_file = require("alien.translators.local-file-translator").translate,
+		local_branch = require("alien.translators.local-branch-translator").translate,
+		commit = require("alien.translators.commit-translator").translate,
+		commit_file = require("alien.translators.commit-file-translator").translate,
+		blame = require("alien.translators.blame-translator").translate,
+	}
+	return object_translate_map[object_type]
 end
 
 return M
