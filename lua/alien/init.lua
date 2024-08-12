@@ -20,17 +20,18 @@ M.local_branches = function()
 	elements.buffer(actions.local_branches, { title = "AlienBranches" })
 end
 
--- Steps:
--- Get current buffer wrap settings
--- Set current buf to wrap
--- Set new buf to wrap
--- Set new buf and old buf to have synced line nums, using syncbind and scrollbind
--- Set autocmd such that when the blame buffer is closed, the original buffer has wrap set back to what it was, and scrollbind and syncbind are turned off (if needed)
--- Highlight fn should parse commit hash into hex, and make that the color for the hash
--- Also color the date
--- Format the date
--- Add some actions
 M.blame = function()
+	local original_win = vim.api.nvim_get_current_win()
+	local current_settings = {
+		scrollbind = vim.api.nvim_get_option_value("scrollbind", { win = original_win }),
+		wrap = vim.api.nvim_get_option_value("wrap", { win = original_win }),
+	}
+	local current_line_num = vim.api.nvim_win_get_cursor(original_win)[1]
+	local function setup_blame_window(win)
+		vim.api.nvim_set_option_value("scrollbind", true, { win = win })
+		vim.api.nvim_set_option_value("wrap", false, { win = win })
+	end
+	setup_blame_window(original_win)
 	elements.split(
 		action(function()
 			return "git blame '"
@@ -39,7 +40,27 @@ M.blame = function()
 		end),
 		{ split = "left" },
 		function(win)
-			vim.api.nvim_set_option_value("wrap", false, { win = win })
+			local closing_paren = string.find(vim.api.nvim_get_current_line(), ")")
+			if closing_paren then
+				local number_width = vim.fn.strwidth(tostring(vim.api.nvim_buf_line_count(0))) + 2
+				vim.api.nvim_win_set_width(0, closing_paren + number_width)
+			end
+			vim.api.nvim_win_set_cursor(win, { current_line_num, 0 })
+			setup_blame_window(win)
+			vim.cmd("syncbind")
+
+			local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
+			vim.api.nvim_create_autocmd("WinClosed", {
+				desc = "Reset original window settings",
+				buffer = 0,
+				callback = function()
+					vim.api.nvim_win_set_cursor(original_win, vim.api.nvim_win_get_cursor(0))
+					for option, value in pairs(current_settings) do
+						vim.api.nvim_set_option_value(option, value, { win = original_win })
+					end
+				end,
+				group = alien_status_group,
+			})
 		end
 	)
 end

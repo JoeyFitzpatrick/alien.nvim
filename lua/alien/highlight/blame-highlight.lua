@@ -23,6 +23,12 @@ M.highlight = function(bufnr)
 		vim.print(hex_obj.stripped_hash)
 		vim.cmd(string.format("highlight %s guifg=%s", "AlienBlameHash" .. hex_obj.stripped_hash, hex_obj.hex))
 		vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienBlameHash" .. hex_obj.stripped_hash, i - 1, 0, #first_word)
+
+		local timestamp_pattern = "%d%d%d%d/%d%d/%d%d %d%d:%d%d %a%a"
+		local start_index, end_index = line:find(timestamp_pattern)
+		if start_index and end_index then
+			vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienBlameDate", i - 1, start_index - 1, end_index)
+		end
 	end
 	::continue::
 end
