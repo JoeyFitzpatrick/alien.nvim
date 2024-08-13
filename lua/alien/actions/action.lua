@@ -132,7 +132,7 @@ M.action = function(cmd, opts)
 			if type(action_args) == "function" then
 				action_args = action_args()
 			end
-			local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args)
+			local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args or {})
 			opts.action_args = combined_args
 		end
 		local action_fn = M.create_action(command, opts)
