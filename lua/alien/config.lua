@@ -20,6 +20,8 @@ local M = {
 			diff = "n",
 			scroll_diff_down = "J",
 			scroll_diff_up = "K",
+			stash = "<leader>s",
+			stash_with_flags = "<leader>S",
 		},
 		local_branch = {
 			switch = "s",

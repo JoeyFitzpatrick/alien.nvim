@@ -22,7 +22,7 @@ M.create_command = function(cmd, get_args, input, element)
 	return function()
 		local args = { get_args() }
 		if not args or #args == 0 then
-			return cmd()
+			return cmd({}, input)
 		end
 		table.insert(args, input)
 		local unpack = unpack and unpack or table.unpack

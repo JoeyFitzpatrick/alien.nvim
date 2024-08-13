@@ -1,4 +1,5 @@
 local create_action = require("alien.actions.action").create_action
+local action = require("alien.actions.action").action
 local is_staged = require("alien.status").is_staged
 local elements = require("alien.elements")
 local keymaps = require("alien.config").keymaps.local_file
@@ -6,6 +7,7 @@ local commands = require("alien.actions.commands")
 local create_command = commands.create_command
 local map = require("alien.keymaps").map
 local map_action = require("alien.keymaps").map_action
+local map_action_with_input = require("alien.keymaps").map_action_with_input
 local translate = require("alien.translators.local-file-translator").translate
 local get_args = commands.get_args(translate)
 local STATUSES = require("alien.status").STATUSES
@@ -80,6 +82,20 @@ M.set_keymaps = function(bufnr)
 		local cmd = commands.add_flags_input("git commit")
 		elements.terminal(cmd, { window = { split = "right" } })
 	end, opts)
+
+	map_action_with_input(keymaps.stash, function(_, stash_name)
+		return "git stash push -m " .. stash_name
+	end, { prompt = "Stash name: " }, alien_opts, opts)
+
+	map(keymaps.stash_with_flags, function()
+		vim.ui.select({ "staged" }, { prompt = "Stash type:" }, function(stash_type)
+			vim.ui.input({ prompt = "Stash name: " }, function(input)
+				local cmd = "git stash push --" .. stash_type .. " -m " .. input
+				action(cmd, alien_opts)()
+			end)
+		end)
+	end, opts)
+
 	map(keymaps.navigate_to_file, function()
 		local filename = get_args().filename
 		vim.api.nvim_win_close(0, true)
