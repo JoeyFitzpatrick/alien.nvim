@@ -52,6 +52,7 @@ M.set_object_keymaps = function(bufnr, object_type)
 		commit = require("alien.keymaps.commit-keymaps").set_keymaps,
 		commit_file = require("alien.keymaps.commit-file-keymaps").set_keymaps,
 		blame = require("alien.keymaps.blame-keymaps").set_keymaps,
+		stash = require("alien.keymaps.stash-keymaps").set_keymaps,
 	}
 	object_keymaps_map[object_type](bufnr)
 end

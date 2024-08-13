@@ -78,6 +78,7 @@ M.setup_colors = function()
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitHash", colors.yellow))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitFile", colors.yellow))
 	vim.cmd(string.format("highlight %s guifg=%s", "AlienBlameDate", colors.red))
+	vim.cmd(string.format("highlight %s guifg=%s", "AlienStashName", colors.yellow))
 
 	-- background colors
 	vim.cmd(string.format("highlight %s guibg=%s", "AlienStagedBg", colors.green_bg_dark))
@@ -98,6 +99,7 @@ M.get_highlight_by_object = function(object_type)
 		commit = require("alien.highlight.commit-highlight").highlight,
 		commit_file = require("alien.highlight.commit-file-highlight").highlight,
 		blame = require("alien.highlight.blame-highlight").highlight,
+		stash = require("alien.highlight.stash-highlight").highlight,
 	}
 	return object_highlight_map[object_type]
 end

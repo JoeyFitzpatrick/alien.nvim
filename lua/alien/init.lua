@@ -20,6 +20,10 @@ M.local_branches = function()
 	elements.buffer(actions.local_branches, { title = "AlienBranches" })
 end
 
+M.stashes = function()
+	elements.buffer(actions.stashes, { title = "AlienStashes" })
+end
+
 M.blame = function()
 	local original_win = vim.api.nvim_get_current_win()
 	local current_settings = {

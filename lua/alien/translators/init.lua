@@ -9,6 +9,7 @@ M.get_translator = function(object_type)
 		commit = require("alien.translators.commit-translator").translate,
 		commit_file = require("alien.translators.commit-file-translator").translate,
 		blame = require("alien.translators.blame-translator").translate,
+		stash = require("alien.translators.stash-translator").translate,
 	}
 	return object_translate_map[object_type]
 end

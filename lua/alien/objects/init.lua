@@ -1,5 +1,5 @@
----@alias AlienObject "commit" | "local_file" | "local_branch" | "commit_file" | "status" | "diff" | "blame" | nil
----@alias AlienVerb "log" | "status" | "diff" | "branch" | "diff-tree" | "blame"
+---@alias AlienObject "commit" | "local_file" | "local_branch" | "commit_file" | "status" | "diff" | "blame" | "stash" | nil
+---@alias AlienVerb "log" | "status" | "diff" | "branch" | "diff-tree" | "blame" | "stash"
 
 local M = {}
 
@@ -10,6 +10,7 @@ M.OBJECT_TYPES = {
 	COMMIT = "commit",
 	DIFF = "diff",
 	BLAME = "blame",
+	STASH = "stash",
 }
 
 M.GIT_VERBS = {
@@ -20,6 +21,7 @@ M.GIT_VERBS = {
 	DIFF_TREE = "diff-tree",
 	SHOW = "show",
 	BLAME = "blame",
+	STASH = "stash",
 }
 
 local verb_to_status = {
@@ -30,6 +32,7 @@ local verb_to_status = {
 	[M.GIT_VERBS.DIFF_TREE] = M.OBJECT_TYPES.COMMIT_FILE,
 	[M.GIT_VERBS.SHOW] = M.OBJECT_TYPES.DIFF,
 	[M.GIT_VERBS.BLAME] = M.OBJECT_TYPES.BLAME,
+	[M.GIT_VERBS.STASH] = M.OBJECT_TYPES.STASH,
 }
 
 ---@param cmd string | fun(obj: table, input: string | nil): string

@@ -29,5 +29,6 @@ M.stats_and_status = create_action({
 })
 
 M.local_branches = create_action("git branch", { object_type = "local_branch" })
+M.stashes = create_action("git stash list", { object_type = "stash" })
 
 return M
