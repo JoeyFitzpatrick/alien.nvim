@@ -8,7 +8,7 @@ local M = {}
 M.translate = function(str)
 	local index = string.match(str, "stash@{(%d+)}")
 	local stash_name = string.match(str, ":%sOn%s[^:]+:%s(.+)")
-	local start_index, end_index = string.find(str, stash_name)
+	local start_index, end_index = string.find(str, stash_name or "")
 	return { index = index, name = stash_name, name_start = start_index - 1, name_end = end_index }
 end
 
