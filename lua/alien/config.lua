@@ -44,6 +44,7 @@ local M = {
 			open = "s",
 			scroll_diff_down = "J",
 			scroll_diff_up = "K",
+			open_in_split = "<C-v>",
 		},
 		stash = {
 			pop = "p",

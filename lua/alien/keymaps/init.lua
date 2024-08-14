@@ -54,7 +54,9 @@ M.set_object_keymaps = function(bufnr, object_type)
 		blame = require("alien.keymaps.blame-keymaps").set_keymaps,
 		stash = require("alien.keymaps.stash-keymaps").set_keymaps,
 	}
-	object_keymaps_map[object_type](bufnr)
+	if object_keymaps_map[object_type] then
+		object_keymaps_map[object_type](bufnr)
+	end
 end
 
 --- Set keymaps by element type for the given buffer

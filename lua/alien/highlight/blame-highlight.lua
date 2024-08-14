@@ -20,7 +20,6 @@ M.highlight = function(bufnr)
 			goto continue
 		end
 		local hex_obj = commit_hash_to_hex(first_word)
-		vim.print(hex_obj.stripped_hash)
 		vim.cmd(string.format("highlight %s guifg=%s", "AlienBlameHash" .. hex_obj.stripped_hash, hex_obj.hex))
 		vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienBlameHash" .. hex_obj.stripped_hash, i - 1, 0, #first_word)
 
