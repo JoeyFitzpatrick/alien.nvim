@@ -39,7 +39,7 @@ M.set_keymaps = function(bufnr)
 				return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
 			end, { trigger_redraw = false }),
 			{},
-			function(_win, buf)
+			function(_, buf)
 				vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
 				vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
 			end
