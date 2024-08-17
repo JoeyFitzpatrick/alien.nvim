@@ -74,6 +74,10 @@ If you see an error like `module 'busted.runner' not found`:
 eval $(luarocks path --no-bin)
 ```
 
+If you see an error like `pl.path requires LuaFileSystem`, you will need to make sure that your luarocks is using lua version 5.1.
+One way to do that is to install lua 5.1, then install luarocks from source instead of via a package manager (e.g. Homebrew).
+luarocks should then point to your lua 5.1, which should allow the tests to run. Check out the GitHub action that runs the test in CI for an example of how this should look.
+
 [rockspec-format]: https://github.com/luarocks/luarocks/wiki/Rockspec-format
 [luarocks]: https://luarocks.org
 [luarocks-api-key]: https://luarocks.org/settings/api-keys
