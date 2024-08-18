@@ -4,16 +4,16 @@ local M = {}
 ---@param str string
 ---@return LocalBranch | nil
 M.translate = function(str)
-	local status_start = 1
-	local status_end = 1
-	local is_current_branch = str:sub(status_start, status_end) == "*"
-	local branch_name_start = 3
-	local branch_name = str:sub(branch_name_start)
-	return {
-		branch_name = branch_name,
-		is_current_branch = is_current_branch,
-		branch_name_position = { start = branch_name_start, ending = #str },
-	}
+  local status_start = 1
+  local status_end = 1
+  local is_current_branch = str:sub(status_start, status_end) == "*"
+  local branch_name_start = 3
+  local branch_name = str:sub(branch_name_start)
+  return {
+    branch_name = branch_name,
+    is_current_branch = is_current_branch,
+    branch_name_position = { start = branch_name_start, ending = #str },
+  }
 end
 
 return M

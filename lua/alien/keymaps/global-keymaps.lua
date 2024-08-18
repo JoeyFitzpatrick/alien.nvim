@@ -4,7 +4,7 @@ local global_actions = require("alien.actions.global-actions")
 local M = {}
 
 M.set_global_keymaps = function()
-	vim.keymap.set("n", keymaps.branch_picker, global_actions.git_branches, { noremap = true, silent = true })
+  vim.keymap.set("n", keymaps.branch_picker, global_actions.git_branches, { noremap = true, silent = true })
 end
 
 return M
