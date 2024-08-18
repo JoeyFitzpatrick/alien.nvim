@@ -16,26 +16,7 @@ local M = {}
 local run_cmd = function(cmd)
   local output = vim.fn.systemlist(cmd)
   if vim.v.shell_error ~= 0 then
-    -- TODO: print err message instead of floating window
-    local bufnr = vim.api.nvim_create_buf(false, true)
-    vim.keymap.set("n", "q", function()
-      vim.api.nvim_buf_delete(bufnr, { force = true })
-    end, { buffer = bufnr })
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, output)
-    local width = math.floor(vim.o.columns * 0.8)
-    local height = math.floor(vim.o.lines * 0.8)
-    local col = math.floor((vim.o.columns - width) / 2)
-    local row = math.floor((vim.o.lines - height) / 2)
-    vim.api.nvim_open_win(bufnr, true, {
-      relative = "editor",
-      width = width,
-      height = height,
-      row = row,
-      col = col,
-      style = "minimal",
-      border = "rounded",
-      title = "Alien error",
-    })
+    vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
   end
   return output
 end
