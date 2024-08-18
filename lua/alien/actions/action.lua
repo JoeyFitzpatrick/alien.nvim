@@ -16,6 +16,7 @@ local M = {}
 local run_cmd = function(cmd)
   local output = vim.fn.systemlist(cmd)
   if vim.v.shell_error ~= 0 then
+    -- TODO: print err message instead of floating window
     local bufnr = vim.api.nvim_create_buf(false, true)
     vim.keymap.set("n", "q", function()
       vim.api.nvim_buf_delete(bufnr, { force = true })
