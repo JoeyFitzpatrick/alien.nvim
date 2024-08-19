@@ -122,27 +122,20 @@ M.action = function(cmd, opts)
   end
 end
 
---- Create an action with just a command (string or function)
+--- Create a composite action with multiple commands
 ---@param cmds string[] | fun(object: table)[]: string
 ---@param opts AlienOpts | nil
-M.multi_action = function(cmds, opts)
+M.composite_action = function(cmds, opts)
   return function()
     local output = {}
     local object_type = nil
     for _, cmd in ipairs(cmds) do
-      local current_object = register.get_current_element() or {}
-      local current_object_type = current_object.object_type
-      local translate = get_translator(current_object_type)
-      local get_args = nil
-      if translate then
-        get_args = commands.get_args(translate)
-      end
-      local action_fn = M.create_action(commands.create_command(cmd, get_args, nil, current_object), opts)
+      local action_fn = M.action(cmd, opts)
       local result = action_fn()
+      object_type = result.object_type
       for _, line in ipairs(result.output) do
         table.insert(output, line)
       end
-      object_type = result.object_type
     end
     return { output = output, object_type = object_type }
   end
