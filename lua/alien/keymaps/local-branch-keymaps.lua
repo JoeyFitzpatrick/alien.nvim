@@ -4,6 +4,7 @@ local action = require("alien.actions.action").action
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
+local ERROR_CODES = require("alien.actions.error-codes")
 
 ---@alias LocalBranch { branch_name: string }
 
@@ -21,13 +22,31 @@ M.set_keymaps = function(bufnr)
     return "git switch --create " .. new_branch_name .. " " .. branch.branch_name
   end, { prompt = "New branch name: " }, alien_opts, opts)
 
-  map_action_with_input(keymaps.delete, function(branch, location)
-    if location == "remote" then
-      return "git push origin --delete " .. branch.branch_name
-    elseif location == "local" then
-      return "git branch --delete " .. branch.branch_name
-    end
-  end, { items = { "local", "remote" }, prompt = "Delete local or remote: " }, alien_opts, opts)
+  local delete_branch_prompt = function(delete_branch_cmd)
+    vim.ui.select(
+      { "yes", "no" },
+      { prompt = "This branch is not fully merged. Are you sure you want to delete it?" },
+      function(selection)
+        if selection == "yes" then
+          action(delete_branch_cmd .. " -D", alien_opts)()
+        end
+      end
+    )
+  end
+
+  map_action_with_input(
+    keymaps.delete,
+    function(branch, location)
+      if location == "remote" then
+        return "git push origin --delete " .. branch.branch_name
+      elseif location == "local" then
+        return "git branch --delete " .. branch.branch_name
+      end
+    end,
+    { items = { "local", "remote" }, prompt = "Delete local or remote: " },
+    { trigger_redraw = true, error_callbacks = { [ERROR_CODES.BRANCH_NOT_FULLY_MERGED] = delete_branch_prompt } },
+    opts
+  )
 
   map_action_with_input(keymaps.rename, function(branch, new_branch_name)
     return "git branch -m " .. branch.branch_name .. " " .. new_branch_name

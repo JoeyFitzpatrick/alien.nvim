@@ -8,15 +8,21 @@ local M = {}
 ---@alias Action fun(): { output: string[], object_type: AlienObject, action_args: table }
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
----@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, action_args: table, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
+---@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, action_args: table, error_callbacks: table<integer, function> | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
+---@param error_callbacks? table<integer, function>
 ---@return string[]
-local run_cmd = function(cmd)
+local run_cmd = function(cmd, error_callbacks)
   local output = vim.fn.systemlist(cmd)
   if vim.v.shell_error ~= 0 then
-    vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
+    vim.print(vim.inspect(error_callbacks))
+    if error_callbacks and error_callbacks[vim.v.shell_error] then
+      error_callbacks[vim.v.shell_error](cmd)
+    else
+      vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
+    end
   end
   return output
 end
@@ -85,7 +91,7 @@ M.create_action = function(cmd, opts)
       return { output = handle_output(output), object_type = object_type, action_args = opts.action_args }
     end
     local parsed_command = M.parse_command(cmd, opts.add_flags)
-    local output = handle_output(run_cmd(parsed_command))
+    local output = handle_output(run_cmd(parsed_command, opts.error_callbacks))
     redraw()
     return {
       output = output,

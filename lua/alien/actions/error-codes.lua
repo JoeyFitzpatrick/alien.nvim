@@ -1,5 +1,6 @@
 local M = {}
 
 M.NO_UPSTREAM_ERROR = 128
+M.BRANCH_NOT_FULLY_MERGED = 1
 
 return M
