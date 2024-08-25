@@ -3,6 +3,7 @@ local actions = require("alien.actions")
 local action = require("alien.actions.action").action
 local highlight = require("alien.highlight")
 local config = require("alien.config")
+local command_mode = require("alien.command-mode")
 
 local M = {}
 
@@ -10,6 +11,7 @@ M.setup = function(opts)
   config = vim.tbl_deep_extend("force", config, opts or {})
   highlight.setup_colors()
   require("alien.keymaps").set_global_keymaps()
+  command_mode.create_git_command()
 end
 
 M.status = function()
