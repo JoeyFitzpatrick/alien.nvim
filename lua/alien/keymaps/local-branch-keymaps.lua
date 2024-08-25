@@ -46,6 +46,14 @@ M.set_keymaps = function(bufnr)
       return "git log " .. branch.branch_name .. " --pretty=format:'%h %cr %an ◯ %s'"
     end))
   end, opts)
+
+  map_action(keymaps.pull, function()
+    return "git pull"
+  end, alien_opts, opts)
+
+  map_action(keymaps.push, function()
+    return "git push"
+  end, alien_opts, opts)
 end
 
 return M

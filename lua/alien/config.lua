@@ -31,6 +31,8 @@ local M = {
       merge = "m",
       rebase = "r",
       log = "l",
+      pull = "p",
+      push = "<leader>p",
     },
     commit = {
       display_files = "s",
