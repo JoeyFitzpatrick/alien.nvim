@@ -28,7 +28,21 @@ M.stats_and_status = create_action({
   output_handler = handle_status_output,
 })
 
-M.local_branches = create_action("git branch", { object_type = "local_branch" })
+---@param lines string[]
+local handle_branch_output = function(lines)
+  local new_output = {}
+  for _, line in ipairs(lines) do
+    local branch = string.sub(line, 3)
+    local num_commits_to_pull = vim.fn.system(commands.num_commits_to_pull(branch)):gsub("\n", "")
+    local num_commits_to_push = vim.fn.system(commands.num_commits_to_push(branch)):gsub("\n", "")
+    local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
+    local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
+    table.insert(new_output, line .. " " .. push_str .. pull_str)
+  end
+  return new_output
+end
+
+M.local_branches = create_action("git branch", { object_type = "local_branch", output_handler = handle_branch_output })
 M.stashes = create_action("git stash list", { object_type = "stash" })
 
 return M

@@ -90,25 +90,29 @@ M.current_head = "printf 'HEAD: %s\n' $(git rev-parse --abbrev-ref HEAD)"
 M.current_remote = "git rev-parse --symbolic-full-name --abbrev-ref HEAD@{u}"
 
 --- Get the number of commits to pull
+---@param branch? string
 ---@return string
-M.num_commits_to_pull = function()
+M.num_commits_to_pull = function(branch)
   local current_remote = vim.fn.system(M.current_remote)
   if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
     return "echo 0"
   end
   current_remote = current_remote:gsub("\n", "")
-  return "git rev-list --count HEAD.." .. current_remote
+  branch = branch or "HEAD"
+  return "git rev-list --count " .. branch .. ".." .. current_remote
 end
 
 --- Get the number of commits to push
+---@param branch? string
 ---@return string
-M.num_commits_to_push = function()
+M.num_commits_to_push = function(branch)
   local current_remote = vim.fn.system(M.current_remote)
   if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
     return "echo 0"
   end
   current_remote = current_remote:gsub("\n", "")
-  return "git rev-list --count " .. current_remote .. "..HEAD"
+  branch = branch or "HEAD"
+  return "git rev-list --count " .. current_remote .. ".." .. branch
 end
 
 return M
