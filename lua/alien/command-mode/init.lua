@@ -1,7 +1,9 @@
+local config = require("alien.config")
+
 local M = {}
 
 function M.create_git_command()
-  for _, command in pairs({ "Git", "G" }) do
+  for _, command in pairs(config.command_mode_commands) do
     -- Neovim API function to create user command
     vim.api.nvim_create_user_command(
       command, -- Command name

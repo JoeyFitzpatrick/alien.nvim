@@ -1,4 +1,5 @@
 local M = {
+  command_mode_commands = { "Git", "G" },
   local_file = {
     display_diff = true,
   },
