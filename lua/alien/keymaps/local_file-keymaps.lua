@@ -12,6 +12,8 @@ local translate = require("alien.translators.local-file-translator").translate
 local get_args = commands.get_args(translate)
 local STATUSES = require("alien.status").STATUSES
 
+local COMMIT_FROM_ALIEN = false
+
 local M = {}
 --comment
 
@@ -74,10 +76,17 @@ M.set_keymaps = function(bufnr)
   end, { add_flags = true, trigger_redraw = true }, opts)
 
   map(keymaps.commit, function()
-    vim.ui.input({ prompt = "Commit message: " }, function(input)
-      elements.terminal("git commit -m '" .. input .. "'", { window = { split = "right" } })
+    local server_name = vim.v.servername
+    local cmd = "git -c core.editor='nvim --server " .. server_name .. " --remote' commit"
+
+    local commit_bufnr = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_open_win(commit_bufnr, true, { split = "right" })
+    vim.api.nvim_buf_call(commit_bufnr, function()
+      COMMIT_FROM_ALIEN = true
+      vim.fn.termopen(cmd)
     end)
   end, opts)
+
   map(keymaps.commit_with_flags, function()
     local cmd = commands.add_flags_input("git commit")
     elements.terminal(cmd, { window = { split = "right" } })
@@ -142,6 +151,18 @@ M.set_keymaps = function(bufnr)
         if ok then
           elements.terminal(cmd, { window = { width = width } })
         end
+      end
+    end,
+    group = alien_status_group,
+  })
+
+  vim.api.nvim_create_autocmd("WinClosed", {
+    desc = "Alient git commit",
+    callback = function()
+      if COMMIT_FROM_ALIEN then
+        vim.fn.system("git commit --file=.git/COMMIT_EDITMSG --cleanup=strip")
+        COMMIT_FROM_ALIEN = false
+        require("alien.elements.register").redraw_elements()
       end
     end,
     group = alien_status_group,
