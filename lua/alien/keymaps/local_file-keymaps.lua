@@ -3,6 +3,7 @@ local action = require("alien.actions.action").action
 local is_staged = require("alien.status").is_staged
 local elements = require("alien.elements")
 local keymaps = require("alien.config").keymaps.local_file
+local config = require("alien.config").local_file
 local commands = require("alien.actions.commands")
 local create_command = commands.create_command
 local map = require("alien.keymaps").map
@@ -20,6 +21,56 @@ local M = {}
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
   local alien_opts = { trigger_redraw = true }
+
+  local diff_native = commands.create_command(function(local_file)
+    local status = local_file.file_status
+    local filename = local_file.filename
+    if status == STATUSES.UNTRACKED then
+      return "git diff --no-index /dev/null " .. filename
+    end
+    return "git diff " .. filename
+  end, get_args)
+
+  local open_diff = function()
+    local width = math.floor(vim.o.columns * 0.67)
+    if vim.api.nvim_get_current_buf() == bufnr then
+      ---@diagnostic disable-next-line: param-type-mismatch
+      local ok, cmd = pcall(diff_native)
+      if ok then
+        elements.terminal(cmd, { window = { width = width } })
+      end
+    end
+  end
+
+  local AUTO_DISPLAY_DIFF = config.auto_display_diff
+  local set_auto_diff = function(should_display)
+    AUTO_DISPLAY_DIFF = should_display
+    if not AUTO_DISPLAY_DIFF then
+      elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
+    else
+      open_diff()
+    end
+  end
+  local toggle_auto_diff = function()
+    set_auto_diff(not AUTO_DISPLAY_DIFF)
+  end
+
+  vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
+  vim.keymap.set("n", keymaps.scroll_diff_down, function()
+    local buffers = elements.register.get_child_elements({ object_type = "diff" })
+    local buffer = buffers[1]
+    if #buffers == 1 and buffer.channel_id then
+      pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
+    end
+  end, opts)
+  vim.keymap.set("n", keymaps.scroll_diff_up, function()
+    local buffers = elements.register.get_child_elements({ object_type = "diff" })
+    local buffer = buffers[1]
+    if #buffers == 1 and buffer.channel_id then
+      pcall(vim.api.nvim_chan_send, buffer.channel_id, "kk")
+    end
+  end, opts)
+
   map_action(keymaps.stage_or_unstage, function(local_file)
     local filename = local_file.filename
     local status = local_file.file_status
@@ -79,6 +130,7 @@ M.set_keymaps = function(bufnr)
     local server_name = vim.v.servername
     local cmd = "git -c core.editor='nvim --server " .. server_name .. " --remote' commit"
 
+    set_auto_diff(false)
     local commit_bufnr = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_open_win(commit_bufnr, true, { split = "right" })
     vim.api.nvim_buf_call(commit_bufnr, function()
@@ -120,9 +172,31 @@ M.set_keymaps = function(bufnr)
     return "git diff " .. filename
   end, get_args)
 
-  vim.keymap.set("n", keymaps.diff, function()
-    elements.terminal(diff_native())
-  end, opts)
+  local open_diff = function()
+    local width = math.floor(vim.o.columns * 0.67)
+    if vim.api.nvim_get_current_buf() == bufnr then
+      ---@diagnostic disable-next-line: param-type-mismatch
+      local ok, cmd = pcall(diff_native)
+      if ok then
+        elements.terminal(cmd, { window = { width = width } })
+      end
+    end
+  end
+
+  local AUTO_DISPLAY_DIFF = config.auto_display_diff
+  local set_auto_diff = function(should_display)
+    AUTO_DISPLAY_DIFF = should_display
+    if not AUTO_DISPLAY_DIFF then
+      elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
+    else
+      open_diff()
+    end
+  end
+  local toggle_auto_diff = function()
+    set_auto_diff(not AUTO_DISPLAY_DIFF)
+  end
+
+  vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
   vim.keymap.set("n", keymaps.scroll_diff_down, function()
     local buffers = elements.register.get_child_elements({ object_type = "diff" })
     local buffer = buffers[1]
@@ -143,14 +217,12 @@ M.set_keymaps = function(bufnr)
     desc = "Diff the file under the cursor",
     buffer = bufnr,
     callback = function()
+      if not AUTO_DISPLAY_DIFF then
+        return
+      end
       elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
-      local width = math.floor(vim.o.columns * 0.67)
       if vim.api.nvim_get_current_buf() == bufnr then
-        ---@diagnostic disable-next-line: param-type-mismatch
-        local ok, cmd = pcall(diff_native)
-        if ok then
-          elements.terminal(cmd, { window = { width = width } })
-        end
+        open_diff()
       end
     end,
     group = alien_status_group,
