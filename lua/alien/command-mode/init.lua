@@ -1,4 +1,5 @@
 local config = require("alien.config")
+local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
 
 local M = {}
 
@@ -40,15 +41,6 @@ function M.create_git_command()
     )
   end
 end
-
-local DISPLAY_STRATEGIES = {
-  PRINT = "print",
-  UI = "ui",
-  SHOW = "show",
-  DIFF = "diff",
-  BLAME = "blame",
-  INTERACTIVE = "interactive",
-}
 
 local GIT_PREFIXES = { "git", "gitk", "gitweb" }
 local PORCELAIN_COMMAND_STRATEGY_MAP = {
