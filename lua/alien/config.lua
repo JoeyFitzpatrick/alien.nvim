@@ -1,7 +1,7 @@
 local M = {
   command_mode_commands = { "Git", "G" },
   local_file = {
-    display_diff = true,
+    auto_display_diff = true,
   },
   keymaps = {
     global = {
@@ -18,7 +18,7 @@ local M = {
       commit = "c",
       commit_with_flags = "C",
       navigate_to_file = "<enter>",
-      diff = "n",
+      toggle_auto_diff = "t",
       scroll_diff_down = "J",
       scroll_diff_up = "K",
       stash = "<leader>s",
