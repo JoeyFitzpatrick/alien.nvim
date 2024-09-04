@@ -24,7 +24,7 @@ M.set_keymaps = function(bufnr)
 
   local diff_native = commands.create_command(function(local_file)
     local status = local_file.file_status
-    local filename = "'" .. local_file.filename .. "'"
+    local filename = local_file.filename
     if status == STATUSES.UNTRACKED then
       return "git diff --no-index /dev/null " .. filename
     end
