@@ -1,46 +1,9 @@
 local config = require("alien.config")
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
+local elements = require("alien.elements")
+local create_action = require("alien.actions.action").create_action
 
 local M = {}
-
-function M.create_git_command()
-  for _, command in pairs(config.command_mode_commands) do
-    -- Neovim API function to create user command
-    vim.api.nvim_create_user_command(
-      command, -- Command name
-      function(input_args)
-        -- Gather the argument provided to your :Git command
-        local args = input_args.args
-
-        -- Create the command string (assume 'git' is installed and configured properly in your environment)
-        local git_command = "git " .. args
-
-        -- Capture the output of the git command using io.popen
-        local handle = io.popen(git_command)
-        if handle then
-          local result = handle:read("*a")
-          handle:close()
-
-          -- Print the output in the command line
-          if result and result ~= "" then
-            print(result)
-          else
-            print("No output from the git command or command failed.")
-          end
-        else
-          print("Failed to execute git command.")
-        end
-      end,
-      {
-        nargs = "+", -- Require at least one argument
-        complete = function(ArgLead, CmdLine, CursorPos)
-          -- Optionally, you can implement completions here
-          return { "status", "add", "commit", "push", "pull", "clone" } -- Example completions
-        end,
-      }
-    )
-  end
-end
 
 local GIT_PREFIXES = { "git", "gitk", "gitweb" }
 local PORCELAIN_COMMAND_STRATEGY_MAP = {
@@ -146,6 +109,47 @@ M.get_command_strategy = function(cmd)
     return strategy
   else
     return strategy(cmd)
+  end
+end
+
+local print_cmd = function(cmd)
+  local output = vim.fn.systemlist(cmd)
+  if vim.v.shell_error ~= 0 then
+    vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
+  else
+    vim.print(output)
+  end
+end
+
+--- Runs the given git command with a command display strategy.
+---@param cmd string
+M.run_command = function(cmd)
+  local strategy = M.get_command_strategy(cmd)
+  local cmd_fn = create_action(cmd)
+  if strategy == DISPLAY_STRATEGIES.PRINT then
+    print_cmd(cmd)
+  elseif strategy == DISPLAY_STRATEGIES.UI then
+    elements.buffer(cmd_fn)
+  end
+end
+
+function M.create_git_command()
+  for _, command in pairs(config.command_mode_commands) do
+    vim.api.nvim_create_user_command(
+      command, -- Command name, e.g. "Git", "G"
+      function(input_args)
+        local args = input_args.args
+        local git_command = "git " .. args
+        M.run_command(git_command)
+      end,
+      {
+        nargs = "+", -- Require at least one argument
+        complete = function(ArgLead, CmdLine, CursorPos)
+          -- Optionally, you can implement completions here
+          return { "status", "add", "commit", "push", "pull", "clone" } -- Example completions
+        end,
+      }
+    )
   end
 end
 
