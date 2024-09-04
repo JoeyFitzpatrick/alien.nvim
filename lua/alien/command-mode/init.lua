@@ -113,11 +113,11 @@ M.get_command_strategy = function(cmd)
 end
 
 local print_cmd = function(cmd)
-  local output = vim.fn.systemlist(cmd)
+  local output = vim.fn.system(cmd)
   if vim.v.shell_error ~= 0 then
-    vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
-  else
-    vim.print(output)
+    vim.notify(output, vim.log.levels.ERROR)
+  elseif #output > 0 then
+    print(output)
   end
 end
 
