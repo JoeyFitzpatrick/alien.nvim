@@ -1,5 +1,5 @@
 local keymaps = require("alien.config").keymaps.global
-local global_actions = require("alien.actions.global-actions")
+local global_actions = require("alien.global-actions.global-actions")
 
 local M = {}
 
