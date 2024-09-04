@@ -24,7 +24,7 @@ M.set_keymaps = function(bufnr)
 
   local diff_native = commands.create_command(function(local_file)
     local status = local_file.file_status
-    local filename = local_file.filename
+    local filename = "'" .. local_file.filename .. "'"
     if status == STATUSES.UNTRACKED then
       return "git diff --no-index /dev/null " .. filename
     end
@@ -161,58 +161,6 @@ M.set_keymaps = function(bufnr)
     local filename = get_args().filename
     vim.api.nvim_win_close(0, true)
     vim.api.nvim_exec2("e " .. filename, {})
-  end, opts)
-
-  local diff_native = commands.create_command(function(local_file)
-    local status = local_file.file_status
-    local filename = local_file.filename
-    if status == STATUSES.UNTRACKED then
-      return "git diff --no-index /dev/null " .. filename
-    end
-    if require("alien.status").is_staged(status) then
-      return "git diff --staged " .. filename
-    end
-    return "git diff " .. filename
-  end, get_args)
-
-  local open_diff = function()
-    local width = math.floor(vim.o.columns * 0.67)
-    if vim.api.nvim_get_current_buf() == bufnr then
-      ---@diagnostic disable-next-line: param-type-mismatch
-      local ok, cmd = pcall(diff_native)
-      if ok then
-        elements.terminal(cmd, { window = { width = width } })
-      end
-    end
-  end
-
-  local AUTO_DISPLAY_DIFF = config.auto_display_diff
-  local set_auto_diff = function(should_display)
-    AUTO_DISPLAY_DIFF = should_display
-    if not AUTO_DISPLAY_DIFF then
-      elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
-    else
-      open_diff()
-    end
-  end
-  local toggle_auto_diff = function()
-    set_auto_diff(not AUTO_DISPLAY_DIFF)
-  end
-
-  vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
-  vim.keymap.set("n", keymaps.scroll_diff_down, function()
-    local buffers = elements.register.get_child_elements({ object_type = "diff" })
-    local buffer = buffers[1]
-    if #buffers == 1 and buffer.channel_id then
-      pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
-    end
-  end, opts)
-  vim.keymap.set("n", keymaps.scroll_diff_up, function()
-    local buffers = elements.register.get_child_elements({ object_type = "diff" })
-    local buffer = buffers[1]
-    if #buffers == 1 and buffer.channel_id then
-      pcall(vim.api.nvim_chan_send, buffer.channel_id, "kk")
-    end
   end, opts)
 
   local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
