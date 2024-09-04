@@ -29,7 +29,7 @@ local PORCELAIN_COMMAND_STRATEGY_MAP = {
   stash = require("alien.command-mode.display-strategies.stash").get_strategy,
   instaweb = DISPLAY_STRATEGIES.PRINT,
   ["cherry-pick"] = DISPLAY_STRATEGIES.PRINT,
-  status = DISPLAY_STRATEGIES.UI,
+  status = require("alien.command-mode.display-strategies.status").get_strategy,
   ["merge-tree"] = DISPLAY_STRATEGIES.PRINT,
   citool = DISPLAY_STRATEGIES.PRINT,
   submodule = DISPLAY_STRATEGIES.PRINT,
@@ -121,9 +121,19 @@ local print_cmd = function(cmd)
   end
 end
 
+local interceptors = {
+  ["git status"] = function()
+    elements.buffer(require("alien.actions.base").stats_and_status)
+  end,
+}
+
 --- Runs the given git command with a command display strategy.
 ---@param cmd string
 M.run_command = function(cmd)
+  if interceptors[cmd] then
+    interceptors[cmd]()
+    return
+  end
   local strategy = M.get_command_strategy(cmd)
   local cmd_fn =
     create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
