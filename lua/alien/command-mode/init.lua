@@ -125,7 +125,8 @@ end
 ---@param cmd string
 M.run_command = function(cmd)
   local strategy = M.get_command_strategy(cmd)
-  local cmd_fn = create_action(cmd)
+  local cmd_fn =
+    create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
   if strategy == DISPLAY_STRATEGIES.PRINT then
     print_cmd(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
