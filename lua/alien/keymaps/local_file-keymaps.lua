@@ -28,6 +28,9 @@ M.set_keymaps = function(bufnr)
     if status == STATUSES.UNTRACKED then
       return "git diff --no-index /dev/null " .. filename
     end
+    if is_staged(status) then
+      return "git diff --staged " .. filename
+    end
     return "git diff " .. filename
   end, get_args)
 
