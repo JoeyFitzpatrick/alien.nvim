@@ -66,6 +66,11 @@ M.set_element_keymaps = function(bufnr, element_type)
   vim.keymap.set("n", "q", function()
     register.close_element(bufnr)
   end, { noremap = true, silent = true, buffer = bufnr })
+  if element_type == "terminal" then
+    vim.keymap.set("n", "<CR>", function()
+      register.close_element(bufnr)
+    end, { noremap = true, silent = true, buffer = bufnr })
+  end
 end
 
 M.set_global_keymaps = require("alien.keymaps.global-keymaps").set_global_keymaps

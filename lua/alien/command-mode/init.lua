@@ -45,9 +45,11 @@ M.get_command_strategy = function(cmd)
   end
   if type(strategy) == "string" then
     return strategy
-  else
+  end
+  if type(strategy) == "function" then
     return strategy(cmd)
   end
+  return DISPLAY_STRATEGIES.PRINT
 end
 
 local print_cmd = function(cmd)
@@ -76,7 +78,7 @@ M.run_command = function(cmd)
   local cmd_fn =
     create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
   if strategy == DISPLAY_STRATEGIES.PRINT then
-    print_cmd(cmd)
+    elements.terminal(cmd, { enter = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
   end
