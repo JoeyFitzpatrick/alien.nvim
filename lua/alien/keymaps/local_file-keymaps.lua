@@ -186,7 +186,8 @@ M.set_keymaps = function(bufnr)
     desc = "Alient git commit",
     callback = function()
       if COMMIT_FROM_ALIEN then
-        vim.fn.system("git commit --file=.git/COMMIT_EDITMSG --cleanup=strip")
+        local commit_cmd = "git commit --file=.git/COMMIT_EDITMSG --cleanup=strip"
+        elements.terminal(commit_cmd, { enter = true, window = { split = "below" } })
         COMMIT_FROM_ALIEN = false
         require("alien.elements.register").redraw_elements()
       end
