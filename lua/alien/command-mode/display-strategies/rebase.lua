@@ -49,7 +49,7 @@ M.interactive_rebase = function(cmd)
     desc = "Alient git rebase",
     callback = function()
       if REBASE_FROM_ALIEN then
-        local rebase_with_file_cmd = "git rebase --continue"
+        local rebase_with_file_cmd = "git rebase --file=.git/REBASE_EDITMSG --cleanup=strip"
         elements.terminal(rebase_with_file_cmd, { enter = true, window = { split = "below" } })
         REBASE_FROM_ALIEN = false
         require("alien.elements.register").redraw_elements()
