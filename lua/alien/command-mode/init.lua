@@ -52,15 +52,6 @@ M.get_command_strategy = function(cmd)
   return DISPLAY_STRATEGIES.PRINT
 end
 
-local print_cmd = function(cmd)
-  local output = vim.fn.system(cmd)
-  if vim.v.shell_error ~= 0 then
-    vim.notify(output, vim.log.levels.ERROR)
-  elseif #output > 0 then
-    print(output)
-  end
-end
-
 local interceptors = {
   ["git status"] = function()
     elements.buffer(require("alien.actions.base").stats_and_status)
@@ -81,6 +72,8 @@ M.run_command = function(cmd)
     elements.terminal(cmd, { enter = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
+  elseif strategy == DISPLAY_STRATEGIES.INTERACTIVE_COMMIT then
+    require("alien.command-mode.display-strategies.commit").interactive_commit(cmd)
   end
 end
 
