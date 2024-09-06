@@ -1,0 +1,13 @@
+-- local get_commit_strategy = require("alien.command-mode.display-strategies.commit").get_strategy
+-- local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
+
+-- describe("get_commit_strategy", function()
+--   it("returns 'print' for commands that should print output", function()
+--     local result = get_commit_strategy("git commit -m mockmessage")
+--     assert.are.equal(result, DISPLAY_STRATEGIES.PRINT)
+--   end)
+--   it("returns 'interactive-commit' for commands that should use interactive output", function()
+--     local result = get_commit_strategy("git commit")
+--     assert.are.equal(result, DISPLAY_STRATEGIES.INTERACTIVE_COMMIT)
+--   end)
+-- end)
