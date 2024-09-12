@@ -1,15 +1,12 @@
 local M = {}
 
----@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame" | "interactive-branch" | "interactive-commit" | "interactive-rebase"
+---@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame"
 M.DISPLAY_STRATEGIES = {
   PRINT = "print",
   UI = "ui",
   SHOW = "show",
   DIFF = "diff",
   BLAME = "blame",
-  INTERACTIVE_BRANCH = "interactive-branch",
-  INTERACTIVE_COMMIT = "interactive-commit",
-  INTERACTIVE_REBASE = "interactive-rebase",
 }
 
 M.PORCELAIN_COMMANDS = {

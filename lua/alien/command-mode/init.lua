@@ -72,10 +72,6 @@ M.run_command = function(cmd)
     elements.terminal(cmd, { enter = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
-  elseif strategy == DISPLAY_STRATEGIES.INTERACTIVE_COMMIT then
-    require("alien.command-mode.display-strategies.commit").interactive_commit(cmd)
-  elseif strategy == DISPLAY_STRATEGIES.INTERACTIVE_REBASE then
-    require("alien.command-mode.display-strategies.rebase").interactive_rebase(cmd)
   end
 end
 
