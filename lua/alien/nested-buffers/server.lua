@@ -17,7 +17,7 @@ local function unblock_client_and_reset_state()
   vim.api.nvim_del_autocmd(bufunload_autocmd_id)
 
   -- Unblock client by killing its editor session.
-  vim.fn.rpcnotify(response_sock, "nvim_exec_lua", "vim.cmd('quit')")
+  vim.fn.rpcnotify(response_sock, "nvim_exec_lua", "vim.cmd('quit')", {})
   vim.fn.chanclose(response_sock)
 
   -- Reset state-sensitive variables.
