@@ -114,6 +114,16 @@ And now your tests should work fine!
 Note: I don't know if manually deleting lua related files is necessary or safe. I'm pretty sure it is, especially the /usr/include file which is the one luarocks shared objects use. Maybe using apt purge to uninstall the packages would have deleted those, I don't know
 </details>
 
+## Credits
+I took quite a bit of inspiration (read: stole) from the awesome [nvim-unception](https://github.com/samjwill/nvim-unception) plugin by [samjwill](https://github.com/samjwill). This plugin prevents nested terminal buffers from occurring. vim-fugitive has the same feature for commands that open an editor, such as `git commit`, and Alien has it as well, thanks to nvim-unception.
+
+Thanks to [tpope](https://github.com/tpope) for creating and maintaining [vim-fugitive](https://github.com/tpope/vim-fugitive). In my opinion, it is the greatest vim plugin ever created, and it obviously inspired Alien.
+
+Thanks to [jesseduffield](https://github.com/jesseduffield) for the awesome [lazygit](https://github.com/jesseduffield/lazygit), which also inspired Alien, and was my daily driver for quite some time.
+
+## Self-Promotion
+If you enjoy using Alien, please give it a star on GitHub!
+
 [rockspec-format]: https://github.com/luarocks/luarocks/wiki/Rockspec-format
 [luarocks]: https://luarocks.org
 [luarocks-api-key]: https://luarocks.org/settings/api-keys
