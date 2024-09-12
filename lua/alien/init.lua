@@ -4,6 +4,7 @@ local action = require("alien.actions.action").action
 local highlight = require("alien.highlight")
 local config = require("alien.config")
 local command_mode = require("alien.command-mode")
+local nested_buffers = require("alien.nested-buffers")
 
 local M = {}
 
@@ -12,6 +13,7 @@ M.setup = function(opts)
   highlight.setup_colors()
   require("alien.keymaps").set_global_keymaps()
   command_mode.create_git_command()
+  nested_buffers.setup_nested_buffers()
 end
 
 M.status = function()

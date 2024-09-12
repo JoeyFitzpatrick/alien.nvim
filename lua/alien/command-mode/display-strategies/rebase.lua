@@ -46,7 +46,7 @@ M.interactive_rebase = function(cmd)
 
   local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
   vim.api.nvim_create_autocmd("WinClosed", {
-    desc = "Alient git rebase",
+    desc = "Alien git rebase",
     callback = function()
       if REBASE_FROM_ALIEN then
         local rebase_with_file_cmd = "git rebase --file=.git/REBASE_EDITMSG --cleanup=strip"
