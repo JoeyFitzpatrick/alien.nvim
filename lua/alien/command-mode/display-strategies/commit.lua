@@ -30,7 +30,7 @@ M.get_strategy = function(cmd)
   if utils.overlap(options, print_options) then
     return DISPLAY_STRATEGIES.PRINT
   end
-  return DISPLAY_STRATEGIES.INTERACTIVE_COMMIT
+  return DISPLAY_STRATEGIES.PRINT
 end
 
 local COMMIT_FROM_ALIEN = false

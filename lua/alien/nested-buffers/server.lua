@@ -1,4 +1,3 @@
-print("server")
 local constants = require("alien.nested-buffers.constants")
 local utils = require("alien.nested-buffers.utils")
 
@@ -85,10 +84,5 @@ end
 
 M.new_server_pipe_path = vim.call("serverstart")
 vim.call("setenv", constants.alien_pipe_path_host_env_var, M.new_server_pipe_path)
-
-vim.keymap.set("n", "<leader><leader>g", function()
-  vim.cmd("split")
-  vim.cmd("term git notes add")
-end)
 
 return M
