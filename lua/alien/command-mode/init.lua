@@ -86,9 +86,8 @@ function M.create_git_command()
       end,
       {
         nargs = "+", -- Require at least one argument
-        complete = function(ArgLead, CmdLine, CursorPos)
-          -- Optionally, you can implement completions here
-          return { "status", "add", "commit", "push", "pull", "clone" } -- Example completions
+        complete = function(arglead, cmdline)
+          return require("alien.command-mode.completion").complete_git_command(arglead, cmdline)
         end,
       }
     )
