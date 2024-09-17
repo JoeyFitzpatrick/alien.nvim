@@ -22,15 +22,22 @@ local function get_subcommand(cmdline)
 end
 
 local function get_arguments(subcommand)
+  local local_branches_command = "git for-each-ref --format='%(refname:short)' refs/heads/"
   local SUBCOMMAND_TO_ARGUMENTS_MAP = {
-    checkout = "git for-each-ref --format='%(refname:short)' refs/heads/",
-    switch = "git for-each-ref --format='%(refname:short)' refs/heads/",
+    checkout = local_branches_command,
+    switch = local_branches_command,
+    merge = local_branches_command,
+    rebase = local_branches_command,
   }
   local cmd = SUBCOMMAND_TO_ARGUMENTS_MAP[subcommand]
   if not cmd then
     return {}
   end
-  return vim.fn.systemlist(cmd)
+  local output = vim.fn.systemlist(cmd)
+  if vim.v.shell_error ~= 0 then
+    return {}
+  end
+  return output
 end
 
 --- takes an arbitrary git command, and returns completion options

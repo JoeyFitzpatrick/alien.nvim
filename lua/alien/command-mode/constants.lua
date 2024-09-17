@@ -124,6 +124,24 @@ M.BASE_COMMANDS = {
 }
 
 M.SUBCOMMAND_FLAGS = {
+  add = {},
+  rebase = {},
+  reset = {},
+  revert = {},
+  difftool = {},
+  bisect = {},
+  rm = {},
+  branch = {},
+  show = {},
+  help = {},
+  checkout = {},
+  stash = {},
+  ["cherry-pick"] = {},
+  status = {},
+  clean = {},
+  tag = {},
+  clone = {},
+  worktree = {},
   commit = {
     "-a",
     "-p",
@@ -156,9 +174,22 @@ M.SUBCOMMAND_FLAGS = {
     "--status",
     "--no-status",
     "--gpg-sign",
-    "--",
     "--help",
   },
+  diff = {},
+  fetch = {},
+  gc = {},
+  mergetool = {},
+  grep = {},
+  init = {},
+  reflog = {},
+  log = {},
+  merge = {},
+  remote = {},
+  mv = {},
+  pull = {},
+  push = {},
+  blame = {},
 }
 
 return M
