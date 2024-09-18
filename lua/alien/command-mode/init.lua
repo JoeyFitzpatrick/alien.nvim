@@ -11,6 +11,7 @@ local PORCELAIN_COMMAND_STRATEGY_MAP = {
   branch = require("alien.command-mode.display-strategies.branch").get_strategy,
   show = DISPLAY_STRATEGIES.SHOW,
   help = DISPLAY_STRATEGIES.SHOW,
+  grep = DISPLAY_STRATEGIES.SHOW,
   stash = require("alien.command-mode.display-strategies.stash").get_strategy,
   status = require("alien.command-mode.display-strategies.status").get_strategy,
   commit = require("alien.command-mode.display-strategies.commit").get_strategy,
@@ -72,6 +73,9 @@ M.run_command = function(cmd)
     elements.terminal(cmd, { enter = true, dynamic_resize = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
+  elseif strategy == DISPLAY_STRATEGIES.SHOW then
+    local bufnr = elements.buffer(cmd_fn)
+    vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })
   end
 end
 
