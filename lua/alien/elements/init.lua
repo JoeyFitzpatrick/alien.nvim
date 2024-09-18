@@ -109,7 +109,7 @@ end
 
 --- Run a command in a new terminal
 ---@param cmd string | nil
----@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil } | nil
+---@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil, dynamic_resize: boolean | nil } | nil
 ---@return integer | nil
 M.terminal = function(cmd, opts)
   if not cmd then
@@ -120,9 +120,37 @@ M.terminal = function(cmd, opts)
   local default_terminal_opts = { split = "right" }
   local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts.window or {})
   local bufnr = vim.api.nvim_create_buf(false, true)
+  local window = vim.api.nvim_open_win(bufnr, opts.enter, terminal_opts)
   local channel_id = nil
   vim.api.nvim_buf_call(bufnr, function()
-    channel_id = vim.fn.termopen(cmd)
+    if not opts.dynamic_resize then
+      channel_id = vim.fn.termopen(cmd)
+    else
+      local height = 2
+      vim.api.nvim_win_set_height(window, height)
+      channel_id = vim.fn.termopen(cmd, {
+        on_stdout = function(_, data)
+          if data[#data] == "" and data[1] ~= "" then
+            for _, _ in pairs(data) do
+              height = height + 1
+            end
+          end
+          vim.api.nvim_win_set_height(window, height)
+        end,
+        on_exit = function()
+          vim.schedule(function()
+            local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+            local lines_to_delete = vim.tbl_filter(function(line)
+              return line == ""
+            end, lines)
+            vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
+            vim.api.nvim_buf_set_lines(bufnr, #lines - #lines_to_delete, -1, false, {})
+            vim.api.nvim_win_set_height(window, #lines - #lines_to_delete + 1)
+            vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+          end)
+        end,
+      })
+    end
   end)
   local object_type = get_object_type(cmd)
   if not channel_id then
@@ -136,7 +164,6 @@ M.terminal = function(cmd, opts)
   })
   autocmds.set_element_autocmds(bufnr)
   keymaps.set_element_keymaps(bufnr, "terminal")
-  vim.api.nvim_open_win(bufnr, opts.enter, terminal_opts)
   return bufnr
 end
 

@@ -69,7 +69,7 @@ M.run_command = function(cmd)
   local cmd_fn =
     create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
   if strategy == DISPLAY_STRATEGIES.PRINT then
-    elements.terminal(cmd, { enter = true, window = { split = "below" } })
+    elements.terminal(cmd, { enter = true, dynamic_resize = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
   end
