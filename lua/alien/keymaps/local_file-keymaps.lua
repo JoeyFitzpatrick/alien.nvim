@@ -128,7 +128,7 @@ M.set_keymaps = function(bufnr)
 
   map(keymaps.commit, function()
     set_auto_diff(false)
-    elements.terminal("git commit", { window = { split = "right" } })
+    elements.terminal("git commit", { enter = true, window = { split = "right" } })
   end, opts)
 
   map(keymaps.commit_with_flags, function()
