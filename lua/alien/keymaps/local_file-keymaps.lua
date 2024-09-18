@@ -13,10 +13,7 @@ local translate = require("alien.translators.local-file-translator").translate
 local get_args = commands.get_args(translate)
 local STATUSES = require("alien.status").STATUSES
 
-local COMMIT_FROM_ALIEN = false
-
 local M = {}
---comment
 
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
@@ -130,16 +127,8 @@ M.set_keymaps = function(bufnr)
   end, { add_flags = true, trigger_redraw = true }, opts)
 
   map(keymaps.commit, function()
-    local server_name = vim.v.servername
-    local cmd = "git -c core.editor='nvim --server " .. server_name .. " --remote' commit"
-
     set_auto_diff(false)
-    local commit_bufnr = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_open_win(commit_bufnr, true, { split = "right" })
-    vim.api.nvim_buf_call(commit_bufnr, function()
-      COMMIT_FROM_ALIEN = true
-      vim.fn.termopen(cmd)
-    end)
+    elements.terminal("git commit", { window = { split = "right" } })
   end, opts)
 
   map(keymaps.commit_with_flags, function()
@@ -177,19 +166,6 @@ M.set_keymaps = function(bufnr)
       elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
       if vim.api.nvim_get_current_buf() == bufnr then
         open_diff()
-      end
-    end,
-    group = alien_status_group,
-  })
-
-  vim.api.nvim_create_autocmd("WinClosed", {
-    desc = "Alient git commit",
-    callback = function()
-      if COMMIT_FROM_ALIEN then
-        local commit_cmd = "git commit --file=.git/COMMIT_EDITMSG --cleanup=strip"
-        elements.terminal(commit_cmd, { enter = true, window = { split = "below" } })
-        COMMIT_FROM_ALIEN = false
-        require("alien.elements.register").redraw_elements()
       end
     end,
     group = alien_status_group,
