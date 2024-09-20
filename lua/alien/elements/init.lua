@@ -48,6 +48,9 @@ local function create(action, element_params)
   if element_params.post_render then
     element_params.post_render(new_bufnr)
   end
+  vim.system({ "git", "fetch" }, {}, function()
+    register.redraw_elements()
+  end)
   return new_bufnr
 end
 
