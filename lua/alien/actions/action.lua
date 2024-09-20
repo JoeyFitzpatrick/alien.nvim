@@ -90,7 +90,10 @@ M.create_action = function(cmd, opts)
       redraw()
       return { output = handle_output(output), object_type = object_type, action_args = opts.action_args }
     end
-    local parsed_command = M.parse_command(cmd, opts.add_flags)
+    local ok, parsed_command = pcall(M.parse_command, cmd, opts.add_flags)
+    if not ok then
+      return nil
+    end
     local output = handle_output(run_cmd(parsed_command, opts.error_callbacks))
     redraw()
     return {

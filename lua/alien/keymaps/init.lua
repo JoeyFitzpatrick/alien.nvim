@@ -30,12 +30,18 @@ M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
   if input_opts.items then
     M.map(keys, function()
       vim.ui.select(input_opts.items, { prompt = input_opts.prompt }, function(input)
+        if not input then
+          return nil
+        end
         action(cmd_fn, alien_opts)(input)
       end)
     end, opts)
   else
     M.map(keys, function()
       vim.ui.input({ prompt = input_opts.prompt }, function(input)
+        if not input then
+          return nil
+        end
         action(cmd_fn, alien_opts)(input)
       end)
     end, opts)
