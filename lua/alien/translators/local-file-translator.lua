@@ -18,6 +18,7 @@ M.translate = function(str)
   local filename = str:sub(4)
   return {
     filename = "'" .. filename .. "'",
+    raw_filename = filename,
     file_status = file_status,
     filename_position = { start = filename_start - 1, ending = #str },
     file_status_position = { start = status_start - 1, ending = status_end },

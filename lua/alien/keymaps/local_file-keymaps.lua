@@ -37,7 +37,7 @@ M.set_keymaps = function(bufnr)
       ---@diagnostic disable-next-line: param-type-mismatch
       local ok, cmd = pcall(diff_native)
       if ok then
-        elements.terminal(cmd, { window = { width = width } })
+        elements.terminal(cmd, { skip_redraw = true, window = { width = width } })
       end
     end
   end
@@ -150,7 +150,7 @@ M.set_keymaps = function(bufnr)
   end, opts)
 
   map(keymaps.navigate_to_file, function()
-    local filename = get_args().filename
+    local filename = get_args().raw_filename
     vim.api.nvim_win_close(0, true)
     vim.api.nvim_exec2("e " .. filename, {})
   end, opts)

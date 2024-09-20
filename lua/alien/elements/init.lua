@@ -109,7 +109,7 @@ end
 
 --- Run a command in a new terminal
 ---@param cmd string | nil
----@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil, dynamic_resize: boolean | nil } | nil
+---@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil, dynamic_resize: boolean | nil, skip_redraw: boolean | nil } | nil
 ---@return integer | nil
 M.terminal = function(cmd, opts)
   if not cmd then
@@ -126,7 +126,9 @@ M.terminal = function(cmd, opts)
     if not opts.dynamic_resize then
       channel_id = vim.fn.termopen(cmd, {
         on_exit = function()
-          register.redraw_elements()
+          if not opts.skip_redraw then
+            register.redraw_elements()
+          end
         end,
       })
     else
@@ -154,7 +156,9 @@ M.terminal = function(cmd, opts)
             vim.api.nvim_win_set_height(window, #lines - #lines_to_delete + 1)
             vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
           end)
-          register.redraw_elements()
+          if not opts.skip_redraw then
+            register.redraw_elements()
+          end
         end,
       })
     end
