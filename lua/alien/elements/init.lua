@@ -150,6 +150,7 @@ M.terminal = function(cmd, opts)
             vim.api.nvim_win_set_height(window, #lines - #lines_to_delete + 1)
             vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
           end)
+          register.redraw_elements()
         end,
       })
     end
