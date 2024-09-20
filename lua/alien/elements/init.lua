@@ -133,7 +133,7 @@ M.terminal = function(cmd, opts)
       local height = 2
       vim.api.nvim_win_set_height(window, height)
       channel_id = vim.fn.termopen(cmd, {
-        on_stdout = function(_, data)
+        on_stdout = function()
           local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
           local empty_lines = vim.tbl_filter(function(line)
             return line == ""
