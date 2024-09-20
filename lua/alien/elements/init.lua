@@ -130,10 +130,12 @@ M.terminal = function(cmd, opts)
       vim.api.nvim_win_set_height(window, height)
       channel_id = vim.fn.termopen(cmd, {
         on_stdout = function(_, data)
-          if data[#data] == "" and data[1] ~= "" then
-            for _, _ in pairs(data) do
-              height = height + 1
-            end
+          local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+          local empty_lines = vim.tbl_filter(function(line)
+            return line == ""
+          end, lines)
+          if #lines - #empty_lines + 1 > height then
+            height = #lines - #empty_lines + 1
           end
           vim.api.nvim_win_set_height(window, height)
         end,
