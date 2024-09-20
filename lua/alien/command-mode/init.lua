@@ -18,6 +18,7 @@ local PORCELAIN_COMMAND_STRATEGY_MAP = {
   diff = DISPLAY_STRATEGIES.DIFF,
   log = DISPLAY_STRATEGIES.UI,
   blame = DISPLAY_STRATEGIES.BLAME,
+  mergetool = DISPLAY_STRATEGIES.MERGETOOL,
 }
 
 --- Takes a git command, and returns the git verb.
@@ -75,6 +76,8 @@ M.run_command = function(cmd)
     elements.buffer(cmd_fn)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame()
+  elseif strategy == DISPLAY_STRATEGIES.MERGETOOL then
+    elements.terminal(cmd + " --tool=nvimdiff", { enter = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
     local bufnr = elements.buffer(cmd_fn)
     vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })

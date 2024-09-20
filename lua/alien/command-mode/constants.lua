@@ -1,12 +1,13 @@
 local M = {}
 
----@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame"
+---@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame" | "mergetool"
 M.DISPLAY_STRATEGIES = {
   PRINT = "print",
   UI = "ui",
   SHOW = "show",
   DIFF = "diff",
   BLAME = "blame",
+  MERGETOOL = "mergetool",
 }
 
 M.PORCELAIN_COMMANDS = {
