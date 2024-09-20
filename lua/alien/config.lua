@@ -1,5 +1,6 @@
 local M = {
-  command_mode_commands = { "Git", "G" },
+  command_mode_commands = { "G" },
+  -- command_mode_commands = { "Git", "G" },
   local_file = {
     auto_display_diff = true,
   },
