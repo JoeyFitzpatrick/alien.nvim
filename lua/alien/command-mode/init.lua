@@ -73,6 +73,8 @@ M.run_command = function(cmd)
     elements.terminal(cmd, { enter = true, dynamic_resize = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
+  elseif strategy == DISPLAY_STRATEGIES.BLAME then
+    require("alien.global-actions.blame").blame()
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
     local bufnr = elements.buffer(cmd_fn)
     vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })
