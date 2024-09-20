@@ -59,7 +59,7 @@ M.set_keymaps = function(bufnr)
           return "git show " .. commit_file.hash .. " -- " .. commit_file.filename
         end, get_args))
         if ok then
-          elements.terminal(cmd, { window = { width = width } })
+          elements.terminal(cmd, { skip_redraw = true, window = { width = width } })
         end
       end
     end,
