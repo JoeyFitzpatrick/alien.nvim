@@ -124,7 +124,11 @@ M.terminal = function(cmd, opts)
   local channel_id = nil
   vim.api.nvim_buf_call(bufnr, function()
     if not opts.dynamic_resize then
-      channel_id = vim.fn.termopen(cmd)
+      channel_id = vim.fn.termopen(cmd, {
+        on_exit = function()
+          register.redraw_elements()
+        end,
+      })
     else
       local height = 2
       vim.api.nvim_win_set_height(window, height)
