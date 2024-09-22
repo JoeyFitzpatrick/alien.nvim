@@ -18,6 +18,7 @@ local PORCELAIN_COMMAND_STRATEGY_MAP = {
   diff = DISPLAY_STRATEGIES.DIFF,
   log = DISPLAY_STRATEGIES.UI,
   blame = DISPLAY_STRATEGIES.BLAME,
+  merge = require("alien.command-mode.display-strategies.merge").get_strategy,
   mergetool = DISPLAY_STRATEGIES.MERGETOOL,
 
   add = DISPLAY_STRATEGIES.PRINT,
