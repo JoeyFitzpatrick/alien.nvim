@@ -1,6 +1,6 @@
 local M = {}
 
----@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame" | "mergetool"
+---@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame" | "mergetool" | "terminal"
 M.DISPLAY_STRATEGIES = {
   PRINT = "print",
   UI = "ui",
@@ -8,6 +8,7 @@ M.DISPLAY_STRATEGIES = {
   DIFF = "diff",
   BLAME = "blame",
   MERGETOOL = "mergetool",
+  TERMINAL = "terminal",
 }
 
 M.PORCELAIN_COMMANDS = {
@@ -176,6 +177,7 @@ M.SUBCOMMAND_FLAGS = {
     "--no-status",
     "--gpg-sign",
     "--help",
+    "--reuse-message",
   },
   diff = {},
   fetch = {},
