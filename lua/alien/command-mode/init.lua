@@ -3,6 +3,8 @@ local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRAT
 local elements = require("alien.elements")
 local create_action = require("alien.actions.action").create_action
 
+---@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
+
 local M = {}
 
 local GIT_PREFIXES = { "git", "gitk", "gitweb" }
@@ -41,7 +43,7 @@ end
 
 --- Get the command strategy for a given command.
 ---@param cmd string
----@return string
+---@return string, DisplayStrategyOpts
 M.get_command_strategy = function(cmd)
   local subcommand = M.get_subcommand(cmd)
   local strategy = PORCELAIN_COMMAND_STRATEGY_MAP[subcommand]
@@ -80,19 +82,19 @@ M.run_command = function(cmd)
     interceptors[cmd]()
     return
   end
-  local strategy = M.get_command_strategy(cmd)
+  local strategy, custom_opts = M.get_command_strategy(cmd)
   local cmd_fn =
     create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
   if strategy == DISPLAY_STRATEGIES.TERMINAL then
-    elements.terminal(cmd, { enter = true, dynamic_resize = true, window = { split = "below" } })
+    local default_opts = { enter = true, dynamic_resize = true, window = { split = "below" } }
+    local opts = vim.tbl_deep_extend("force", default_opts, custom_opts or {})
+    elements.terminal(cmd, opts)
   elseif strategy == DISPLAY_STRATEGIES.PRINT then
     print_output(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame()
-  elseif strategy == DISPLAY_STRATEGIES.MERGETOOL then
-    elements.terminal(cmd + " --tool=nvimdiff", { enter = true, window = { split = "below" } })
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
     local bufnr = elements.buffer(cmd_fn)
     vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })
