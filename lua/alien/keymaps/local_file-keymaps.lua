@@ -105,14 +105,29 @@ M.set_keymaps = function(bufnr)
     ),
     opts
   )
-  map_action(keymaps.restore_file, function(local_file)
+
+  map_action_with_input(keymaps.restore, function(local_file, restore_type)
     local filename = local_file.filename
     local status = local_file.file_status
-    if status == STATUSES.UNTRACKED then
-      return "git clean -f -- " .. filename
+    if restore_type == "just this file" then
+      if status == STATUSES.UNTRACKED then
+        return "git clean -f -- " .. filename
+      end
+      return "git restore -- " .. filename
+    elseif restore_type == "nuke working tree" then
+      return "git reset --hard HEAD && git clean -fd"
+    elseif restore_type == "hard reset" then
+      return "git reset --hard HEAD"
+    elseif restore_type == "mixed reset" then
+      return "git reset --mixed HEAD"
+    elseif restore_type == "soft reset" then
+      return "git reset --soft HEAD"
     end
-    return "git restore -- " .. filename
-  end, alien_opts, opts)
+  end, {
+    prompt = "restore type: ",
+    items = { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
+  }, alien_opts, opts)
+
   map_action(keymaps.pull, function()
     return "git pull"
   end, alien_opts, opts)

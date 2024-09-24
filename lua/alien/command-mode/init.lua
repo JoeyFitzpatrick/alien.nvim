@@ -113,7 +113,15 @@ function M.create_git_command()
       {
         nargs = "+", -- Require at least one argument
         complete = function(arglead, cmdline)
-          return require("alien.command-mode.completion").complete_git_command(arglead, cmdline)
+          return {
+            {
+              label = "label",
+              insertText = "insertText",
+              kind = 6,
+              data = "data",
+            },
+          }
+          -- return require("alien.command-mode.completion").complete_git_command(arglead, cmdline)
         end,
       }
     )

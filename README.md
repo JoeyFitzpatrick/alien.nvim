@@ -1,9 +1,9 @@
 ## What is Alien?
 
-Alien is a Neovim git client. It takes some ideas from [vim-fugitive](https://github.com/tpope/vim-fugitive) and [lazygit](https://github.com/jesseduffield/lazygit), and [git](https://git-scm.com/) itself, and introduces some other ideas. The main features are:
+Alien is a Neovim git client. It takes some ideas from [vim-fugitive](https://github.com/tpope/vim-fugitive), [lazygit](https://github.com/jesseduffield/lazygit), and [git](https://git-scm.com/) itself, and introduces some other ideas. The main features are:
 - Any valid git command can be called via command-mode, e.g. `:Git commit`, like fugitive
 - Autocompletion for those commands, e.g. typing `:Git switch` will cause valid branches to be autocompleted
-- Commands that open an editor (such as `git commit` and `git rebase -i`) do so in the current instance of Neovim, instead of opening a nested editor
+- Commands that open an editor (such as `:Git commit` and `:Git rebase -i`) do so in the current instance of Neovim, instead of opening a nested editor
 - Keymaps for common actions in various git contexts, e.g. `n` to create a new branch from the branch UI, like lazygit
 - Rich UIs that always show the up-to-date git status and provide context for available actions
 - Easy and straightforward customizability
@@ -27,7 +27,7 @@ Here's an example using [Lazy](https://github.com/folke/lazy.nvim):
 You can use any package manager you like, but note that you'll need to require and setup the plugin like so:
 
 ```lua
-	require("alien").setup()
+require("alien").setup()
 ```
 
 After that, using Alien is as simple as calling git commands via the `:Git` command (or `:G`):
@@ -38,7 +38,7 @@ After that, using Alien is as simple as calling git commands via the `:Git` comm
 ## Dependencies
 
 ### Optional
-[Telescope](https://github.com/nvim-telescope/telescope.nvim) - Neovim fuzzy finder
+[Telescope](https://github.com/nvim-telescope/telescope.nvim) - Neovim fuzzy finder\
 [Delta](https://github.com/dandavison/delta) - improved git diff output (used in the demos/examples)
 
 
