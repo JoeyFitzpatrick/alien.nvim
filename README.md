@@ -8,6 +8,11 @@ Alien is a Neovim git client. It takes some ideas from [vim-fugitive](https://gi
 - Rich UIs that always show the up-to-date git status and provide context for available actions
 - Easy and straightforward customizability
 
+🚧 NOTE: this plugin is in an alpha state. API changes and bugs are expected. 🚧
+
+https://github.com/user-attachments/assets/dbae252d-2031-4703-8016-9b2cdd60e605
+
+
 
 ## Installation
 
