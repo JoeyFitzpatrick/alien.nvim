@@ -56,6 +56,7 @@ M.set_keymaps = function(bufnr)
   end
 
   vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
+
   vim.keymap.set("n", keymaps.scroll_diff_down, function()
     local buffers = elements.register.get_child_elements({ object_type = "diff" })
     local buffer = buffers[1]
@@ -63,6 +64,7 @@ M.set_keymaps = function(bufnr)
       pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
     end
   end, opts)
+
   vim.keymap.set("n", keymaps.scroll_diff_up, function()
     local buffers = elements.register.get_child_elements({ object_type = "diff" })
     local buffer = buffers[1]
@@ -131,12 +133,15 @@ M.set_keymaps = function(bufnr)
   map_action(keymaps.pull, function()
     return "git pull"
   end, alien_opts, opts)
+
   map_action(keymaps.push, function()
     return "git push"
   end, alien_opts, opts)
+
   map_action(keymaps.pull_with_flags, function()
     return "git pull"
   end, { add_flags = true, trigger_redraw = true }, opts)
+
   map_action(keymaps.push_with_flags, function()
     return "git push"
   end, { add_flags = true, trigger_redraw = true }, opts)

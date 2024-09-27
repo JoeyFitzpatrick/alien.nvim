@@ -23,6 +23,7 @@ local M = {
       toggle_auto_diff = "t",
       scroll_diff_down = "J",
       scroll_diff_up = "K",
+      vimdiff = "D",
       stash = "<leader>s",
       stash_with_flags = "<leader>S",
     },
@@ -49,6 +50,7 @@ local M = {
       open = "s",
       scroll_diff_down = "J",
       scroll_diff_up = "K",
+      vimdiff = "D",
       open_in_split = "<C-v>",
     },
     stash = {
