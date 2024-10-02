@@ -51,6 +51,7 @@ M.set_keymaps = function(bufnr)
       open_diff()
     end
   end
+
   local toggle_auto_diff = function()
     set_auto_diff(not AUTO_DISPLAY_DIFF)
   end
@@ -73,6 +74,22 @@ M.set_keymaps = function(bufnr)
     end
   end, opts)
 
+  map(keymaps.vimdiff, function()
+    local current_file = translate(vim.api.nvim_get_current_line())
+    if not current_file then
+      return
+    end
+    set_auto_diff(false)
+    local head_file_bufnr = elements.buffer(action(function(local_file)
+      return "git show HEAD:" .. local_file.filename
+    end, { object_type = "local_file" }))
+    vim.cmd("diffthis")
+    vim.cmd("rightbelow vsplit " .. current_file.raw_filename)
+    vim.cmd("diffthis")
+    local filetype = vim.api.nvim_get_option_value("filetype", { buf = 0 })
+    vim.api.nvim_set_option_value("filetype", filetype, { buf = head_file_bufnr })
+  end, opts)
+
   map_action(keymaps.stage_or_unstage, function(local_file)
     local filename = local_file.filename
     local status = local_file.file_status
@@ -91,6 +108,7 @@ M.set_keymaps = function(bufnr)
     end
     return "git reset"
   end
+
   map(
     keymaps.stage_or_unstage_all,
     create_action(

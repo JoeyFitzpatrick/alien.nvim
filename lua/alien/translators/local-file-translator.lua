@@ -1,6 +1,6 @@
 local status = require("alien.status")
 
----@alias LocalFile { filename: string, file_status: string }
+---@alias LocalFile { filename: string, file_status: string, raw_filename: string }
 
 local M = {}
 

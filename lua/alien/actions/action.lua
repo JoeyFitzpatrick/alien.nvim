@@ -111,7 +111,7 @@ M.action = function(cmd, opts)
   return function(input)
     opts = opts or {}
     local current_element = register.get_current_element()
-    local current_object_type = current_element and current_element.object_type or nil
+    local current_object_type = current_element and current_element.object_type or opts.object_type
     local translate = get_translator(current_object_type)
     local get_args = nil
     if translate then
