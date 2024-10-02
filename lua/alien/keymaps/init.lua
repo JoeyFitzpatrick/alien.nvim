@@ -79,6 +79,8 @@ M.set_element_keymaps = function(bufnr, element_type)
   end
 end
 
-M.set_global_keymaps = require("alien.keymaps.global-keymaps").set_global_keymaps
+M.set_global_keymaps = function()
+  require("alien.keymaps.global-keymaps").set_global_keymaps()
+end
 
 return M

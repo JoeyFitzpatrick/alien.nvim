@@ -1,5 +1,5 @@
 ---@diagnostic disable: param-type-mismatch
-local keymaps = require("alien.config").keymaps.commit_file
+local keymaps = require("alien.config").config.keymaps.commit_file
 local commands = require("alien.actions.commands")
 local elements = require("alien.elements")
 local translate = require("alien.translators.commit-file-translator").translate

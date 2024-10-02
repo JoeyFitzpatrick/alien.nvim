@@ -1,4 +1,4 @@
-local keymaps = require("alien.config").keymaps.commit
+local keymaps = require("alien.config").config.keymaps.commit
 local elements = require("alien.elements")
 local action = require("alien.actions.action").action
 local multi_action = require("alien.actions.action").composite_action

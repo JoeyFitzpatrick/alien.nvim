@@ -1,4 +1,4 @@
-local keymaps = require("alien.config").keymaps.global
+local keymaps = require("alien.config").config.keymaps.global
 local register = require("alien.elements.register")
 local global_actions = require("alien.global-actions.global-actions")
 
@@ -15,7 +15,7 @@ local function toggle_keymap_display()
   if not element or not element.object_type then
     return nil
   end
-  local element_keymaps = require("alien.config").keymaps[element.object_type]
+  local element_keymaps = require("alien.config").config.keymaps[element.object_type]
   local max_keymap_length = 0
   for _, mapping in pairs(element_keymaps) do
     max_keymap_length = math.max(max_keymap_length, #mapping)

@@ -1,6 +1,6 @@
-local M = {
-  command_mode_commands = { "G" },
-  -- command_mode_commands = { "Git", "G" },
+local M = {}
+M.default_config = {
+  command_mode_commands = { "Git", "G" },
   local_file = {
     auto_display_diff = true,
   },
@@ -59,5 +59,7 @@ local M = {
     },
   },
 }
+
+M.config = {}
 
 return M

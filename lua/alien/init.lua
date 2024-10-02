@@ -8,10 +8,11 @@ local nested_buffers = require("alien.nested-buffers")
 local M = {}
 
 M.setup = function(opts)
-  config = vim.tbl_deep_extend("force", config, opts or {})
+  local new_config = vim.tbl_deep_extend("force", config.default_config, opts or {})
+  config.config = new_config
   highlight.setup_colors()
   require("alien.keymaps").set_global_keymaps()
-  command_mode.create_git_command()
+  command_mode.create_git_command(config.config.command_mode_commands)
   nested_buffers.setup_nested_buffers()
 end
 

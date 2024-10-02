@@ -1,4 +1,4 @@
-local config = require("alien.config")
+local config = require("alien.config").config
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
 local elements = require("alien.elements")
 local create_action = require("alien.actions.action").create_action
@@ -101,8 +101,9 @@ M.run_command = function(cmd)
   end
 end
 
+--- Set up Git command with given commands. Note that the command comes from the config, and does not have to be "Git".
 function M.create_git_command()
-  for _, command in pairs(config.command_mode_commands) do
+  for _, command in pairs(require("alien.config").config.command_mode_commands) do
     vim.api.nvim_create_user_command(
       command, -- Command name, e.g. "Git", "G"
       function(input_args)
