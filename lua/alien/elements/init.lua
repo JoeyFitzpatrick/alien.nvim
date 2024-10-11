@@ -48,10 +48,31 @@ local function create(action, element_params)
   if element_params.post_render then
     element_params.post_render(new_bufnr)
   end
-  vim.system({ "git", "fetch" }, {}, function()
-    register.redraw_elements()
-  end)
   return new_bufnr
+end
+
+local function post_create()
+  local handle
+
+  local stdout = vim.loop.new_pipe(false)
+  local stderr = vim.loop.new_pipe(false)
+
+  handle, _ = vim.loop.spawn(
+    "git",
+    {
+      args = { "fetch" },
+      stdio = { nil, stdout, stderr },
+    },
+    vim.schedule_wrap(function(code, signal)
+      stdout:close()
+      stderr:close()
+      handle:close()
+
+      if code == 0 then
+        register.redraw_elements()
+      end
+    end)
+  )
 end
 
 --- Create a new buffer with the given action, and open it in a floating window
@@ -76,6 +97,7 @@ M.float = function(action, opts)
   local float_opts = vim.tbl_extend("force", default_float_opts, opts or {})
   local bufnr = create(action, { element_type = "float" })
   vim.api.nvim_open_win(bufnr, true, float_opts)
+  post_create()
   return bufnr
 end
 
@@ -95,6 +117,7 @@ M.split = function(action, opts, post_render)
   if post_render then
     post_render(win, bufnr)
   end
+  post_create()
   return bufnr
 end
 
@@ -107,6 +130,7 @@ M.buffer = function(action, opts)
   local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
   local bufnr = create(action, { element_type = "buffer" })
   vim.api.nvim_win_set_buf(buffer_opts.winnr, bufnr)
+  post_create()
   return bufnr
 end
 
