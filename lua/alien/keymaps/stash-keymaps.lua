@@ -1,10 +1,6 @@
 local keymaps = require("alien.config").config.keymaps.stash
-local elements = require("alien.elements")
-local action = require("alien.actions.action").action
-local multi_action = require("alien.actions.action").composite_action
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
-local map = require("alien.keymaps").map
 
 local M = {}
 
@@ -19,6 +15,12 @@ M.set_keymaps = function(bufnr)
   map_action(keymaps.pop, function(stash)
     return string.format("git stash pop stash@{%s}", stash.index)
   end, alien_opts, opts)
+
+  map_action_with_input(keymaps.drop, function(stash, should_drop_stash)
+    if should_drop_stash == "Yes" then
+      return string.format("git stash drop stash@{%s}", stash.index)
+    end
+  end, { prompt = "Are you sure you want to drop this stash? ", items = { "Yes", "No" } }, alien_opts, opts)
 end
 
 return M

@@ -38,6 +38,9 @@ local verb_to_status = {
 ---@param cmd string | fun(obj: table, input: string | nil): string
 ---@return AlienObject
 M.get_object_type = function(cmd)
+  if not cmd then
+    return nil
+  end
   local first_word = cmd:match("%w+")
   if first_word ~= "git" then
     return nil

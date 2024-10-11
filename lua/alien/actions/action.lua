@@ -15,6 +15,9 @@ local M = {}
 ---@param error_callbacks? table<integer, function>
 ---@return string[]
 local run_cmd = function(cmd, error_callbacks)
+  if not cmd then
+    return {}
+  end
   local output = vim.fn.systemlist(cmd)
   if vim.v.shell_error ~= 0 then
     vim.print(vim.inspect(error_callbacks))

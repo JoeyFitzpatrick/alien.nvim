@@ -56,6 +56,7 @@ M.default_config = {
     stash = {
       pop = "p",
       apply = "a",
+      drop = "d",
     },
   },
 }
