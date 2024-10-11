@@ -24,10 +24,6 @@ M.local_branches = function()
   elements.buffer(actions.local_branches, { title = "AlienBranches" })
 end
 
-M.stashes = function()
-  elements.buffer(actions.stashes, { title = "AlienStashes" })
-end
-
 M.blame = require("alien.global-actions.blame").blame
 
 return M
