@@ -3,7 +3,18 @@ local action = require("alien.actions.action").action
 
 local M = {}
 
-M.blame = function()
+local function blame_output_handler(lines)
+  local replacement_lines = {}
+  for _, line in ipairs(lines) do
+    local new_line = line:gsub("^(%S*)%s+[^%(]*%(", "%1 (") -- remove the filename when it is shown, e.g. when using -C flag
+    table.insert(replacement_lines, new_line)
+  end
+  return replacement_lines
+end
+
+--- Function that handles most of the git blame logic
+---@param cmd string
+M.blame = function(cmd)
   local original_win = vim.api.nvim_get_current_win()
   local current_settings = {
     scrollbind = vim.api.nvim_get_option_value("scrollbind", { win = original_win }),
@@ -15,12 +26,14 @@ M.blame = function()
     vim.api.nvim_set_option_value("wrap", false, { win = win })
   end
   setup_blame_window(original_win)
+  local parsed_cmd = cmd
+    .. " '"
+    .. vim.api.nvim_buf_get_name(0)
+    .. "' --date=format-local:'%Y/%m/%d %I:%M %p' | sed -E 's/ +[0-9]+\\)/)/'"
   elements.split(
     action(function()
-      return "git blame '"
-        .. vim.api.nvim_buf_get_name(0)
-        .. "' --date=format-local:'%Y/%m/%d %I:%M %p' | sed -E 's/ +[0-9]+\\)/)/'"
-    end),
+      return parsed_cmd
+    end, { output_handler = blame_output_handler }),
     { split = "left" },
     function(win)
       local closing_paren = string.find(vim.api.nvim_get_current_line(), ")")

@@ -94,7 +94,7 @@ M.run_command = function(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
     elements.buffer(cmd_fn)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
-    require("alien.global-actions.blame").blame()
+    require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
     local bufnr = elements.buffer(cmd_fn)
     vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })

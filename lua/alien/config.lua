@@ -7,7 +7,7 @@ M.default_config = {
   keymaps = {
     global = {
       branch_picker = "<leader>B",
-      toggle_keymap_display = "?",
+      toggle_keymap_display = "g?",
     },
     local_file = {
       stage_or_unstage = "s",
