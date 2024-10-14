@@ -26,6 +26,7 @@ M.default_config = {
       vimdiff = "D",
       stash = "<leader>s",
       stash_with_flags = "<leader>S",
+      amend = "<leader>am",
     },
     local_branch = {
       switch = "s",

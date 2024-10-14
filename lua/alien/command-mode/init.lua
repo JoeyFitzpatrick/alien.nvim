@@ -1,6 +1,6 @@
-local config = require("alien.config").config
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
 local elements = require("alien.elements")
+local register = elements.register
 local create_action = require("alien.actions.action").create_action
 
 ---@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
@@ -67,6 +67,7 @@ local function print_output(cmd)
   else
     vim.notify(output, vim.log.levels.INFO)
   end
+  register.redraw_elements()
 end
 
 local interceptors = {

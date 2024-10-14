@@ -193,6 +193,10 @@ M.set_keymaps = function(bufnr)
     vim.api.nvim_exec2("e " .. filename, {})
   end, opts)
 
+  -- TODO: get this prefix from config
+  local command_mode_prefix = "G"
+  vim.keymap.set("n", keymaps.amend, "<cmd>" .. command_mode_prefix .. " commit --amend --reuse-message HEAD<CR>")
+
   local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
   vim.api.nvim_create_autocmd("CursorMoved", {
     desc = "Diff the file under the cursor",
