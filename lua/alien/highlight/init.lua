@@ -67,9 +67,11 @@ M.setup_colors = function()
   local colors = M.get_palette()
   -- foreground colors
   vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
+  vim.cmd(string.format("highlight %s guifg=%s", "AlienDiffAdd", colors.green))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienCurrentBranch", colors.green))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
+  vim.cmd(string.format("highlight %s guifg=%s", "AlienDiffRemove", colors.red))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchName", colors.purple))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchStar", colors.purple))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienTimeMachineCommit", colors.purple))
@@ -100,6 +102,8 @@ M.get_highlight_by_object = function(object_type)
     commit_file = require("alien.highlight.commit-file-highlight").highlight,
     blame = require("alien.highlight.blame-highlight").highlight,
     stash = require("alien.highlight.stash-highlight").highlight,
+    show = require("alien.highlight.generic-highlight").highlight,
+    diff = require("alien.highlight.generic-highlight").highlight,
   }
   return object_highlight_map[object_type]
 end

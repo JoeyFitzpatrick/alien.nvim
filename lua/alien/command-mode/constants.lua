@@ -127,8 +127,8 @@ M.BASE_COMMANDS = {
 }
 
 M.SUBCOMMAND_FLAGS = {
-  add = {},
-  rebase = {},
+  add = { "-A" },
+  rebase = { "--interactive", "-i" },
   reset = {},
   revert = {},
   difftool = {},

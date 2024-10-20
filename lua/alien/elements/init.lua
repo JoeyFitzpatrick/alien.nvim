@@ -111,9 +111,9 @@ M.split = function(action, opts, post_render)
   local default_split_opts = {
     split = "right",
   }
-  local float_opts = vim.tbl_extend("force", default_split_opts, opts or {})
+  local split_opts = vim.tbl_extend("force", default_split_opts, opts or {})
   local bufnr = create(action, { element_type = "split" })
-  local win = vim.api.nvim_open_win(bufnr, true, float_opts)
+  local win = vim.api.nvim_open_win(bufnr, true, split_opts)
   if post_render then
     post_render(win, bufnr)
   end

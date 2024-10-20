@@ -21,14 +21,16 @@ local function get_subcommand(cmdline)
   return words[2]
 end
 
+local local_branches_command = "git for-each-ref --format='%(refname:short)' refs/heads/"
+local SUBCOMMAND_TO_ARGUMENTS_MAP = {
+  checkout = local_branches_command,
+  switch = local_branches_command,
+  merge = local_branches_command,
+  rebase = local_branches_command,
+  revert = local_branches_command,
+}
+
 local function get_arguments(subcommand)
-  local local_branches_command = "git for-each-ref --format='%(refname:short)' refs/heads/"
-  local SUBCOMMAND_TO_ARGUMENTS_MAP = {
-    checkout = local_branches_command,
-    switch = local_branches_command,
-    merge = local_branches_command,
-    rebase = local_branches_command,
-  }
   local cmd = SUBCOMMAND_TO_ARGUMENTS_MAP[subcommand]
   if not cmd then
     return {}

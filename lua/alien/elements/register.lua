@@ -131,7 +131,9 @@ M.redraw_elements = function()
       goto continue
     end
     vim.api.nvim_buf_set_lines(element.bufnr, 0, -1, false, result.output)
-    element.highlight(element.bufnr)
+    if element.highlight then
+      element.highlight(element.bufnr)
+    end
     ::continue::
   end
 end

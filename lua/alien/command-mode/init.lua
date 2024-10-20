@@ -9,21 +9,20 @@ local M = {}
 
 local GIT_PREFIXES = { "git", "gitk", "gitweb" }
 local PORCELAIN_COMMAND_STRATEGY_MAP = {
-  rebase = require("alien.command-mode.display-strategies.rebase").get_strategy,
+  add = DISPLAY_STRATEGIES.PRINT,
+  blame = DISPLAY_STRATEGIES.BLAME,
   branch = require("alien.command-mode.display-strategies.branch").get_strategy,
-  show = DISPLAY_STRATEGIES.SHOW,
-  help = DISPLAY_STRATEGIES.SHOW,
-  grep = DISPLAY_STRATEGIES.SHOW,
-  stash = require("alien.command-mode.display-strategies.stash").get_strategy,
-  status = require("alien.command-mode.display-strategies.status").get_strategy,
   commit = require("alien.command-mode.display-strategies.commit").get_strategy,
   diff = DISPLAY_STRATEGIES.DIFF,
+  grep = DISPLAY_STRATEGIES.SHOW,
+  help = DISPLAY_STRATEGIES.SHOW,
   log = DISPLAY_STRATEGIES.UI,
-  blame = DISPLAY_STRATEGIES.BLAME,
   merge = require("alien.command-mode.display-strategies.merge").get_strategy,
   mergetool = DISPLAY_STRATEGIES.MERGETOOL,
-
-  add = DISPLAY_STRATEGIES.PRINT,
+  rebase = require("alien.command-mode.display-strategies.rebase").get_strategy,
+  show = DISPLAY_STRATEGIES.SHOW,
+  stash = require("alien.command-mode.display-strategies.stash").get_strategy,
+  status = require("alien.command-mode.display-strategies.status").get_strategy,
 }
 
 --- Takes a git command, and returns the git verb.
@@ -97,8 +96,12 @@ M.run_command = function(cmd)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
-    local bufnr = elements.buffer(cmd_fn)
-    vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })
+    local buf_cmd_fn = create_action(
+      -- Remove backspace chars (^H) from things like help pages
+      cmd .. " | col -b",
+      { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) }
+    )
+    elements.buffer(buf_cmd_fn)
   end
 end
 
