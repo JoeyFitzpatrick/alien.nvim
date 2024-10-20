@@ -115,15 +115,10 @@ function M.create_git_command()
       {
         nargs = "+", -- Require at least one argument
         complete = function(arglead, cmdline)
-          return {
-            {
-              label = "label",
-              insertText = "insertText",
-              kind = 6,
-              data = "data",
-            },
-          }
-          -- return require("alien.command-mode.completion").complete_git_command(arglead, cmdline)
+          local completion = require("alien.command-mode.completion").complete_git_command(arglead, cmdline)
+          return vim.tbl_filter(function(val)
+            return vim.startswith(val, arglead)
+          end, completion)
         end,
       }
     )
