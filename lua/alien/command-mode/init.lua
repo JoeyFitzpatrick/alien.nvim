@@ -93,6 +93,7 @@ local intercept = function(cmd, input_args)
     literal_commands[cmd]()
     return false, cmd
   end
+  cmd = utils.populate_filename(cmd)
   for pattern, fn in pairs(patterns) do
     if cmd:find(pattern) then
       cmd = fn(cmd, input_args)

@@ -31,4 +31,12 @@ M.is_visual_range = function(input_args)
   return input_args.range == 2
 end
 
+--- Replace the "%" character with the current filename (like vim-fugitive)
+---@param cmd string
+---@return string
+M.populate_filename = function(cmd)
+  local command_with_filename = string.gsub(cmd, "%%", vim.api.nvim_buf_get_name(0))
+  return command_with_filename
+end
+
 return M
