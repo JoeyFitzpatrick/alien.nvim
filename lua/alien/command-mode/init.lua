@@ -69,17 +69,40 @@ local function print_output(cmd)
   register.redraw_elements()
 end
 
-local interceptors = {
+local literal_commands = {
   ["git status"] = function()
     elements.buffer(require("alien.actions.base").stats_and_status)
   end,
 }
 
+local patterns = {
+  ["^git log %-L"] = function()
+    vim.print("hello")
+  end,
+}
+
+---@param cmd string
+local intercepted = function(cmd)
+  if literal_commands[cmd] then
+    literal_commands[cmd]()
+    return true
+  end
+  for pattern, fn in pairs(patterns) do
+    vim.print(pattern)
+    vim.print(cmd)
+    if cmd:find(pattern) then
+      fn()
+      return true
+    end
+  end
+  return false
+end
+
 --- Runs the given git command with a command display strategy.
 ---@param cmd string
 M.run_command = function(cmd)
-  if interceptors[cmd] then
-    interceptors[cmd]()
+  local is_command_intercepted = intercepted(cmd)
+  if is_command_intercepted then
     return
   end
   local strategy, custom_opts = M.get_command_strategy(cmd)
