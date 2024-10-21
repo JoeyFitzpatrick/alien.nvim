@@ -1,4 +1,5 @@
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
+local utils = require("alien.command-mode.utils")
 local elements = require("alien.elements")
 local register = elements.register
 local create_action = require("alien.actions.action").create_action
@@ -76,35 +77,40 @@ local literal_commands = {
 }
 
 local patterns = {
-  ["^git log %-L"] = function()
-    vim.print("hello")
+  ["^git log %-L"] = function(cmd, input_args)
+    if utils.is_visual_range(input_args) then
+      return cmd .. input_args.line1 .. "," .. input_args.line2 .. ":" .. vim.api.nvim_buf_get_name(0)
+    end
+    return cmd
   end,
 }
 
 ---@param cmd string
-local intercepted = function(cmd)
+---@param input_args { line1?: integer, line2?: integer, range?: integer }
+---@return boolean, string
+local intercept = function(cmd, input_args)
   if literal_commands[cmd] then
     literal_commands[cmd]()
-    return true
+    return false, cmd
   end
   for pattern, fn in pairs(patterns) do
-    vim.print(pattern)
-    vim.print(cmd)
     if cmd:find(pattern) then
-      fn()
-      return true
+      cmd = fn(cmd, input_args)
+      return true, cmd
     end
   end
-  return false
+  return true, cmd
 end
 
 --- Runs the given git command with a command display strategy.
 ---@param cmd string
-M.run_command = function(cmd)
-  local is_command_intercepted = intercepted(cmd)
-  if is_command_intercepted then
+---@param input_args { line1?: integer, line2?: integer, range?: integer }
+M.run_command = function(cmd, input_args)
+  local should_continue, new_cmd = intercept(cmd, input_args)
+  if not should_continue then
     return
   end
+  cmd = new_cmd
   local strategy, custom_opts = M.get_command_strategy(cmd)
   local cmd_fn =
     create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
@@ -136,7 +142,7 @@ function M.create_git_command()
       function(input_args)
         local args = input_args.args
         local git_command = "git " .. args
-        M.run_command(git_command)
+        M.run_command(git_command, input_args)
       end,
       {
         nargs = "+", -- Require at least one argument
@@ -146,6 +152,7 @@ function M.create_git_command()
             return vim.startswith(val, arglead)
           end, completion)
         end,
+        range = true,
       }
     )
   end

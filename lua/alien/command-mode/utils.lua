@@ -24,4 +24,11 @@ M.overlap = function(t1, t2)
   return false
 end
 
+--- Returns true if the input args from command mode represent a visual range, e.g. '<,'>G log -L
+---@param input_args { line1?: integer, line2?: integer, range?: integer }
+---@return boolean
+M.is_visual_range = function(input_args)
+  return input_args.range == 2
+end
+
 return M
