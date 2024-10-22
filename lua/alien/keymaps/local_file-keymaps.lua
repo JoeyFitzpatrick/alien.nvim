@@ -11,6 +11,7 @@ local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local translate = require("alien.translators.local-file-translator").translate
 local get_args = commands.get_args(translate)
+local utils = require("alien.utils")
 local STATUSES = require("alien.status").STATUSES
 
 local M = {}
@@ -99,6 +100,43 @@ M.set_keymaps = function(bufnr)
       return "git reset HEAD -- " .. filename
     end
   end, alien_opts, opts)
+
+  local visual_stage_or_unstage_fn = function(local_files)
+    local should_stage = false
+    local filenames = ""
+    for _, local_file in ipairs(local_files) do
+      local status = local_file.file_status
+      if not is_staged(status) then
+        should_stage = true
+      end
+      filenames = filenames .. " " .. local_file.filename
+    end
+    if should_stage then
+      return "git add " .. filenames
+    end
+    return "git reset " .. filenames
+  end
+
+  vim.keymap.set(
+    "v",
+    keymaps.stage_or_unstage,
+    create_action(
+      create_command(visual_stage_or_unstage_fn, function()
+        local start_line, end_line = utils.get_visual_line_nums()
+        local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
+        vim.print(lines)
+        local local_files = {}
+        for _, line in ipairs(lines) do
+          local local_file = translate(line)
+          table.insert(local_files, local_file)
+        end
+        return local_files
+      end),
+      { trigger_redraw = true }
+    ),
+    opts
+  )
+
   local stage_or_unstage_all_fn = function(local_files)
     for _, local_file in ipairs(local_files) do
       local status = local_file.file_status
