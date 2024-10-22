@@ -18,6 +18,9 @@ end
 local setup_element = function(action, element_params)
   local bufnr = vim.api.nvim_create_buf(false, true)
   local result = action()
+  if not result then
+    error("action returned nil")
+  end
   local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
   element_params.bufnr = bufnr
   element_params.action = action
@@ -95,9 +98,12 @@ M.float = function(action, opts)
     style = "minimal",
   }
   local float_opts = vim.tbl_extend("force", default_float_opts, opts or {})
-  local bufnr = create(action, { element_type = "float" })
+  local ok, bufnr = pcall(create, action, { element_type = "float" })
+  if not ok then
+    return nil
+  end
   vim.api.nvim_open_win(bufnr, true, float_opts)
-  post_create()
+  -- post_create()
   return bufnr
 end
 
@@ -112,12 +118,15 @@ M.split = function(action, opts, post_render)
     split = "right",
   }
   local split_opts = vim.tbl_extend("force", default_split_opts, opts or {})
-  local bufnr = create(action, { element_type = "split" })
+  local ok, bufnr = pcall(create, action, { element_type = "split" })
+  if not ok then
+    return nil
+  end
   local win = vim.api.nvim_open_win(bufnr, true, split_opts)
   if post_render then
     post_render(win, bufnr)
   end
-  post_create()
+  -- post_create()
   return bufnr
 end
 
@@ -128,8 +137,12 @@ end
 M.buffer = function(action, opts)
   local default_buffer_opts = { winnr = vim.api.nvim_get_current_win() }
   local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
-  local bufnr = create(action, { element_type = "buffer" })
+  local ok, bufnr = pcall(create, action, { element_type = "buffer" })
+  if not ok then
+    return nil
+  end
   vim.api.nvim_win_set_buf(buffer_opts.winnr, bufnr)
+  vim.cmd("only")
   post_create()
   return bufnr
 end
