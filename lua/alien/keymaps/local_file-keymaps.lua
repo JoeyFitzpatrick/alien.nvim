@@ -124,7 +124,6 @@ M.set_keymaps = function(bufnr)
       create_command(visual_stage_or_unstage_fn, function()
         local start_line, end_line = utils.get_visual_line_nums()
         local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
-        vim.print(lines)
         local local_files = {}
         for _, line in ipairs(lines) do
           local local_file = translate(line)

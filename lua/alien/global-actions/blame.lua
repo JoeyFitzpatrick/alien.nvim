@@ -54,6 +54,7 @@ M.blame = function(cmd)
           for option, value in pairs(current_settings) do
             vim.api.nvim_set_option_value(option, value, { win = original_win })
           end
+          vim.api.nvim_buf_delete(0, { force = true })
         end,
         group = alien_status_group,
       })

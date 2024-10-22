@@ -39,6 +39,11 @@ M.default_config = {
       pull = "p",
       push = "<leader>p",
     },
+    blame = {
+      display_files = "s",
+      open_in_browser = "o",
+      commit_info = "i",
+    },
     commit = {
       display_files = "s",
       reword = "rw",

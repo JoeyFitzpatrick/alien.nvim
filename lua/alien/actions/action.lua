@@ -5,7 +5,7 @@ local get_translator = require("alien.translators").get_translator
 
 local M = {}
 
----@alias Action fun(): { output: string[], object_type: AlienObject, action_args: table }
+---@alias Action fun(): ({ output: string[], object_type: AlienObject, action_args: table } | nil)
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
 ---@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, action_args: table, error_callbacks: table<integer, function> | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
