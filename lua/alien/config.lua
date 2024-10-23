@@ -41,7 +41,7 @@ M.default_config = {
     },
     blame = {
       display_files = "s",
-      open_in_browser = "o",
+      copy_commit_url = "o",
       commit_info = "i",
     },
     commit = {
@@ -49,7 +49,7 @@ M.default_config = {
       reword = "rw",
       revert = "rv",
       reset = "rs",
-      open_in_browser = "o",
+      copy_commit_url = "o",
       commit_info = "i",
     },
     commit_file = {

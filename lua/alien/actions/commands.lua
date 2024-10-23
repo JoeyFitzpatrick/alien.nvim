@@ -155,7 +155,7 @@ end
 
 --- Function to open a Git commit in the browser using dynamically fetched GitHub URL
 ---@param commit_hash string
-M.open_git_commit_in_browser = function(commit_hash)
+M.copy_git_commit_url = function(commit_hash)
   if not commit_hash or commit_hash == "" then
     error("Commit hash is required")
   end

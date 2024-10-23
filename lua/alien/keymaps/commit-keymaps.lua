@@ -33,8 +33,8 @@ M.set_keymaps = function(bufnr)
     }))
   end, opts)
 
-  map_action(keymaps.open_in_browser, function(commit)
-    commands.open_git_commit_in_browser(commit.hash)
+  map_action(keymaps.copy_commit_url, function(commit)
+    commands.copy_git_commit_url(commit.hash)
   end, alien_opts, opts)
 
   map_action_with_input(keymaps.reset, function(commit, reset_type)
