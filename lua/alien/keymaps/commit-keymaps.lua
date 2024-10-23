@@ -5,6 +5,7 @@ local multi_action = require("alien.actions.action").composite_action
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
+local commands = require("alien.actions.commands")
 
 local M = {}
 
@@ -31,6 +32,10 @@ M.set_keymaps = function(bufnr)
       end,
     }))
   end, opts)
+
+  map_action(keymaps.open_in_browser, function(commit)
+    commands.open_git_commit_in_browser(commit.hash)
+  end, alien_opts, opts)
 
   map_action_with_input(keymaps.reset, function(commit, reset_type)
     return "git reset --" .. reset_type .. " " .. commit.hash

@@ -3,11 +3,14 @@ local elements = require("alien.elements")
 local action = require("alien.actions.action").action
 local multi_action = require("alien.actions.action").composite_action
 local map = require("alien.keymaps").map
+local map_action = require("alien.keymaps").map_action
+local commands = require("alien.actions.commands")
 
 local M = {}
 
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
+  local alien_opts = { trigger_redraw = true }
   map(keymaps.commit_info, function()
     elements.float(action(function(commit)
       return "git log -n 1 " .. commit.hash
@@ -24,6 +27,10 @@ M.set_keymaps = function(bufnr)
       end,
     }))
   end, opts)
+
+  map_action(keymaps.open_in_browser, function(commit)
+    commands.open_git_commit_in_browser(commit.hash)
+  end, alien_opts, opts)
 end
 
 return M

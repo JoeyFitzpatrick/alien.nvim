@@ -118,4 +118,55 @@ M.num_commits_to_push = function(branch)
   return "git rev-list --count " .. current_remote .. ".." .. branch
 end
 
+-- TODO: make this work for non-github urls
+local function find_remote_url()
+  local handle = io.popen("git config --get remote.origin.url")
+  if not handle then
+    error("Could not fetch remote.origin.url from config")
+  end
+  local repo_url = handle:read("*a")
+  handle:close()
+
+  if not repo_url or repo_url == "" then
+    error("Could not fetch the GitHub URL. Ensure you're in a git repository with a remote 'origin'.")
+  end
+
+  repo_url = repo_url:gsub("\n", "")
+  if repo_url:sub(1, 4) == "git@" then
+    -- SSH Format: git@github.com:user/repo.git
+    repo_url = repo_url:match("git@github.com:(.+).git")
+  elseif repo_url:sub(1, 8) == "https://" then
+    -- HTTPS Format: https://github.com/user/repo.git
+    repo_url = repo_url:match("https://github.com/(.+).git")
+    -- Alternatively, handle URLs without a ".git" suffix
+    if not repo_url then
+      repo_url = repo_url:match("https://github.com/(.+)")
+    end
+  else
+    error("The URL format is unrecognized or unsupported.")
+  end
+
+  if not repo_url then
+    error("Unable to parse the GitHub URL.")
+  end
+
+  return "https://github.com/" .. repo_url .. "/commit/"
+end
+
+--- Function to open a Git commit in the browser using dynamically fetched GitHub URL
+---@param commit_hash string
+M.open_git_commit_in_browser = function(commit_hash)
+  if not commit_hash or commit_hash == "" then
+    error("Commit hash is required")
+  end
+
+  local repository_url = find_remote_url() .. commit_hash
+
+  -- os.execute(string.format("xdg-open %q", repositoryURL)) -- For Unix/Linux systems
+  -- os.execute(string.format("sh -c 'open %q' &", repository_url)) -- for Mac
+  -- os.execute(string.format("start %q", repositoryURL))  -- For Windows
+  vim.fn.setreg("+", repository_url)
+  vim.print("Copied " .. repository_url .. " to clipboard")
+end
+
 return M
