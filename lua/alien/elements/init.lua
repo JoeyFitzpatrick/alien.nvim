@@ -31,6 +31,7 @@ local setup_element = function(action, element_params)
   end
   register.register_element(element_params)
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, result.output)
+  vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
   if highlight then
     highlight(bufnr)
   end
@@ -133,8 +134,9 @@ end
 --- Create a new buffer with the given action, and open it in a target window
 ---@param action Action
 ---@param opts { winnr: integer | nil} | nil
+---@param post_render fun(win: integer, bufnr?: integer) | nil
 ---@return integer
-M.buffer = function(action, opts)
+M.buffer = function(action, opts, post_render)
   local default_buffer_opts = { winnr = vim.api.nvim_get_current_win() }
   local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
   local ok, bufnr = pcall(create, action, { element_type = "buffer" })
@@ -143,6 +145,26 @@ M.buffer = function(action, opts)
   end
   vim.api.nvim_win_set_buf(buffer_opts.winnr, bufnr)
   vim.cmd("only")
+  if post_render then
+    post_render(0, bufnr)
+  end
+  post_create()
+  return bufnr
+end
+
+--- Create a new buffer with the given action, and open it in a new tab
+---@param action Action
+---@param opts { title: string | nil } | nil
+---@return integer
+M.tab = function(action, opts)
+  local default_buffer_opts = {}
+  local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
+  local ok, bufnr = pcall(create, action, { element_type = "tab" })
+  if not ok then
+    return nil
+  end
+  vim.cmd("tabnew")
+  vim.api.nvim_win_set_buf(0, bufnr)
   post_create()
   return bufnr
 end

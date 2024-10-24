@@ -130,7 +130,9 @@ M.redraw_elements = function()
     if not ok then
       goto continue
     end
+    vim.api.nvim_set_option_value("modifiable", true, { buf = element.bufnr })
     vim.api.nvim_buf_set_lines(element.bufnr, 0, -1, false, result.output)
+    vim.api.nvim_set_option_value("modifiable", false, { buf = element.bufnr })
     if element.highlight then
       element.highlight(element.bufnr)
     end

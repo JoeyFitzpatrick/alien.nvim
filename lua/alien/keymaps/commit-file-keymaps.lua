@@ -1,5 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 local keymaps = require("alien.config").config.keymaps.commit_file
+local config = require("alien.config").config.commit_file
 local commands = require("alien.actions.commands")
 local elements = require("alien.elements")
 local translate = require("alien.translators.commit-file-translator").translate
@@ -31,7 +32,40 @@ M.set_keymaps = function(bufnr)
     end
   end, opts)
 
-  map(keymaps.open_in_split, function()
+  local diff_native = commands.create_command(function(commit_file)
+    return "git show " .. commit_file.hash .. " -- " .. commit_file.filename
+  end, get_args)
+
+  local open_diff = function()
+    local width = math.floor(vim.o.columns * 0.67)
+    if vim.api.nvim_get_current_buf() == bufnr then
+      ---@diagnostic disable-next-line: param-type-mismatch
+      local ok, cmd = pcall(diff_native)
+      if ok then
+        elements.terminal(cmd, { skip_redraw = true, window = { width = width } })
+      end
+    end
+  end
+
+  local AUTO_DISPLAY_DIFF = config.auto_display_diff
+  local set_auto_diff = function(should_display)
+    AUTO_DISPLAY_DIFF = should_display
+    if not AUTO_DISPLAY_DIFF then
+      elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
+    else
+      open_diff()
+    end
+  end
+
+  local toggle_auto_diff = function()
+    set_auto_diff(not AUTO_DISPLAY_DIFF)
+  end
+
+  vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
+
+  -- file open functions
+  map(keymaps.open_in_vertical_split, function()
+    set_auto_diff(false)
     local commit_file_from_action = nil
     elements.split(
       action(function(commit_file)
@@ -46,21 +80,62 @@ M.set_keymaps = function(bufnr)
     )
   end, opts)
 
+  map(keymaps.open_in_horizontal_split, function()
+    set_auto_diff(false)
+    local commit_file_from_action = nil
+    elements.split(
+      action(function(commit_file)
+        commit_file_from_action = commit_file
+        return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
+      end, { trigger_redraw = false }),
+      { split = "above" },
+      function(_, buf)
+        vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
+        vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+      end
+    )
+  end, opts)
+
+  map(keymaps.open_in_tab, function()
+    local commit_file_from_action = nil
+    local act = action(function(commit_file)
+      commit_file_from_action = commit_file
+      return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
+    end, { trigger_redraw = false })
+    local buf = elements.tab(act, {})
+    vim.api.nvim_buf_set_name(
+      0,
+      os.tmpname() .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
+    )
+    vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+  end, opts)
+
+  map(keymaps.open_in_window, function()
+    local commit_file_from_action = nil
+    local act = action(function(commit_file)
+      commit_file_from_action = commit_file
+      return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
+    end, { trigger_redraw = false })
+    local buf = elements.buffer(act, {})
+    vim.api.nvim_buf_set_name(
+      0,
+      os.tmpname() .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
+    )
+    vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+  end, opts)
+
   -- Autocmds
   local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
   vim.api.nvim_create_autocmd("CursorMoved", {
     desc = "Diff the commit file under the cursor",
     buffer = bufnr,
     callback = function()
+      if not AUTO_DISPLAY_DIFF then
+        return
+      end
       elements.register.close_child_elements({ object_type = "diff", element_type = "terminal" })
-      local width = math.floor(vim.o.columns * 0.67)
       if vim.api.nvim_get_current_buf() == bufnr then
-        local ok, cmd = pcall(commands.create_command(function(commit_file)
-          return "git show " .. commit_file.hash .. " -- " .. commit_file.filename
-        end, get_args))
-        if ok then
-          elements.terminal(cmd, { skip_redraw = true, window = { width = width } })
-        end
+        open_diff()
       end
     end,
     group = alien_status_group,

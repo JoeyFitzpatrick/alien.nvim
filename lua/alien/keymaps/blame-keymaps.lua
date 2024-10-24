@@ -29,7 +29,7 @@ M.set_keymaps = function(bufnr)
   end, opts)
 
   map_action(keymaps.copy_commit_url, function(commit)
-    commands.open_git_commit_in_browser(commit.hash)
+    commands.copy_git_commit_url(commit.hash)
   end, alien_opts, opts)
 end
 

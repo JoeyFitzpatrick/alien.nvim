@@ -4,6 +4,9 @@ M.default_config = {
   local_file = {
     auto_display_diff = true,
   },
+  commit_file = {
+    auto_display_diff = true,
+  },
   keymaps = {
     global = {
       branch_picker = "<leader>B",
@@ -57,7 +60,11 @@ M.default_config = {
       scroll_diff_down = "J",
       scroll_diff_up = "K",
       vimdiff = "D",
-      open_in_split = "<C-v>",
+      toggle_auto_diff = "t",
+      open_in_vertical_split = "<C-v>",
+      open_in_horizontal_split = "<C-h>",
+      open_in_tab = "<C-t>",
+      open_in_window = "<C-w>",
     },
     stash = {
       pop = "p",
