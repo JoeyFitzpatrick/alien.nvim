@@ -20,6 +20,7 @@ local PORCELAIN_COMMAND_STRATEGY_MAP = {
   log = DISPLAY_STRATEGIES.UI,
   merge = require("alien.command-mode.display-strategies.merge").get_strategy,
   mergetool = DISPLAY_STRATEGIES.MERGETOOL,
+  notes = require("alien.command-mode.display-strategies.notes").get_strategy,
   rebase = require("alien.command-mode.display-strategies.rebase").get_strategy,
   show = DISPLAY_STRATEGIES.SHOW,
   stash = require("alien.command-mode.display-strategies.stash").get_strategy,
