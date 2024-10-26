@@ -55,25 +55,31 @@ local function create(action, element_params)
   return new_bufnr
 end
 
-local function post_create()
-  local handle
+local function post_create_co()
+  -- Utilize a coroutine to run the function asynchronously
+  local co = coroutine.create(function()
+    local handle = io.popen("git fetch --dry-run 2>&1") -- Including stderr in the output stream
+    local result = handle:read("*a") -- 'read('*a')' reads the full output of the command
+    handle:close()
 
-  local stdout = vim.loop.new_pipe(false)
-  local stderr = vim.loop.new_pipe(false)
+    if not result or result:match("^%s*$") then
+      return
+    end
 
-  handle, _ = vim.loop.spawn(
-    "git",
-    {
-      args = { "fetch" },
-      stdio = { nil, stdout, stderr },
-    },
-    vim.schedule_wrap(function(code, signal)
-      stdout:close()
-      stderr:close()
-      handle:close()
+    local fetch_handle = io.popen("git fetch")
+    fetch_handle:close()
+    register.redraw_elements()
+  end)
 
-      if code == 0 then
-        register.redraw_elements()
+  -- Wrap coroutine execution in a vim timer to ensure non-blocking behavior
+  -- This runs the coroutine asynchronously in such a way that it doesn't block UI
+  vim.loop.new_timer():start(
+    0,
+    0,
+    vim.schedule_wrap(function()
+      local status, error = coroutine.resume(co)
+      if not status then
+        print("Error during async git fetch: " .. tostring(error))
       end
     end)
   )
@@ -148,7 +154,7 @@ M.buffer = function(action, opts, post_render)
   if post_render then
     post_render(0, bufnr)
   end
-  post_create()
+  post_create_co()
   return bufnr
 end
 
@@ -165,7 +171,7 @@ M.tab = function(action, opts)
   end
   vim.cmd("tabnew")
   vim.api.nvim_win_set_buf(0, bufnr)
-  post_create()
+  post_create_co()
   return bufnr
 end
 
