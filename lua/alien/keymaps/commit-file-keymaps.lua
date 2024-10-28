@@ -63,6 +63,11 @@ M.set_keymaps = function(bufnr)
 
   vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
 
+  local ALIEN_FILENAME_PREFIX = "Alien://"
+  local function get_tmp_name(hash, filename)
+    return os.tmpname() .. ALIEN_FILENAME_PREFIX .. hash .. ":" .. filename
+  end
+
   -- file open functions
   map(keymaps.open_in_vertical_split, function()
     set_auto_diff(false)
@@ -74,8 +79,12 @@ M.set_keymaps = function(bufnr)
       end, { trigger_redraw = false }),
       {},
       function(_, buf)
-        vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
+        vim.api.nvim_buf_set_name(
+          0,
+          ALIEN_FILENAME_PREFIX .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
+        )
         vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+        vim.cmd("set winhighlight=LineNr:AlienCommitFileLineNr")
       end
     )
   end, opts)
@@ -103,10 +112,7 @@ M.set_keymaps = function(bufnr)
       return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
     end, { trigger_redraw = false })
     local buf = elements.tab(act, {})
-    vim.api.nvim_buf_set_name(
-      0,
-      os.tmpname() .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
-    )
+    vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
     vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
   end, opts)
 
@@ -117,10 +123,7 @@ M.set_keymaps = function(bufnr)
       return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
     end, { trigger_redraw = false })
     local buf = elements.buffer(act, {})
-    vim.api.nvim_buf_set_name(
-      0,
-      os.tmpname() .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
-    )
+    vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
     vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
   end, opts)
 

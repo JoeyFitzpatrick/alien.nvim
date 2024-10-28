@@ -45,6 +45,8 @@ M.get_palette = function()
   local green_bg_light = "006200"
   local cyan = get_colors("Operator")
   local blue = get_colors("Macro")
+  local dark_blue = "020204"
+  local light_blue = "03cff6"
   local purple = "e1a2da"
   -- local purple = get_colors("Include")
   return {
@@ -59,6 +61,8 @@ M.get_palette = function()
     green_bg_light = "#" .. green_bg_light,
     cyan = "#" .. cyan,
     blue = "#" .. blue,
+    dark_blue = "#" .. dark_blue,
+    light_blue = "#" .. light_blue,
     purple = "#" .. purple,
   }
 end
@@ -88,6 +92,10 @@ M.setup_colors = function()
   vim.cmd(string.format("highlight %s guibg=%s", "AlienTimeMachineCurrentCommit", colors.orange))
   vim.cmd(string.format("highlight %s guibg=%s", "AlienDiffNew", colors.green_bg_dark))
   vim.cmd(string.format("highlight %s guibg=%s", "AlienDiffOld", colors.red_bg_dark))
+  vim.cmd(string.format("highlight %s guibg=%s", "AlienCommitFileLineNrBg", colors.dark_blue))
+
+  -- highlights with fg and bg
+  vim.cmd(string.format("highlight %s guifg=%s guibg=%s", "AlienCommitFileLineNr", colors.light_blue, colors.dark_blue))
 end
 
 --- Get the highlight group by object type
