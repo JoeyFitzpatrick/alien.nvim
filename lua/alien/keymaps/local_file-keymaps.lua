@@ -249,6 +249,15 @@ M.set_keymaps = function(bufnr)
     end,
     group = alien_status_group,
   })
+
+  vim.api.nvim_create_autocmd("BufHidden", {
+    desc = "Close open diffs when buffer is hidden",
+    buffer = bufnr,
+    callback = function()
+      set_auto_diff(false)
+    end,
+    group = alien_status_group,
+  })
 end
 
 return M
