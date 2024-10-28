@@ -135,7 +135,7 @@ M.redraw_elements = function()
   for _, element in ipairs(M.elements) do
     -- some elements (like terminals) don't have actions
     local ok, result = pcall(element.action)
-    if not ok then
+    if not ok or not result then
       goto continue
     end
     vim.api.nvim_set_option_value("modifiable", true, { buf = element.bufnr })
