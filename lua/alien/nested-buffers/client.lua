@@ -19,6 +19,13 @@ end
 
 -- Send messages to host on existing pipe.
 local sock = vim.fn.sockconnect("pipe", os.getenv(constants.alien_pipe_path_host_env_var), { rpc = true })
+
+local should_use_nested_nvim_call = "return alien_should_use_nested_nvim()" -- note that using 'return' allows for getting the returned value of the fn
+local should_use_nested_nvim = vim.fn.rpcrequest(sock, "nvim_exec_lua", should_use_nested_nvim_call, {})
+if should_use_nested_nvim == vim.NIL or not should_use_nested_nvim then
+  return
+end
+
 local edit_files_call = "alien_edit_files(" .. '"' .. arg_str .. '", ' .. #args .. ")"
 vim.fn.rpcrequest(sock, "nvim_exec_lua", edit_files_call, {})
 

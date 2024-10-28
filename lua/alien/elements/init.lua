@@ -23,6 +23,7 @@ local setup_element = function(action, element_params)
   end
   local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
   element_params.bufnr = bufnr
+  element_params.win = vim.api.nvim_get_current_win()
   element_params.action = action
   element_params.highlight = highlight
   element_params.action_args = result.action_args
@@ -238,6 +239,7 @@ M.terminal = function(cmd, opts)
   register.register_element({
     element_type = "terminal",
     bufnr = bufnr,
+    win = vim.api.nvim_get_current_win(),
     channel_id = channel_id,
     object_type = object_type,
   })

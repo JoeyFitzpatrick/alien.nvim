@@ -82,6 +82,10 @@ function _G.alien_notify_when_done_editing(pipe_to_respond_on, filepath)
     vim.api.nvim_create_autocmd("BufUnload", { command = "lua alien_handle_bufunload(vim.fn.expand('<afile>:p'))" })
 end
 
+function _G.alien_should_use_nested_nvim()
+  return require("alien.elements.register").get_current_element() ~= nil
+end
+
 M.new_server_pipe_path = vim.call("serverstart")
 vim.call("setenv", constants.alien_pipe_path_host_env_var, M.new_server_pipe_path)
 

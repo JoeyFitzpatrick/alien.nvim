@@ -2,7 +2,7 @@
 local M = {}
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
----@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, object_type: AlienObject, child_elements: BaseElement[], action_args: table, action: Action, post_render: fun(bufnr: integer) | nil, highlight: fun(bufnr: integer): nil}
+---@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, win?: integer, object_type: AlienObject, child_elements: BaseElement[], action_args: table, action: Action, post_render: fun(bufnr: integer) | nil, highlight: fun(bufnr: integer): nil}
 ---@alias TabElement {element_type: "tab", tabnr: integer, bufnr: integer, object_type: AlienObject, child_elements: BaseElement[]}
 ---@alias TerminalElement {element_type: "terminal", channel_id: integer, bufnr: integer, object_type: AlienObject}
 ---@alias Element BaseElement | TabElement | TerminalElement
@@ -13,9 +13,17 @@ M.elements = {}
 ---@return Element | nil
 M.get_current_element = function()
   local bufnr = vim.api.nvim_get_current_buf()
-  return vim.tbl_filter(function(element)
+  local win = vim.api.nvim_get_current_win()
+  local result = nil
+  result = vim.tbl_filter(function(element)
     return element.bufnr == bufnr
   end, M.elements)[1]
+  if not result then
+    result = vim.tbl_filter(function(element)
+      return element.win == win
+    end, M.elements)[1]
+  end
+  return result
 end
 
 ---@param opts {bufnr: integer | nil, object_type: AlienObject | nil, element_type: ElementType | nil }
