@@ -111,7 +111,7 @@ M.set_keymaps = function(bufnr)
       commit_file_from_action = commit_file
       return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
     end, { trigger_redraw = false })
-    local buf = elements.tab(act, {})
+    local buf = elements.tab(act)
     vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
     vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
   end, opts)

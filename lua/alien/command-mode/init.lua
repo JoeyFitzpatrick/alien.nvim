@@ -73,7 +73,7 @@ end
 
 local literal_commands = {
   ["git status"] = function()
-    elements.buffer(require("alien.actions.base").stats_and_status)
+    elements.buffer(require("alien.actions.special_actions").stats_and_status)
   end,
 }
 

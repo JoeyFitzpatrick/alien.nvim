@@ -1,4 +1,4 @@
-local base = require("alien.actions.base")
+local base = require("alien.actions.special_actions")
 
 local M = {}
 

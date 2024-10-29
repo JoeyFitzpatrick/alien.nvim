@@ -8,7 +8,7 @@ local M = {}
 ---@alias Action fun(): ({ output: string[], object_type: AlienObject, action_args: table } | nil)
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
----@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, add_flags: boolean | nil, action_args: table, error_callbacks: table<integer, function> | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
+---@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, action_args: table, error_callbacks: table<integer, function> | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
@@ -53,17 +53,13 @@ end
 
 --- Parses a command from an AlienCommand, which is a very lenient data type
 ---@param alien_command AlienCommand
----@param add_flags boolean | nil
 ---@return string
-M.parse_command = function(alien_command, add_flags)
+M.parse_command = function(alien_command)
   local cmd = nil
   if type(alien_command) == "function" then
     cmd = alien_command()
   else
     cmd = alien_command
-  end
-  if add_flags then
-    cmd = commands.add_flags_input(cmd)
   end
   return cmd
 end
@@ -93,7 +89,7 @@ M.create_action = function(cmd, opts)
       redraw()
       return { output = handle_output(output), object_type = object_type, action_args = opts.action_args }
     end
-    local ok, parsed_command = pcall(M.parse_command, cmd, opts.add_flags)
+    local ok, parsed_command = pcall(M.parse_command, cmd)
     if not ok then
       return nil
     end

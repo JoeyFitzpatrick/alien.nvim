@@ -161,11 +161,8 @@ end
 
 --- Create a new buffer with the given action, and open it in a new tab
 ---@param action Action
----@param opts { title: string | nil } | nil
 ---@return integer
-M.tab = function(action, opts)
-  local default_buffer_opts = {}
-  local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
+M.tab = function(action)
   local ok, bufnr = pcall(create, action, { element_type = "tab" })
   if not ok then
     return nil
