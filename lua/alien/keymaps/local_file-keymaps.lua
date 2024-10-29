@@ -193,22 +193,9 @@ M.set_keymaps = function(bufnr)
   set_command_keymap(keymaps.pull, "pull")
   set_command_keymap(keymaps.push, "push")
 
-  map_action(keymaps.pull_with_flags, function()
-    return "git pull"
-  end, { add_flags = true, trigger_redraw = true }, opts)
-
-  map_action(keymaps.push_with_flags, function()
-    return "git push"
-  end, { add_flags = true, trigger_redraw = true }, opts)
-
   map(keymaps.commit, function()
     set_auto_diff(false)
     elements.terminal("git commit", { enter = true, window = { split = "right" } })
-  end, opts)
-
-  map(keymaps.commit_with_flags, function()
-    local cmd = commands.add_flags_input("git commit")
-    elements.terminal(cmd, { window = { split = "right" } })
   end, opts)
 
   map_action_with_input(keymaps.stash, function(_, stash_name)
