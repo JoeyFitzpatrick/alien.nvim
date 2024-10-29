@@ -16,14 +16,14 @@ local STATUSES = require("alien.status").STATUSES
 
 local M = {}
 
-local function set_command_keymap(mapping, command)
-  local alien_command_name = require("alien.config").config.command_mode_commands[1]
-  vim.keymap.set("n", mapping, "<cmd>" .. alien_command_name .. " " .. command .. "<CR>")
-end
-
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
   local alien_opts = { trigger_redraw = true }
+
+  local function set_command_keymap(mapping, command)
+    local alien_command_name = require("alien.config").config.command_mode_commands[1]
+    vim.keymap.set("n", mapping, "<cmd>" .. alien_command_name .. " " .. command .. "<CR>", opts)
+  end
 
   local diff_native = commands.create_command(function(local_file)
     local status = local_file.file_status
