@@ -1,23 +1,24 @@
-local commands = require("alien.actions.commands")
-
 local M = {}
 
 M.status_output_handler = function(output)
-  local head = output[1]
-  local num_commits_to_pull = output[2]
-  local num_commits_to_push = output[3]
+  local commands = require("alien.actions.commands")
+  local run_cmd = require("alien.actions.action").run_cmd
+
+  local head = table.concat(run_cmd(commands.current_head))
+  local num_commits_to_pull = table.concat(run_cmd(commands.num_commits_to_pull()))
+  local num_commits_to_push = table.concat(run_cmd(commands.num_commits_to_push()))
+  local staged_stats = table.concat(run_cmd(commands.staged_stats))
 
   local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
   local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
-  for _ = 1, 3 do
-    table.remove(output, 1)
-  end
   table.insert(output, 1, head .. " " .. pull_str .. push_str)
+  table.insert(output, 2, staged_stats)
   return output
 end
 
 ---@param lines string[]
 M.branch_output_handler = function(lines)
+  local commands = require("alien.actions.commands")
   local new_output = {}
   for _, line in ipairs(lines) do
     local branch = string.sub(line, 3)

@@ -14,7 +14,7 @@ local M = {}
 ---@param cmd string
 ---@param error_callbacks? table<integer, function>
 ---@return string[]
-local run_cmd = function(cmd, error_callbacks)
+M.run_cmd = function(cmd, error_callbacks)
   if not cmd then
     return {}
   end
@@ -25,27 +25,6 @@ local run_cmd = function(cmd, error_callbacks)
       error_callbacks[vim.v.shell_error](cmd)
     else
       vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
-    end
-  end
-  return output
-end
-
---- Return the output of multiple commands
---- If one of the commands is itself an array, the outputs of the commands in the array will be concatenated on a single line
----@param cmds AlienCommand[]
----@return string[]
-local function get_multiple_outputs(cmds)
-  local output = {}
-  for _, c in ipairs(cmds) do
-    if type(c) == "string" then
-      for _, line in ipairs(run_cmd(c)) do
-        table.insert(output, line)
-      end
-    end
-    if type(c) == "function" then
-      for _, line in ipairs(run_cmd(c())) do
-        table.insert(output, line)
-      end
     end
   end
   return output
@@ -65,7 +44,7 @@ M.parse_command = function(alien_command)
 end
 
 --- Takes a command and returns an Action function
----@param cmd AlienCommand | AlienCommand[]
+---@param cmd AlienCommand
 ---@param opts AlienOpts | nil
 ---@return Action
 M.create_action = function(cmd, opts)
@@ -83,17 +62,11 @@ M.create_action = function(cmd, opts)
     return output
   end
   return function()
-    if type(cmd) == "table" then
-      ---@type string[]
-      local output = get_multiple_outputs(cmd)
-      redraw()
-      return { output = handle_output(output), object_type = object_type, action_args = opts.action_args }
-    end
     local ok, parsed_command = pcall(M.parse_command, cmd)
     if not ok then
       return nil
     end
-    local output = handle_output(run_cmd(parsed_command, opts.error_callbacks))
+    local output = handle_output(M.run_cmd(parsed_command, opts.error_callbacks))
     redraw()
     return {
       output = output,

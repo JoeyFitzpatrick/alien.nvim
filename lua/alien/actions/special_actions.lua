@@ -4,13 +4,7 @@ local output_handlers = require("alien.actions.output-handlers")
 
 local M = {}
 
-M.stats_and_status = create_action({
-  commands.current_head,
-  commands.num_commits_to_pull,
-  commands.num_commits_to_push,
-  commands.staged_stats,
-  commands.status,
-}, {
+M.stats_and_status = create_action(commands.status, {
   object_type = "local_file",
   output_handler = output_handlers.status_output_handler,
 })
