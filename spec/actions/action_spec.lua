@@ -1,5 +1,4 @@
 local action = require("alien.actions.action").action
-local register = require("alien.elements.register")
 
 describe("action", function()
   local cmd_fn = function()

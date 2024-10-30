@@ -1,4 +1,3 @@
-local get_object_type = require("alien.objects").get_object_type
 local commands = require("alien.actions.commands")
 local register = require("alien.elements.register")
 local get_translator = require("alien.translators").get_translator
@@ -15,12 +14,11 @@ local M = {}
 ---@param error_callbacks? table<integer, function>
 ---@return string[]
 M.run_cmd = function(cmd, error_callbacks)
-  if not cmd then
+  if cmd == "" then
     return {}
   end
   local output = vim.fn.systemlist(cmd)
   if vim.v.shell_error ~= 0 then
-    vim.print(vim.inspect(error_callbacks))
     if error_callbacks and error_callbacks[vim.v.shell_error] then
       error_callbacks[vim.v.shell_error](cmd)
     else
@@ -30,7 +28,7 @@ M.run_cmd = function(cmd, error_callbacks)
   return output
 end
 
---- Parses a command from an AlienCommand, which is a very lenient data type
+--- Parses a command from an AlienCommand (string | function)
 ---@param alien_command AlienCommand
 ---@return string
 M.parse_command = function(alien_command)
@@ -70,7 +68,7 @@ M.create_action = function(cmd, opts)
     redraw()
     return {
       output = output,
-      object_type = object_type or get_object_type(parsed_command),
+      object_type = object_type or require("alien.objects").get_object_type(parsed_command),
       action_args = opts.action_args,
     }
   end
@@ -85,10 +83,7 @@ M.action = function(cmd, opts)
     local current_element = register.get_current_element()
     local current_object_type = current_element and current_element.object_type or opts.object_type
     local translate = get_translator(current_object_type)
-    local get_args = nil
-    if translate then
-      get_args = commands.get_args(translate)
-    end
+    local get_args = translate and commands.get_args(translate) or nil
     local command = commands.create_command(cmd, get_args, input, current_element)
     if get_args then
       local action_args = get_args(input)
@@ -113,10 +108,14 @@ M.composite_action = function(cmds, opts)
     for _, cmd in ipairs(cmds) do
       local action_fn = M.action(cmd, opts)
       local result = action_fn()
+      if not result then
+        goto continue
+      end
       object_type = result.object_type
       for _, line in ipairs(result.output) do
         table.insert(output, line)
       end
+      ::continue::
     end
     return { output = output, object_type = object_type }
   end
