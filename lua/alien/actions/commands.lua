@@ -51,7 +51,7 @@ M.status = "git status --porcelain --untracked=all | sort -k1.4"
 -- output stats for staged files, or a message if no files are staged
 M.staged_stats =
   "git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
-M.current_head = "printf 'HEAD: %s\n' $(git rev-parse --abbrev-ref HEAD)"
+M.current_head = "git rev-parse --abbrev-ref HEAD"
 
 ---@param branch? string
 M.current_remote = function(branch)

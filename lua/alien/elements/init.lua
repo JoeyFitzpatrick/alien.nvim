@@ -17,8 +17,7 @@ end
 ---@return integer, AlienObject
 local setup_element = function(cmd, element_params)
   local bufnr = vim.api.nvim_create_buf(false, true)
-  print(vim.inspect(cmd))
-  local result = require("alien.actions.action").action(cmd)()
+  local result = require("alien.actions.action").action(cmd, element_params)()
   if not result then
     error("action returned nil")
   end
@@ -141,13 +140,13 @@ end
 
 --- Create a new buffer with the given action, and open it in a target window
 ---@param cmd string
----@param opts { winnr: integer | nil} | nil
+---@param opts { winnr: integer | nil, output_handler?: fun(lines: string[]): string[] } | nil
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
 ---@return integer | nil
 M.buffer = function(cmd, opts, post_render)
   local default_buffer_opts = { winnr = vim.api.nvim_get_current_win() }
   local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
-  local bufnr = create(cmd, { element_type = "buffer" })
+  local bufnr = create(cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
   -- local ok, bufnr = pcall(create, cmd, { element_type = "buffer" })
   -- if not ok then
   --   return nil

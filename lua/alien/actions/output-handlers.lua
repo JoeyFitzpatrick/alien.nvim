@@ -11,7 +11,7 @@ M.status_output_handler = function(output)
 
   local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
   local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
-  table.insert(output, 1, head .. " " .. pull_str .. push_str)
+  table.insert(output, 1, "HEAD: " .. head .. " " .. pull_str .. push_str)
   table.insert(output, 2, staged_stats)
   return output
 end
