@@ -12,19 +12,20 @@ local set_buf_options = function(bufnr)
   vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
 end
 
----@param action Action
+---@param cmd string
 ---@param element_params Element
 ---@return integer, AlienObject
-local setup_element = function(action, element_params)
+local setup_element = function(cmd, element_params)
   local bufnr = vim.api.nvim_create_buf(false, true)
-  local result = action()
+  print(vim.inspect(cmd))
+  local result = require("alien.actions.action").action(cmd)()
   if not result then
     error("action returned nil")
   end
   local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
   element_params.bufnr = bufnr
   element_params.win = vim.api.nvim_get_current_win()
-  element_params.action = action
+  element_params.cmd = cmd
   element_params.highlight = highlight
   element_params.action_args = result.action_args
   if not element_params.object_type then
@@ -43,11 +44,11 @@ end
 
 --- Create a new Element with the given action.
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
----@param action Action
+---@param cmd string
 ---@param element_params Element
 ---@return integer
-local function create(action, element_params)
-  local new_bufnr, object_type = setup_element(action, element_params)
+local function create(cmd, element_params)
+  local new_bufnr, object_type = setup_element(cmd, element_params)
   keymaps.set_object_keymaps(new_bufnr, object_type)
   keymaps.set_element_keymaps(new_bufnr, element_params.element_type)
   if element_params.post_render then
@@ -139,17 +140,18 @@ M.split = function(action, opts, post_render)
 end
 
 --- Create a new buffer with the given action, and open it in a target window
----@param action Action
+---@param cmd string
 ---@param opts { winnr: integer | nil} | nil
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
----@return integer
-M.buffer = function(action, opts, post_render)
+---@return integer | nil
+M.buffer = function(cmd, opts, post_render)
   local default_buffer_opts = { winnr = vim.api.nvim_get_current_win() }
   local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
-  local ok, bufnr = pcall(create, action, { element_type = "buffer" })
-  if not ok then
-    return nil
-  end
+  local bufnr = create(cmd, { element_type = "buffer" })
+  -- local ok, bufnr = pcall(create, cmd, { element_type = "buffer" })
+  -- if not ok then
+  --   return nil
+  -- end
   vim.api.nvim_win_set_buf(buffer_opts.winnr, bufnr)
   vim.cmd("only")
   if post_render then

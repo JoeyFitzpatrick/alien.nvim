@@ -73,7 +73,7 @@ end
 
 local literal_commands = {
   ["git status"] = function()
-    elements.buffer(require("alien.actions.special_actions").stats_and_status)
+    require("alien.actions.special_actions").stats_and_status()
   end,
 }
 
@@ -123,7 +123,7 @@ M.run_command = function(cmd, input_args)
   elseif strategy == DISPLAY_STRATEGIES.PRINT then
     print_output(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
-    elements.buffer(cmd_fn)
+    elements.buffer(cmd)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
