@@ -78,24 +78,23 @@ end
 ---@param cmd string | fun(object: table, input: string | nil): string
 ---@param opts AlienOpts | nil
 M.action = function(cmd, opts)
-  return function(input)
-    opts = opts or {}
-    local current_element = register.get_current_element()
-    local current_object_type = current_element and current_element.object_type or opts.object_type
-    local translate = get_translator(current_object_type)
-    local get_args = translate and commands.get_args(translate) or nil
-    local command = commands.create_command(cmd, get_args, input, current_element)
-    if get_args then
-      local action_args = get_args(input)
-      if type(action_args) == "function" then
-        action_args = action_args()
-      end
-      local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args or {})
-      opts.action_args = combined_args
+  local input = nil
+  opts = opts or {}
+  local current_element = register.get_current_element()
+  local current_object_type = current_element and current_element.object_type or opts.object_type
+  local translate = get_translator(current_object_type)
+  local get_args = translate and commands.get_args(translate) or nil
+  local command = commands.create_command(cmd, get_args, input, current_element)
+  if get_args then
+    local action_args = get_args(input)
+    if type(action_args) == "function" then
+      action_args = action_args()
     end
-    local action_fn = M.create_action(command, opts)
-    return action_fn()
+    local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args or {})
+    opts.action_args = combined_args
   end
+  local action_fn = M.create_action(command, opts)
+  return action_fn()
 end
 
 --- Create a composite action with multiple commands

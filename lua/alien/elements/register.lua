@@ -1,12 +1,6 @@
 --!strict
 local M = {}
 
----@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
----@alias BaseElement {element_type: "split" | "float" | "buffer", bufnr: integer, win?: integer, object_type: AlienObject, child_elements: BaseElement[], action_args: table, action: Action, post_render: fun(bufnr: integer) | nil, highlight: fun(bufnr: integer): nil}
----@alias TabElement {element_type: "tab", tabnr: integer, bufnr: integer, object_type: AlienObject, child_elements: BaseElement[]}
----@alias TerminalElement {element_type: "terminal", channel_id: integer, bufnr: integer, object_type: AlienObject}
----@alias Element BaseElement | TabElement | TerminalElement
-
 ---@type Element[]
 M.elements = {}
 
@@ -57,19 +51,12 @@ end
 M.register_element = function(params)
   params.child_elements = {}
   local current_element = M.get_current_element()
-  if params.element_type == "terminal" then
-    if not params.channel_id then
-      error("channel_id is required for terminal elements")
-    end
-    table.insert(M.elements, params)
-    if current_element then
-      table.insert(current_element.child_elements, params)
-    end
-  else
-    table.insert(M.elements, params)
-    if current_element then
-      table.insert(current_element.child_elements, params)
-    end
+  if params.element_type == "terminal" and not params.channel_id then
+    error("channel_id is required for terminal elements")
+  end
+  table.insert(M.elements, params)
+  if current_element then
+    table.insert(current_element.child_elements, params)
   end
 end
 
