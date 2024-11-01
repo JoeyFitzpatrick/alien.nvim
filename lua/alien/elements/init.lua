@@ -5,13 +5,15 @@ local autocmds = require("alien.elements.element-autocmds")
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
 
----@class Element
----@field win? integer
----@field bufnr integer
+---@class ElementParams
 ---@field output_handler? fun(lines: string[]): string[]
 ---@field post_render? fun(bufnr: integer): nil
----@field element_type? ElementType
 ---@field object_type? AlienObject
+
+---@class Element: ElementParams
+---@field win? integer
+---@field bufnr integer
+---@field element_type? ElementType
 ---@field child_elements? Element[]
 ---@field action Action
 ---@field highlight fun(bufnr: integer): nil
@@ -28,8 +30,8 @@ local set_buf_options = function(bufnr)
 end
 
 ---@param cmd string
----@param opts Element
----@return integer, AlienObject
+---@param opts ElementParams
+---@return integer, Element
 local setup_element = function(cmd, opts)
   local bufnr = vim.api.nvim_create_buf(false, true)
   local result = require("alien.actions").action(cmd, opts)
@@ -37,6 +39,7 @@ local setup_element = function(cmd, opts)
     error("action returned nil")
   end
   local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
+  ---@cast opts Element
   opts.bufnr = bufnr
   opts.win = vim.api.nvim_get_current_win()
   opts.action = function()
@@ -54,18 +57,18 @@ local setup_element = function(cmd, opts)
   end
   set_buf_options(bufnr)
   autocmds.set_element_autocmds(bufnr)
-  return bufnr, result.object_type
+  return bufnr, opts
 end
 
 --- Create a new Element with the given action.
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param cmd string
----@param opts Element
+---@param opts ElementParams
 ---@return integer
 local function create(cmd, opts)
-  local new_bufnr, object_type = setup_element(cmd, opts)
-  keymaps.set_object_keymaps(new_bufnr, object_type)
-  keymaps.set_element_keymaps(new_bufnr, opts.element_type)
+  local new_bufnr, element = setup_element(cmd, opts)
+  keymaps.set_object_keymaps(new_bufnr, element.object_type)
+  keymaps.set_element_keymaps(new_bufnr, element.element_type)
   if opts.post_render then
     opts.post_render(new_bufnr)
   end
@@ -76,6 +79,9 @@ local function post_create_co()
   -- Utilize a coroutine to run the function asynchronously
   local co = coroutine.create(function()
     local handle = io.popen("git fetch --dry-run 2>&1") -- Including stderr in the output stream
+    if not handle then
+      return nil
+    end
     local result = handle:read("*a") -- 'read('*a')' reads the full output of the command
     handle:close()
 
@@ -84,6 +90,9 @@ local function post_create_co()
     end
 
     local fetch_handle = io.popen("git fetch")
+    if not fetch_handle then
+      return nil
+    end
     fetch_handle:close()
     register.redraw_elements()
   end)
@@ -156,16 +165,15 @@ end
 
 --- Create a new buffer with the given action, and open it in a target window
 ---@param cmd string
----@param opts Element | nil
+---@param opts ElementParams | nil
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
 ---@return integer | nil
 M.buffer = function(cmd, opts, post_render)
   opts = opts or {}
-  local bufnr = create(cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
-  -- local ok, bufnr = pcall(create, cmd, { element_type = "buffer" })
-  -- if not ok then
-  --   return nil
-  -- end
+  local ok, bufnr = pcall(create, cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
+  if not ok then
+    return nil
+  end
   vim.api.nvim_win_set_buf(0, bufnr)
   vim.cmd("silent only")
   if post_render then
