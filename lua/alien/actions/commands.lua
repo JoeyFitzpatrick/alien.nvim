@@ -52,35 +52,13 @@ M.status = "git status --porcelain --untracked=all | sort -k1.4"
 M.staged_stats =
   "git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.current_head = "git rev-parse --abbrev-ref HEAD"
+M.num_commits_to_pull = "git rev-list --count HEAD..@{u}"
+M.num_commits_to_push = "git rev-list --count @{u}..HEAD"
 
 ---@param branch? string
 M.current_remote = function(branch)
   branch = branch or "HEAD"
   return "git rev-parse --symbolic-full-name --abbrev-ref " .. branch .. "@{u}"
-end
-
---- Get the number of commits to pull
----@param branch? string
----@return string
-M.num_commits_to_pull = function(branch)
-  local current_remote = vim.fn.system(M.current_remote(branch)):gsub("\n", "")
-  if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
-    return "echo 0"
-  end
-  branch = branch or "HEAD"
-  return "git rev-list --count " .. branch .. ".." .. current_remote
-end
-
---- Get the number of commits to push
----@param branch? string
----@return string
-M.num_commits_to_push = function(branch)
-  local current_remote = vim.fn.system(M.current_remote(branch)):gsub("\n", "")
-  if vim.v.shell_error == ERROR_CODES.NO_UPSTREAM_ERROR then
-    return "echo 0"
-  end
-  branch = branch or "HEAD"
-  return "git rev-list --count " .. current_remote .. ".." .. branch
 end
 
 -- TODO: make this work for non-github urls

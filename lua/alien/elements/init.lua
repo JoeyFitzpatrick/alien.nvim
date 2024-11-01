@@ -158,6 +158,7 @@ end
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
 ---@return integer | nil
 M.buffer = function(cmd, opts, post_render)
+  opts = opts or {}
   local default_buffer_opts = { win = vim.api.nvim_get_current_win() }
   local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
   local bufnr = create(cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
