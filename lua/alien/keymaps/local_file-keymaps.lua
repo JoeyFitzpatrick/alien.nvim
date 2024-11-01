@@ -9,6 +9,7 @@ local create_command = commands.create_command
 local map = require("alien.keymaps").map
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
+local set_command_keymap = require("alien.keymaps").set_command_keymap
 local translate = require("alien.translators.local-file-translator").translate
 local get_args = commands.get_args(translate)
 local utils = require("alien.utils")
@@ -19,11 +20,6 @@ local M = {}
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
   local alien_opts = { trigger_redraw = true }
-
-  local function set_command_keymap(mapping, command)
-    local alien_command_name = require("alien.config").config.command_mode_commands[1]
-    vim.keymap.set("n", mapping, "<cmd>" .. alien_command_name .. " " .. command .. "<CR>", opts)
-  end
 
   local diff_native = commands.create_command(function(local_file)
     local status = local_file.file_status
@@ -190,8 +186,8 @@ M.set_keymaps = function(bufnr)
     items = { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
   }, alien_opts, opts)
 
-  set_command_keymap(keymaps.pull, "pull")
-  set_command_keymap(keymaps.push, "push")
+  set_command_keymap(keymaps.pull, "pull", opts)
+  set_command_keymap(keymaps.push, "push", opts)
 
   map(keymaps.commit, function()
     set_auto_diff(false)

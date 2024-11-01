@@ -7,7 +7,14 @@ local M = {}
 ---@alias Action fun(): ({ output: string[], object_type: AlienObject, action_args: table } | nil)
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
----@alias AlienOpts { object_type: AlienObject | nil, trigger_redraw: boolean | nil, action_args: table, error_callbacks: table<integer, function> | nil, output_handler: nil | fun(output: string[]): string[], input: function | nil  }
+
+---@class AlienOpts
+---@field object_type AlienObject|nil
+---@field trigger_redraw boolean|nil
+---@field action_args table
+---@field error_callbacks table<integer, function>|nil
+---@field output_handler nil|fun(output: string[]):string[]
+---@field input string|nil
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
@@ -20,7 +27,7 @@ M.run_cmd = function(cmd, error_callbacks)
   local output = vim.fn.systemlist(cmd)
   if vim.v.shell_error ~= 0 then
     if error_callbacks and error_callbacks[vim.v.shell_error] then
-      error_callbacks[vim.v.shell_error](cmd)
+      return error_callbacks[vim.v.shell_error](cmd)
     else
       vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
     end
@@ -78,8 +85,8 @@ end
 ---@param cmd string | fun(object: table, input: string | nil): string
 ---@param opts AlienOpts | nil
 M.action = function(cmd, opts)
-  local input = nil
   opts = opts or {}
+  local input = opts.input
   local current_element = register.get_current_element()
   local current_object_type = current_element and current_element.object_type or opts.object_type
   local translate = get_translator(current_object_type)

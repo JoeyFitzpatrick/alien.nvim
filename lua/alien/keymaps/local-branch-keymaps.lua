@@ -4,6 +4,7 @@ local action = require("alien.actions").action
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
+local set_command_keymap = require("alien.keymaps").set_command_keymap
 local ERROR_CODES = require("alien.actions.error-codes")
 
 ---@alias LocalBranch { branch_name: string }
@@ -66,13 +67,8 @@ M.set_keymaps = function(bufnr)
     end))
   end, opts)
 
-  map_action(keymaps.pull, function()
-    return "git pull"
-  end, alien_opts, opts)
-
-  map_action(keymaps.push, function()
-    return "git push"
-  end, alien_opts, opts)
+  set_command_keymap(keymaps.pull, "pull", opts)
+  set_command_keymap(keymaps.push, "push", opts)
 end
 
 return M

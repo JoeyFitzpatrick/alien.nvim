@@ -114,8 +114,8 @@ M.run_command = function(cmd, input_args)
   end
   cmd = new_cmd
   local strategy, custom_opts = M.get_command_strategy(cmd)
-  local cmd_fn =
-    create_action(cmd, { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) })
+  local output_handler_fn = require("alien.actions.output-handlers").get_output_handler(cmd)
+  local output_handler = output_handler_fn and { output_handler = output_handler_fn } or nil
   if strategy == DISPLAY_STRATEGIES.TERMINAL then
     local default_opts = { enter = true, dynamic_resize = true, window = { split = "below" } }
     local opts = vim.tbl_deep_extend("force", default_opts, custom_opts or {})
@@ -123,7 +123,7 @@ M.run_command = function(cmd, input_args)
   elseif strategy == DISPLAY_STRATEGIES.PRINT then
     print_output(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
-    elements.buffer(cmd)
+    elements.buffer(cmd, output_handler)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then

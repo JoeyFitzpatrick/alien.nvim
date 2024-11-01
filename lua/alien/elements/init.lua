@@ -161,15 +161,13 @@ end
 ---@return integer | nil
 M.buffer = function(cmd, opts, post_render)
   opts = opts or {}
-  local default_buffer_opts = { win = vim.api.nvim_get_current_win() }
-  local buffer_opts = vim.tbl_extend("force", default_buffer_opts, opts or {})
   local bufnr = create(cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
   -- local ok, bufnr = pcall(create, cmd, { element_type = "buffer" })
   -- if not ok then
   --   return nil
   -- end
-  vim.api.nvim_win_set_buf(buffer_opts.win, bufnr)
-  vim.cmd("only")
+  vim.api.nvim_win_set_buf(0, bufnr)
+  vim.cmd("silent only")
   if post_render then
     post_render(0, bufnr)
   end

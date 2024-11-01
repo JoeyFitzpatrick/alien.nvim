@@ -18,7 +18,9 @@ end
 ---@param alien_opts? AlienOpts
 ---@param opts? vim.keymap.set.Opts
 M.map_action = function(keys, cmd_fn, alien_opts, opts)
-  M.map(keys, action(cmd_fn, alien_opts), opts)
+  M.map(keys, function()
+    return action(cmd_fn, alien_opts)
+  end, opts)
 end
 
 ---@param keys string
@@ -31,21 +33,28 @@ M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
     M.map(keys, function()
       vim.ui.select(input_opts.items, { prompt = input_opts.prompt }, function(input)
         if not input then
-          return nil
+          return
         end
-        action(cmd_fn, alien_opts)(input)
+        alien_opts.input = input
+        action(cmd_fn, alien_opts)
       end)
     end, opts)
   else
     M.map(keys, function()
       vim.ui.input({ prompt = input_opts.prompt }, function(input)
         if not input then
-          return nil
+          return
         end
-        action(cmd_fn, alien_opts)(input)
+        alien_opts.input = input
+        action(cmd_fn, alien_opts)
       end)
     end, opts)
   end
+end
+
+M.set_command_keymap = function(mapping, command, opts)
+  local alien_command_name = require("alien.config").config.command_mode_commands[1]
+  vim.keymap.set("n", mapping, "<cmd>" .. alien_command_name .. " " .. command .. "<CR>", opts)
 end
 
 --- Set keymaps by object type for the given buffer

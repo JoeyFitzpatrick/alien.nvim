@@ -1,5 +1,3 @@
-local ERROR_CODES = require("alien.actions.error-codes")
-
 ---@alias CommandArgs LocalBranch | Commit
 
 local M = {}
@@ -52,8 +50,22 @@ M.status = "git status --porcelain --untracked=all | sort -k1.4"
 M.staged_stats =
   "git diff --staged --shortstat | grep -q '^' && git diff --staged --shortstat || echo 'No files staged'"
 M.current_head = "git rev-parse --abbrev-ref HEAD"
-M.num_commits_to_pull = "git rev-list --count HEAD..@{u}"
-M.num_commits_to_push = "git rev-list --count @{u}..HEAD"
+
+---@param branch string
+M.num_commits_to_pull = function(branch)
+  if not branch then
+    return "git rev-list --count HEAD..@{u}"
+  end
+  return "git rev-list --count " .. branch .. "..@{u}"
+end
+
+---@param branch string
+M.num_commits_to_push = function(branch)
+  if not branch then
+    return "git rev-list --count @{u}..HEAD"
+  end
+  return "git rev-list --count @{u}.." .. branch
+end
 
 ---@param branch? string
 M.current_remote = function(branch)
