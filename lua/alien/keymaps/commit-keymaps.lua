@@ -30,14 +30,22 @@ M.set_keymaps = function(bufnr)
   end, alien_opts, opts)
 
   map(keymaps.display_files, function()
-    elements.buffer(multi_action({
-      function(commit)
-        return "git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'"
+    local commit = translate()
+    if not commit then
+      return
+    end
+
+    local tree_cmd = "git diff-tree --no-commit-id --name-only " .. commit.hash .. " -r"
+    elements.buffer(tree_cmd, {
+      output_handler = function(lines)
+        local new_lines =
+          require("alien.actions").run_cmd("git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'")
+        for _, line in ipairs(lines) do
+          table.insert(new_lines, line)
+        end
+        return new_lines
       end,
-      function(commit)
-        return "git diff-tree --no-commit-id --name-only " .. commit.hash .. " -r"
-      end,
-    }))
+    })
   end, opts)
 
   map_action(keymaps.copy_commit_url, function(commit)
