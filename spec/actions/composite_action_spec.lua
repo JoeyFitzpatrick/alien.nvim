@@ -1,4 +1,4 @@
-local composite_action = require("alien.actions.action").composite_action
+local composite_action = require("alien.actions").composite_action
 
 -- describe("composite_action", function()
 --   it("returns the output of multiple commands", function()

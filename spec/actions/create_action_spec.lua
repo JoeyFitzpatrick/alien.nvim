@@ -1,4 +1,4 @@
-local create_action = require("alien.actions.action").create_action
+local create_action = require("alien.actions").create_action
 
 local function output(str1, str2)
   return { output = { str1, str2 } }

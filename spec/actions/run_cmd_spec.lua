@@ -1,4 +1,4 @@
-local run_cmd = require("alien.actions.action").run_cmd
+local run_cmd = require("alien.actions").run_cmd
 
 describe("run_cmd", function()
   local mock_vim = {

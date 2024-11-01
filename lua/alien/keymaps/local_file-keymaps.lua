@@ -1,5 +1,5 @@
-local create_action = require("alien.actions.action").create_action
-local action = require("alien.actions.action").action
+local create_action = require("alien.actions").create_action
+local action = require("alien.actions").action
 local is_staged = require("alien.status").is_staged
 local elements = require("alien.elements")
 local keymaps = require("alien.config").config.keymaps.local_file

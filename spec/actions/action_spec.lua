@@ -1,4 +1,4 @@
-local action = require("alien.actions.action").action
+local action = require("alien.actions").action
 
 describe("action", function()
   local cmd_fn = function()

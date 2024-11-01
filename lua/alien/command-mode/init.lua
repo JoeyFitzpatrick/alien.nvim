@@ -2,7 +2,7 @@ local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRAT
 local utils = require("alien.command-mode.utils")
 local elements = require("alien.elements")
 local register = elements.register
-local create_action = require("alien.actions.action").create_action
+local create_action = require("alien.actions").create_action
 
 ---@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
 

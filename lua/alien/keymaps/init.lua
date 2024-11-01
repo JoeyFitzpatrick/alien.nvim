@@ -1,5 +1,5 @@
 local register = require("alien.elements.register")
-local action = require("alien.actions.action").action
+local action = require("alien.actions").action
 
 local M = {}
 

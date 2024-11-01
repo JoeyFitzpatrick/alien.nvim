@@ -32,14 +32,16 @@ end
 ---@return integer, AlienObject
 local setup_element = function(cmd, opts)
   local bufnr = vim.api.nvim_create_buf(false, true)
-  local result = require("alien.actions.action").action(cmd, opts)
+  local result = require("alien.actions").action(cmd, opts)
   if not result then
     error("action returned nil")
   end
   local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
   opts.bufnr = bufnr
   opts.win = vim.api.nvim_get_current_win()
-  opts.cmd = cmd
+  opts.action = function()
+    return require("alien.actions").action(cmd, opts)
+  end
   opts.highlight = highlight
   if not opts.object_type then
     opts.object_type = result.object_type

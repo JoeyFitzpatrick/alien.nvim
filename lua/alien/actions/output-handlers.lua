@@ -1,5 +1,5 @@
 local commands = require("alien.actions.commands")
-local run_cmd = require("alien.actions.action").run_cmd
+local run_cmd = require("alien.actions").run_cmd
 local ERROR_CODES = require("alien.actions.error-codes")
 
 local num_commits_error_handler = {
