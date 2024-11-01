@@ -7,15 +7,22 @@ local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
 local commands = require("alien.actions.commands")
 
+local translate = function()
+  return require("alien.translators.commit-translator").translate(vim.api.nvim_get_current_line())
+end
+
 local M = {}
 
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
   local alien_opts = { trigger_redraw = true }
+
   map(keymaps.commit_info, function()
-    elements.float(action(function(commit)
-      return "git log -n 1 " .. commit.hash
-    end))
+    local commit = translate()
+    if not commit then
+      return
+    end
+    elements.float("git log -n 1 " .. commit.hash)
   end, opts)
 
   map_action(keymaps.revert, function(commit)

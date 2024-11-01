@@ -5,7 +5,7 @@ local autocmds = require("alien.elements.element-autocmds")
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
 
----@class (exact) Element
+---@class Element
 ---@field win? integer
 ---@field bufnr integer
 ---@field output_handler? fun(lines: string[]): string[]
@@ -103,10 +103,10 @@ local function post_create_co()
 end
 
 --- Create a new buffer with the given action, and open it in a floating window
----@param action Action
+---@param cmd string
 ---@param opts vim.api.keyset.win_config | nil
----@return integer
-M.float = function(action, opts)
+---@return integer | nil
+M.float = function(cmd, opts)
   local width = math.floor(vim.o.columns * 0.8)
   local height = math.floor(vim.o.lines * 0.8)
   local col = math.floor((vim.o.columns - width) / 2)
@@ -122,7 +122,7 @@ M.float = function(action, opts)
     style = "minimal",
   }
   local float_opts = vim.tbl_extend("force", default_float_opts, opts or {})
-  local ok, bufnr = pcall(create, action, { element_type = "float" })
+  local ok, bufnr = pcall(create, cmd, { element_type = "float" })
   if not ok then
     return nil
   end
@@ -132,17 +132,17 @@ M.float = function(action, opts)
 end
 
 --- Create a new buffer with the given action, and open it in a new split
----@param action Action
+---@param cmd string
 ---@param opts vim.api.keyset.win_config | nil
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
----@return integer
-M.split = function(action, opts, post_render)
+---@return integer | nil
+M.split = function(cmd, opts, post_render)
   ---@type vim.api.keyset.win_config
   local default_split_opts = {
     split = "right",
   }
   local split_opts = vim.tbl_extend("force", default_split_opts, opts or {})
-  local ok, bufnr = pcall(create, action, { element_type = "split" })
+  local ok, bufnr = pcall(create, cmd, { element_type = "split" })
   if not ok then
     return nil
   end
@@ -176,10 +176,10 @@ M.buffer = function(cmd, opts, post_render)
 end
 
 --- Create a new buffer with the given action, and open it in a new tab
----@param action Action
----@return integer
-M.tab = function(action)
-  local ok, bufnr = pcall(create, action, { element_type = "tab" })
+---@param cmd string
+---@return integer | nil
+M.tab = function(cmd)
+  local ok, bufnr = pcall(create, cmd, { element_type = "tab" })
   if not ok then
     return nil
   end
