@@ -25,8 +25,6 @@ M.create_command = function(cmd, get_args, input, element)
     local ok, result = pcall(cmd, unpack(args))
     if ok then
       return result
-    elseif element and element.action_args then
-      return cmd(element.action_args)
     end
   end
 end

@@ -4,14 +4,13 @@ local get_translator = require("alien.translators").get_translator
 
 local M = {}
 
----@alias Action fun(): ({ output: string[], object_type: AlienObject, action_args: table } | nil)
+---@alias Action fun(): ({ output: string[], object_type: AlienObject } | nil)
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
 
 ---@class AlienOpts
 ---@field object_type AlienObject|nil
 ---@field trigger_redraw boolean|nil
----@field action_args table
 ---@field error_callbacks table<integer, function>|nil
 ---@field output_handler nil|fun(output: string[]):string[]
 ---@field input string|nil
@@ -76,7 +75,6 @@ M.create_action = function(cmd, opts)
     return {
       output = output,
       object_type = object_type or require("alien.objects").get_object_type(parsed_command),
-      action_args = opts.action_args,
     }
   end
 end
@@ -92,14 +90,6 @@ M.action = function(cmd, opts)
   local translate = get_translator(current_object_type)
   local get_args = translate and commands.get_args(translate) or nil
   local command = commands.create_command(cmd, get_args, input, current_element)
-  if get_args then
-    local action_args = get_args(input)
-    if type(action_args) == "function" then
-      action_args = action_args()
-    end
-    local combined_args = vim.tbl_extend("force", opts.action_args or {}, action_args or {})
-    opts.action_args = combined_args
-  end
   local action_fn = M.create_action(command, opts)
   return action_fn()
 end
