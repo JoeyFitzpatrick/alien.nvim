@@ -118,7 +118,7 @@ M.close_child_elements = function(opts)
   end
 end
 
-M.redraw_elements = function()
+M.redraw_elements_logic = function()
   for _, element in ipairs(M.elements) do
     -- some elements (like terminals) don't have actions
     local ok, result = pcall(element.action)
@@ -133,6 +133,11 @@ M.redraw_elements = function()
     end
     ::continue::
   end
+end
+
+--TODO: Make this function redraw current element immediately, then redraw the rest async
+M.redraw_elements = function()
+  vim.schedule(M.redraw_elements_logic)
 end
 
 return M
