@@ -4,7 +4,11 @@ local get_translator = require("alien.translators").get_translator
 
 local M = {}
 
----@alias Action fun(): ({ output: string[], object_type: AlienObject } | nil)
+---@class ActionResult
+---@field output string[]
+---@field object_type AlienObject
+
+---@alias Action fun(): (ActionResult | nil)
 ---@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
 

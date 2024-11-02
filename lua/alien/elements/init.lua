@@ -29,6 +29,33 @@ local set_buf_options = function(bufnr)
   vim.api.nvim_set_option_value("swapfile", false, { buf = bufnr })
 end
 
+local function highlight_element(bufnr, highlight)
+  if highlight then
+    highlight(bufnr)
+  end
+end
+
+--- Turn ElementParams into Element
+---@param cmd string
+---@param opts ElementParams
+---@param bufnr integer
+---@param result ActionResult
+---@return Element
+M._set_element_opts = function(cmd, opts, bufnr, result, highlight)
+  ---@cast opts Element
+  opts.action = function()
+    return require("alien.actions").action(cmd, opts)
+  end
+  opts.bufnr = bufnr
+  opts.win = vim.api.nvim_get_current_win()
+  opts.highlight = highlight
+
+  if not opts.object_type then
+    opts.object_type = result.object_type
+  end
+  return opts
+end
+
 ---@param cmd string
 ---@param opts ElementParams
 ---@return integer, Element
@@ -39,22 +66,12 @@ local setup_element = function(cmd, opts)
     error("action returned nil")
   end
   local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
-  ---@cast opts Element
-  opts.bufnr = bufnr
-  opts.win = vim.api.nvim_get_current_win()
-  opts.action = function()
-    return require("alien.actions").action(cmd, opts)
-  end
-  opts.highlight = highlight
-  if not opts.object_type then
-    opts.object_type = result.object_type
-  end
+  opts = M._set_element_opts(cmd, opts, bufnr, result, highlight)
+
   register.register_element(opts)
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, result.output)
   vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-  if highlight then
-    highlight(bufnr)
-  end
+  highlight_element(bufnr, highlight)
   set_buf_options(bufnr)
   autocmds.set_element_autocmds(bufnr)
   return bufnr, opts
