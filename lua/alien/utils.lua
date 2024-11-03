@@ -10,4 +10,23 @@ M.get_visual_line_nums = function()
   return start, ending
 end
 
+--- Shallow validation to ensure a table conforms to a given schema
+---@param tbl table
+---@param schema table<string, string>
+M.validate = function(tbl, schema)
+  for key, property_type in pairs(schema) do
+    local value_type = type(tbl[key])
+    if property_type ~= value_type then
+      error(
+        string.format(
+          "Validation error: table with property %s (%s) does not match type %s",
+          key,
+          value_type,
+          property_type
+        )
+      )
+    end
+  end
+end
+
 return M

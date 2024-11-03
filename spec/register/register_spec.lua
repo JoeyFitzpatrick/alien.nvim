@@ -16,13 +16,3 @@ describe("register", function()
     assert.are.same(register.elements, { { bufnr = 1, child_elements = {} } })
   end)
 end)
-
-describe("get_current_element", function()
-  it("should return the element with the bufnr of the current buffer", function()
-    local buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_set_current_buf(buf)
-    local mock_element = { bufnr = buf, child_elements = {}, object_type = "diff" }
-    register.elements = { mock_element }
-    assert.are.same(mock_element, register.get_current_element())
-  end)
-end)

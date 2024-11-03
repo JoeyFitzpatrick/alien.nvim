@@ -20,19 +20,6 @@ M.get_current_element = function()
   return result
 end
 
----@param opts {bufnr: integer | nil, object_type: AlienObject | nil, element_type: ElementType | nil }
-M.get_elements = function(opts)
-  if opts.bufnr then
-    return vim.tbl_filter(function(element)
-      return element.bufnr == opts.bufnr
-    end, M.elements)
-  end
-  return vim.tbl_filter(function(element)
-    return (not opts.object_type or element.object_type == opts.object_type)
-      and (not opts.element_type or element.element_type == opts.element_type)
-  end, M.elements)
-end
-
 ---@param opts { object_type: AlienObject | nil, element_type: ElementType | nil } | nil
 M.get_child_elements = function(opts)
   opts = opts or {}
@@ -46,9 +33,16 @@ M.get_child_elements = function(opts)
   end, current_element.child_elements)
 end
 
+local element_schema = {
+  bufnr = "number",
+  win = "number",
+  element_type = "string",
+}
+
 --- Register a new element
 ---@param params Element
 M.register_element = function(params)
+  require("alien.utils").validate(params, element_schema)
   params.child_elements = {}
   local current_element = M.get_current_element()
   if params.element_type == "terminal" and not params.channel_id then

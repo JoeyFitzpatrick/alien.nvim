@@ -17,7 +17,6 @@ local autocmds = require("alien.elements.element-autocmds")
 ---@field child_elements? Element[]
 ---@field action Action
 ---@field highlight fun(bufnr: integer): nil
----@field cmd string
 ---@field channel_id? string
 
 local M = {}
@@ -148,10 +147,12 @@ M.float = function(cmd, opts)
     style = "minimal",
   }
   local float_opts = vim.tbl_extend("force", default_float_opts, opts or {})
-  local ok, bufnr = pcall(create, cmd, { element_type = "float" })
+  local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "float" })
   if not ok then
+    vim.notify(result, vim.log.levels.ERROR)
     return nil
   end
+  local bufnr = result
   vim.api.nvim_open_win(bufnr, true, float_opts)
   -- post_create()
   return bufnr
@@ -168,10 +169,12 @@ M.split = function(cmd, opts, post_render)
     split = "right",
   }
   local split_opts = vim.tbl_extend("force", default_split_opts, opts or {})
-  local ok, bufnr = pcall(create, cmd, { element_type = "split" })
+  local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "split" })
   if not ok then
+    vim.notify(result, vim.log.levels.ERROR)
     return nil
   end
+  local bufnr = result
   local win = vim.api.nvim_open_win(bufnr, true, split_opts)
   if post_render then
     post_render(win, bufnr)
@@ -187,10 +190,12 @@ end
 ---@return integer | nil
 M.buffer = function(cmd, opts, post_render)
   opts = opts or {}
-  local ok, bufnr = pcall(create, cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
+  local ok, result = xpcall(create, debug.traceback, cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
   if not ok then
+    vim.notify(result, vim.log.levels.ERROR)
     return nil
   end
+  local bufnr = result
   vim.api.nvim_win_set_buf(0, bufnr)
   vim.cmd("silent only")
   if post_render then
@@ -204,10 +209,12 @@ end
 ---@param cmd string
 ---@return integer | nil
 M.tab = function(cmd)
-  local ok, bufnr = pcall(create, cmd, { element_type = "tab" })
+  local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "tab" })
   if not ok then
+    vim.notify(result, vim.log.levels.ERROR)
     return nil
   end
+  local bufnr = result
   vim.cmd("tabnew")
   vim.api.nvim_win_set_buf(0, bufnr)
   post_create_co()
