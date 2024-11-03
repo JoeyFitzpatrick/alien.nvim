@@ -160,7 +160,7 @@ end
 
 --- Create a new buffer with the given action, and open it in a new split
 ---@param cmd string
----@param opts vim.api.keyset.win_config | nil
+---@param opts { split_opts: vim.api.keyset.win_config | nil } | nil
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
 ---@return integer | nil
 M.split = function(cmd, opts, post_render)
@@ -168,8 +168,8 @@ M.split = function(cmd, opts, post_render)
   local default_split_opts = {
     split = "right",
   }
-  local split_opts = vim.tbl_extend("force", default_split_opts, opts or {})
-  local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "split" })
+  local split_opts = vim.tbl_extend("force", default_split_opts, opts and opts.split_opts or {})
+  local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "split" }, opts)
   if not ok then
     vim.notify(result, vim.log.levels.ERROR)
     return nil

@@ -6,9 +6,6 @@ local elements = require("alien.elements")
 local translate = require("alien.translators.commit-file-translator").translate
 local get_args = commands.get_args(translate)
 local action = require("alien.actions").action
-local multi_action = require("alien.actions").composite_action
-local map_action = require("alien.keymaps").map_action
-local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
 
 local M = {}
@@ -97,7 +94,7 @@ M.set_keymaps = function(bufnr)
         commit_file_from_action = commit_file
         return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
       end, { trigger_redraw = false }),
-      { split = "above" },
+      { split_opts = { split = "above" } },
       function(_, buf)
         vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
         vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })

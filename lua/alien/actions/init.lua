@@ -98,27 +98,4 @@ M.action = function(cmd, opts)
   return action_fn()
 end
 
---- Create a composite action with multiple commands
----@param cmds string[] | fun(object: table)[]: string
----@param opts AlienOpts | nil
-M.composite_action = function(cmds, opts)
-  return function()
-    local output = {}
-    local object_type = nil
-    for _, cmd in ipairs(cmds) do
-      local action_fn = M.action(cmd, opts)
-      local result = action_fn()
-      if not result then
-        goto continue
-      end
-      object_type = result.object_type
-      for _, line in ipairs(result.output) do
-        table.insert(output, line)
-      end
-      ::continue::
-    end
-    return { output = output, object_type = object_type }
-  end
-end
-
 return M
