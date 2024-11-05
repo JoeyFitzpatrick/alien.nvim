@@ -29,4 +29,23 @@ M.validate = function(tbl, schema)
   end
 end
 
+--- Run a command, with side effects, such as displaying errors
+---@param cmd string
+---@param error_callbacks? table<integer, function>
+---@return string[]
+M.run_cmd = function(cmd, error_callbacks)
+  if cmd == "" then
+    return {}
+  end
+  local output = vim.fn.systemlist(cmd)
+  if vim.v.shell_error ~= 0 then
+    if error_callbacks and error_callbacks[vim.v.shell_error] then
+      return error_callbacks[vim.v.shell_error](cmd)
+    else
+      vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
+    end
+  end
+  return output
+end
+
 return M

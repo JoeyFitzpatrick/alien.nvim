@@ -19,25 +19,6 @@ local M = {}
 ---@field output_handler nil|fun(output: string[]):string[]
 ---@field input string|nil
 
---- Run a command, with side effects, such as displaying errors
----@param cmd string
----@param error_callbacks? table<integer, function>
----@return string[]
-M.run_cmd = function(cmd, error_callbacks)
-  if cmd == "" then
-    return {}
-  end
-  local output = vim.fn.systemlist(cmd)
-  if vim.v.shell_error ~= 0 then
-    if error_callbacks and error_callbacks[vim.v.shell_error] then
-      return error_callbacks[vim.v.shell_error](cmd)
-    else
-      vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
-    end
-  end
-  return output
-end
-
 --- Parses a command from an AlienCommand (string | function)
 ---@param alien_command AlienCommand
 ---@return string
@@ -74,7 +55,7 @@ M.create_action = function(cmd, opts)
     if not ok then
       return nil
     end
-    local output = handle_output(M.run_cmd(parsed_command, opts.error_callbacks))
+    local output = handle_output(require("alien.utils").run_cmd(parsed_command, opts.error_callbacks))
     redraw()
     return {
       output = output,

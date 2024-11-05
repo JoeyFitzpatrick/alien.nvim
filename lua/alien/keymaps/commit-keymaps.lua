@@ -37,7 +37,7 @@ M.set_keymaps = function(bufnr)
     elements.buffer(tree_cmd, {
       output_handler = function(lines)
         local new_lines =
-          require("alien.actions").run_cmd("git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'")
+          require("alien.utils").run_cmd("git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'")
         for _, line in ipairs(lines) do
           table.insert(new_lines, line)
         end
