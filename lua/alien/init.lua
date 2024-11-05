@@ -14,6 +14,4 @@ M.setup = function()
   nested_buffers.setup_nested_buffers()
 end
 
-M.blame = require("alien.global-actions.blame").blame
-
 return M
