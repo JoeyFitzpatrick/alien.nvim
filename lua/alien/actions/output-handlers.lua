@@ -48,7 +48,7 @@ local verb_to_output_handler = {
 }
 
 ---@param cmd string | fun(obj: table, input: string | nil): string
----@return "status" | "branch" | nil
+---@return nil | fun(lines: string[]): string[]
 M.get_output_handler = function(cmd)
   local first_word = cmd:match("%w+")
   if first_word ~= "git" then

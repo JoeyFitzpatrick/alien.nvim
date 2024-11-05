@@ -1,8 +1,5 @@
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
 local utils = require("alien.command-mode.utils")
-local elements = require("alien.elements")
-local register = elements.register
-local run_action = require("alien.actions").run_action
 
 ---@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
 
@@ -48,9 +45,6 @@ end
 M.get_command_strategy = function(cmd)
   local subcommand = M.get_subcommand(cmd)
   local strategy = PORCELAIN_COMMAND_STRATEGY_MAP[subcommand]
-  if not strategy then
-    return DISPLAY_STRATEGIES.TERMINAL
-  end
   if type(strategy) == "string" then
     return strategy
   end
@@ -68,7 +62,7 @@ local function print_output(cmd)
   else
     vim.notify(output, vim.log.levels.INFO)
   end
-  register.redraw_elements()
+  require("alien.elements.register").redraw_elements()
 end
 
 local literal_commands = {
@@ -119,16 +113,16 @@ M.run_command = function(cmd, input_args)
   if strategy == DISPLAY_STRATEGIES.TERMINAL then
     local default_opts = { enter = true, dynamic_resize = true, window = { split = "below" } }
     local opts = vim.tbl_deep_extend("force", default_opts, custom_opts or {})
-    elements.terminal(cmd, opts)
+    require("alien.elements").terminal(cmd, opts)
   elseif strategy == DISPLAY_STRATEGIES.PRINT then
     print_output(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
-    elements.buffer(cmd, output_handler)
+    require("alien.elements").buffer(cmd, output_handler)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
     local show_cmd = cmd .. " | col -b"
-    elements.buffer(
+    require("alien.elements").buffer(
       show_cmd,
       { output_handler = require("alien.actions.output-handlers").get_output_handler(show_cmd) }
     )

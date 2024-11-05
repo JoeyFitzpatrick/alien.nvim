@@ -73,7 +73,21 @@ M.set_keymaps = function(bufnr)
 
   local function set_commit_file_options(buf)
     vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
-    vim.cmd("set winhighlight=LineNr:AlienCommitFileLineNr")
+    local set_highlight_cmd = "set winhighlight=LineNr:AlienCommitFileLineNr"
+    local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
+    vim.api.nvim_create_autocmd("BufEnter", {
+      desc = "Add linenr highlighting for commit files",
+      buffer = buf,
+      command = set_highlight_cmd,
+      group = alien_status_group,
+    })
+    vim.api.nvim_create_autocmd("BufLeave", {
+      desc = "Remove linenr highlighting for commit files",
+      buffer = buf,
+      command = "set winhighlight=",
+      group = alien_status_group,
+    })
+    vim.cmd(set_highlight_cmd)
   end
 
   -- file open functions
