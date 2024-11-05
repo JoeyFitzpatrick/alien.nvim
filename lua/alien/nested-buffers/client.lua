@@ -1,5 +1,22 @@
-local utils = require("alien.nested-buffers.utils")
+-- As of this writing, rpcrequest fails if the last argument ({}) is missing, but the language server complains that it doesn't need that argument
+---@diagnostic disable: redundant-parameter
+
 local constants = require("alien.nested-buffers.constants")
+
+local function escape_special_chars(str)
+  if str ~= nil then
+    -- Need to escape backslashes and quotes in case they are part of the
+    -- filepaths. Lua needs \\ to define a \, so to escape special chars,
+    -- there are twice as many backslashes as you would think that there
+    -- should be.
+    str = string.gsub(str, "\\", "\\\\\\\\")
+    str = string.gsub(str, '"', '\\\\\\"')
+    str = string.gsub(str, " ", "\\\\ ")
+    return str
+  else
+    return ""
+  end
+end
 
 -- We don't want to overwrite :h shada
 vim.o.sdf = "NONE"
@@ -8,12 +25,11 @@ vim.o.sdf = "NONE"
 local args = vim.call("argv")
 
 local arg_str = ""
-for _, iter in pairs(args) do
-  local absolute_filepath = utils.get_absolute_filepath(iter)
+for _, filepath in pairs(args) do
   if string.len(arg_str) == 0 then
-    arg_str = utils.escape_special_chars(absolute_filepath)
+    arg_str = escape_special_chars(filepath)
   else
-    arg_str = arg_str .. " " .. utils.escape_special_chars(absolute_filepath)
+    arg_str = arg_str .. " " .. escape_special_chars(filepath)
   end
 end
 
