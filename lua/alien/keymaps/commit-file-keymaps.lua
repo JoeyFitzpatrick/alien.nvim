@@ -12,7 +12,9 @@ local M = {}
 
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
-  local alien_opts = { trigger_redraw = true }
+  local translate = function()
+    return require("alien.translators.commit-file-translator").translate(vim.api.nvim_get_current_line())
+  end
 
   vim.keymap.set("n", keymaps.scroll_diff_down, function()
     local buffers = elements.register.get_child_elements({ object_type = "diff" })
@@ -65,63 +67,61 @@ M.set_keymaps = function(bufnr)
     return os.tmpname() .. ALIEN_FILENAME_PREFIX .. hash .. ":" .. filename
   end
 
+  local function get_show_command(commit_file)
+    return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
+  end
+
+  local function set_commit_file_options(buf)
+    vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+    vim.cmd("set winhighlight=LineNr:AlienCommitFileLineNr")
+  end
+
   -- file open functions
   map(keymaps.open_in_vertical_split, function()
     set_auto_diff(false)
-    local commit_file_from_action = nil
-    elements.split(
-      action(function(commit_file)
-        commit_file_from_action = commit_file
-        return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
-      end, { trigger_redraw = false }),
-      {},
-      function(_, buf)
-        vim.api.nvim_buf_set_name(
-          0,
-          ALIEN_FILENAME_PREFIX .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
-        )
-        vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
-        vim.cmd("set winhighlight=LineNr:AlienCommitFileLineNr")
-      end
-    )
+    local commit_file_from_action = translate()
+    if not commit_file_from_action then
+      return
+    end
+    elements.split(get_show_command(commit_file_from_action), {}, function(_, buf)
+      vim.api.nvim_buf_set_name(
+        0,
+        ALIEN_FILENAME_PREFIX .. commit_file_from_action.hash .. "-" .. commit_file_from_action.filename
+      )
+      set_commit_file_options(buf)
+    end)
   end, opts)
 
   map(keymaps.open_in_horizontal_split, function()
     set_auto_diff(false)
-    local commit_file_from_action = nil
-    elements.split(
-      action(function(commit_file)
-        commit_file_from_action = commit_file
-        return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
-      end, { trigger_redraw = false }),
-      { split_opts = { split = "above" } },
-      function(_, buf)
-        vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
-        vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
-      end
-    )
+    local commit_file_from_action = translate()
+    if not commit_file_from_action then
+      return
+    end
+    elements.split(get_show_command(commit_file_from_action), { split_opts = { split = "above" } }, function(_, buf)
+      vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
+      set_commit_file_options(buf)
+    end)
   end, opts)
 
   map(keymaps.open_in_tab, function()
-    local commit_file_from_action = nil
-    local act = action(function(commit_file)
-      commit_file_from_action = commit_file
-      return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
-    end, { trigger_redraw = false })
-    local buf = elements.tab(act)
+    local commit_file_from_action = translate()
+    if not commit_file_from_action then
+      return
+    end
+    local buf = elements.tab(get_show_command(commit_file_from_action))
     vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
-    vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+    set_commit_file_options(buf)
   end, opts)
 
   map(keymaps.open_in_window, function()
-    local commit_file_from_action = nil
-    local act = action(function(commit_file)
-      commit_file_from_action = commit_file
-      return string.format("git show %s:%s", commit_file.hash, commit_file.filename)
-    end, { trigger_redraw = false })
-    local buf = elements.buffer(act, {})
+    local commit_file_from_action = translate()
+    if not commit_file_from_action then
+      return
+    end
+    local buf = elements.buffer(get_show_command(commit_file_from_action), {})
     vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
-    vim.api.nvim_set_option_value("filetype", vim.filetype.match({ buf = buf }), { buf = buf })
+    set_commit_file_options(buf)
   end, opts)
 
   -- Autocmds

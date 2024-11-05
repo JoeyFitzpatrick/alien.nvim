@@ -70,7 +70,7 @@ M.set_keymaps = function(bufnr)
     if not branch then
       return
     end
-    elements.buffer("git log " .. branch.branch_name .. " --pretty=format:'%h %cr %an ◯ %s'")
+    elements.buffer("git log " .. branch.branch_name .. " --pretty=format:'%h\t%cr\t%an\t%s'")
   end, opts)
 
   set_command_keymap(keymaps.pull, "pull", opts)

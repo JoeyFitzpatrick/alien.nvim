@@ -85,6 +85,7 @@ M.setup_colors = function()
   vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitFile", colors.yellow))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienBlameDate", colors.red))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienStashName", colors.yellow))
+  vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitAuthorName", colors.light_blue))
 
   -- background colors
   vim.cmd(string.format("highlight %s guibg=%s", "AlienStagedBg", colors.green_bg_dark))
@@ -92,7 +93,6 @@ M.setup_colors = function()
   vim.cmd(string.format("highlight %s guibg=%s", "AlienTimeMachineCurrentCommit", colors.orange))
   vim.cmd(string.format("highlight %s guibg=%s", "AlienDiffNew", colors.green_bg_dark))
   vim.cmd(string.format("highlight %s guibg=%s", "AlienDiffOld", colors.red_bg_dark))
-  vim.cmd(string.format("highlight %s guibg=%s", "AlienCommitFileLineNrBg", colors.dark_blue))
 
   -- highlights with fg and bg
   vim.cmd(string.format("highlight %s guifg=%s guibg=%s", "AlienCommitFileLineNr", colors.light_blue, colors.dark_blue))

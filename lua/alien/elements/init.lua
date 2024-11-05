@@ -92,7 +92,7 @@ local function create(cmd, opts)
 end
 
 local function post_create_co()
-  -- Utilize a coroutine to run the function asynchronously
+  -- Use a coroutine to run the function asynchronously
   local co = coroutine.create(function()
     local handle = io.popen("git fetch --dry-run 2>&1") -- Including stderr in the output stream
     if not handle then
