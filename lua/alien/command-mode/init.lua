@@ -2,7 +2,7 @@ local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRAT
 local utils = require("alien.command-mode.utils")
 local elements = require("alien.elements")
 local register = elements.register
-local create_action = require("alien.actions").create_action
+local run_action = require("alien.actions").run_action
 
 ---@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
 
@@ -127,12 +127,11 @@ M.run_command = function(cmd, input_args)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
-    local buf_cmd_fn = create_action(
-      -- Remove backspace chars (^H) from things like help pages
-      cmd .. " | col -b",
-      { output_handler = require("alien.actions.output-handlers").get_output_handler(cmd) }
+    local show_cmd = cmd .. " | col -b"
+    elements.buffer(
+      show_cmd,
+      { output_handler = require("alien.actions.output-handlers").get_output_handler(show_cmd) }
     )
-    elements.buffer(buf_cmd_fn)
   end
 end
 

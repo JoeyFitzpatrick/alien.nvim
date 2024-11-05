@@ -9,7 +9,6 @@ local M = {}
 ---@field object_type AlienObject
 
 ---@alias Action fun(): (ActionResult | nil)
----@alias MultiAction { actions: Action[], object_type: AlienObject }
 ---@alias AlienCommand string | fun(): string
 
 ---@class AlienOpts
@@ -19,7 +18,7 @@ local M = {}
 ---@field output_handler nil|fun(output: string[]):string[]
 ---@field input string|nil
 
---- Parses a command from an AlienCommand (string | function)
+--- Converts an AlienCommand (string | function) to a string if it is a function
 ---@param alien_command AlienCommand
 ---@return string
 M.parse_command = function(alien_command)
@@ -35,33 +34,24 @@ end
 --- Takes a command and returns an Action function
 ---@param cmd AlienCommand
 ---@param opts AlienOpts | nil
----@return Action
-M.create_action = function(cmd, opts)
+---@return ActionResult | nil
+M.run_action = function(cmd, opts)
   opts = opts or {}
-  local object_type = opts.object_type
-  local redraw = function()
-    if opts.trigger_redraw then
-      require("alien.elements.register").redraw_elements()
-    end
+  local ok, parsed_command = pcall(M.parse_command, cmd)
+  if not ok then
+    return nil
   end
-  local handle_output = function(output)
-    if opts.output_handler then
-      return opts.output_handler(output)
-    end
-    return output
+  local output = require("alien.utils").run_cmd(parsed_command, opts.error_callbacks)
+  if opts.output_handler then
+    output = opts.output_handler(output)
   end
-  return function()
-    local ok, parsed_command = pcall(M.parse_command, cmd)
-    if not ok then
-      return nil
-    end
-    local output = handle_output(require("alien.utils").run_cmd(parsed_command, opts.error_callbacks))
-    redraw()
-    return {
-      output = output,
-      object_type = object_type or require("alien.objects").get_object_type(parsed_command),
-    }
+  if opts.trigger_redraw then
+    require("alien.elements.register").redraw_elements()
   end
+  return {
+    output = output,
+    object_type = opts.object_type or require("alien.objects").get_object_type(parsed_command),
+  }
 end
 
 --- Create an action with just a command (string or function)
@@ -75,8 +65,7 @@ M.action = function(cmd, opts)
   local translate = get_translator(current_object_type)
   local get_args = translate and commands.get_args(translate) or nil
   local command = commands.create_command(cmd, get_args, input, current_element)
-  local action_fn = M.create_action(command, opts)
-  return action_fn()
+  return M.run_action(command, opts)
 end
 
 return M

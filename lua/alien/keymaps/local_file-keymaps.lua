@@ -1,4 +1,4 @@
-local create_action = require("alien.actions").create_action
+local run_action = require("alien.actions").run_action
 local action = require("alien.actions").action
 local is_staged = require("alien.status").is_staged
 local elements = require("alien.elements")
@@ -118,10 +118,8 @@ M.set_keymaps = function(bufnr)
     return "git reset " .. filenames
   end
 
-  vim.keymap.set(
-    "v",
-    keymaps.stage_or_unstage,
-    create_action(
+  vim.keymap.set("v", keymaps.stage_or_unstage, function()
+    run_action(
       create_command(visual_stage_or_unstage_fn, function()
         local start_line, end_line = utils.get_visual_line_nums()
         local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
@@ -133,9 +131,8 @@ M.set_keymaps = function(bufnr)
         return local_files
       end),
       { trigger_redraw = true }
-    ),
-    opts
-  )
+    )
+  end, opts)
 
   local stage_or_unstage_all_fn = function(local_files)
     for _, local_file in ipairs(local_files) do
@@ -147,9 +144,8 @@ M.set_keymaps = function(bufnr)
     return "git reset"
   end
 
-  map(
-    keymaps.stage_or_unstage_all,
-    create_action(
+  map(keymaps.stage_or_unstage_all, function()
+    run_action(
       create_command(stage_or_unstage_all_fn, function()
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         local local_files = {}
@@ -160,9 +156,8 @@ M.set_keymaps = function(bufnr)
         return local_files
       end),
       { trigger_redraw = true }
-    ),
-    opts
-  )
+    )
+  end, opts)
 
   map_action_with_input(keymaps.restore, function(local_file, restore_type)
     local filename = local_file.filename
