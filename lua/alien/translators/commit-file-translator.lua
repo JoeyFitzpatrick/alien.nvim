@@ -1,5 +1,3 @@
-local register = require("alien.elements.register")
-
 local M = {}
 
 ---@alias CommitFile { hash: string, filename: string }

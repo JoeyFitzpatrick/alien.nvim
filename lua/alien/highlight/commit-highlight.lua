@@ -7,8 +7,10 @@ M.highlight = function(bufnr)
     if commit then
       vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienCommitHash", i - 1, commit.start, commit.ending)
       local name = line:match("^[^\t]*\t[^\t]*\t([^\t]*)")
-      local name_start, name_end = line:find(name)
-      vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienCommitAuthorName", i - 1, name_start - 1, name_end)
+      if name then
+        local name_start, name_end = line:find(name)
+        vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienCommitAuthorName", i - 1, name_start - 1, name_end)
+      end
     end
   end
 end

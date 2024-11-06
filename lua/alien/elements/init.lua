@@ -92,39 +92,23 @@ local function create(cmd, opts)
 end
 
 local function post_create_co()
-  -- Use a coroutine to run the function asynchronously
+  local should_run_fetch = false
   local co = coroutine.create(function()
-    local handle = io.popen("git fetch --dry-run 2>&1") -- Including stderr in the output stream
-    if not handle then
-      return nil
-    end
-    local result = handle:read("*a") -- 'read('*a')' reads the full output of the command
-    handle:close()
-
-    if not result or result:match("^%s*$") then
+    if not should_run_fetch then
       return
     end
-
-    local fetch_handle = io.popen("git fetch")
-    if not fetch_handle then
-      return nil
-    end
-    fetch_handle:close()
-    register.redraw_elements()
+    vim.system({ "git", "fetch" }, { text = true }, function()
+      register.redraw_elements()
+    end)
   end)
 
-  -- Wrap coroutine execution in a vim timer to ensure non-blocking behavior
-  -- This runs the coroutine asynchronously in such a way that it doesn't block UI
-  vim.loop.new_timer():start(
-    0,
-    0,
-    vim.schedule_wrap(function()
-      local status, error = coroutine.resume(co)
-      if not status then
-        print("Error during async git fetch: " .. tostring(error))
-      end
-    end)
-  )
+  vim.system({ "git", "fetch", "--dry-run" }, { text = true }, function(result)
+    if result.stderr and result.code == 0 then
+      should_run_fetch = true
+    end
+  end)
+
+  coroutine.resume(co)
 end
 
 --- Create a new buffer with the given action, and open it in a floating window

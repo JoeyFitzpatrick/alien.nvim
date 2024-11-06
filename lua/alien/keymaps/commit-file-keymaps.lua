@@ -5,7 +5,6 @@ local commands = require("alien.actions.commands")
 local elements = require("alien.elements")
 local translate = require("alien.translators.commit-file-translator").translate
 local get_args = commands.get_args(translate)
-local action = require("alien.actions").action
 local map = require("alien.keymaps").map
 
 local M = {}
