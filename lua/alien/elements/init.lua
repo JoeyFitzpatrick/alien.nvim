@@ -100,11 +100,10 @@ local function post_create_co(bufnr)
     if not should_run_fetch then
       return
     end
-    local position = { 0, 10 }
-    local timer = require("alien.ui").start_spinner(bufnr, position)
+    require("alien.ui").start_spinner(bufnr, 0)
     vim.system({ "git", "fetch" }, { text = true }, function()
       register.redraw_elements()
-      require("alien.ui").stop_spinner(timer, bufnr, position)
+      require("alien.ui").stop_spinner(bufnr)
     end)
   end)
 
