@@ -19,7 +19,6 @@ end
 local function get_colors(name)
   local success, color = pcall(vim.api.nvim_get_hl, 0, { name = name })
   if not success then
-    print("Could not retrieve highlight group:", name)
     return nil
   end
 
@@ -33,37 +32,24 @@ local function get_colors(name)
 end
 
 M.get_palette = function()
-  local bg = get_colors("Normal")
-  local red = get_colors("Error")
-  local red_bg_dark = "4f1d21"
-  local red_bg_light = "620000"
-  local orange = get_colors("SpecialChar")
-  local yellow = "e9b770"
-  -- local yellow = get_colors("PreProc")
-  local green = "66ff00"
-  local green_bg_dark = "27542a"
-  local green_bg_light = "006200"
-  local cyan = get_colors("Operator")
-  local blue = get_colors("Macro")
-  local dark_blue = "020204"
-  local light_blue = "03cff6"
-  local purple = "e1a2da"
-  -- local purple = get_colors("Include")
   return {
-    bg = "#" .. bg,
-    red = "#" .. red,
-    red_bg_dark = "#" .. red_bg_dark,
-    red_bg_light = "#" .. red_bg_light,
-    orange = "#" .. orange,
-    yellow = "#" .. yellow,
-    green = "#" .. green,
-    green_bg_dark = "#" .. green_bg_dark,
-    green_bg_light = "#" .. green_bg_light,
-    cyan = "#" .. cyan,
-    blue = "#" .. blue,
-    dark_blue = "#" .. dark_blue,
-    light_blue = "#" .. light_blue,
-    purple = "#" .. purple,
+    bg = get_colors("Normal"),
+    red = get_colors("Error"),
+    red_bg_dark = "#4f1d21",
+    red_bg_light = "#620000",
+    orange = get_colors("SpecialChar"),
+    yellow = "#e9b770",
+    -- yellow = get_colors("PreProc"),
+    green = "#66ff00",
+    light_green = "#84E184",
+    green_bg_dark = "#27542a",
+    green_bg_light = "#006200",
+    cyan = get_colors("Operator"),
+    blue = get_colors("Macro"),
+    dark_blue = "#020204",
+    light_blue = "#93D7FF",
+    purple = "#e1a2da",
+    -- purple = get_colors("Include"),
   }
 end
 
@@ -72,13 +58,11 @@ M.setup_colors = function()
   -- foreground colors
   vim.cmd(string.format("highlight %s guifg=%s", "AlienStaged", colors.green))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienDiffAdd", colors.green))
-  vim.cmd(string.format("highlight %s guifg=%s", "AlienCurrentBranch", colors.green))
+  vim.cmd(string.format("highlight %s guifg=%s", "AlienCurrentBranch", colors.light_green))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienPartiallyStaged", colors.orange))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienUnstaged", colors.red))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienDiffRemove", colors.red))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchName", colors.purple))
-  vim.cmd(string.format("highlight %s guifg=%s", "AlienBranchStar", colors.purple))
-  vim.cmd(string.format("highlight %s guifg=%s", "AlienTimeMachineCommit", colors.purple))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienHead", colors.purple))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienPushPullString", colors.yellow))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitHash", colors.yellow))
