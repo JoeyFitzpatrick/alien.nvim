@@ -93,14 +93,18 @@ local function create(cmd, opts)
   return new_bufnr
 end
 
-local function post_create_co()
+---@param bufnr integer
+local function post_create_co(bufnr)
   local should_run_fetch = false
   local co = coroutine.create(function()
     if not should_run_fetch then
       return
     end
+    local position = { 0, 10 }
+    local timer = require("alien.ui").start_spinner(bufnr, position)
     vim.system({ "git", "fetch" }, { text = true }, function()
       register.redraw_elements()
+      require("alien.ui").stop_spinner(timer, bufnr, position)
     end)
   end)
 
@@ -187,7 +191,7 @@ M.buffer = function(cmd, opts, post_render)
   if post_render then
     post_render(0, bufnr)
   end
-  post_create_co()
+  post_create_co(bufnr)
   return bufnr
 end
 
