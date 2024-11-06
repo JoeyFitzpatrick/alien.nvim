@@ -1,6 +1,6 @@
 local M = {}
 
-M.highlight = function(bufnr)
+M.highlight_oneline_pretty = function(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   for i, line in ipairs(lines) do
     local commit = require("alien.translators.commit-translator").translate(line)
@@ -13,6 +13,10 @@ M.highlight = function(bufnr)
       end
     end
   end
+end
+
+M.highlight = function(bufnr)
+  vim.api.nvim_set_option_value("filetype", "git", { buf = bufnr })
 end
 
 return M

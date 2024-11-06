@@ -9,6 +9,7 @@ local autocmds = require("alien.elements.element-autocmds")
 ---@field output_handler? fun(lines: string[]): string[]
 ---@field post_render? fun(bufnr: integer): nil
 ---@field object_type? AlienObject
+---@field highlight? fun(bufnr: integer): nil
 
 ---@class Element: ElementParams
 ---@field win? integer
@@ -64,7 +65,8 @@ local setup_element = function(cmd, opts)
   if not result then
     error("action returned nil")
   end
-  local highlight = require("alien.highlight").get_highlight_by_object(result.object_type)
+  local highlight = opts.highlight and opts.highlight
+    or require("alien.highlight").get_highlight_by_object(result.object_type)
   opts = M._set_element_opts(cmd, opts, bufnr, result, highlight)
 
   register.register_element(opts)
