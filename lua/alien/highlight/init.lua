@@ -86,6 +86,7 @@ M.setup_colors = function()
   vim.cmd(string.format("highlight %s guifg=%s", "AlienBlameDate", colors.red))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienStashName", colors.yellow))
   vim.cmd(string.format("highlight %s guifg=%s", "AlienCommitAuthorName", colors.light_blue))
+  vim.cmd(string.format("highlight %s guifg=%s", "AlienSpinner", colors.light_blue))
 
   -- background colors
   vim.cmd(string.format("highlight %s guibg=%s", "AlienStagedBg", colors.green_bg_dark))
