@@ -5,10 +5,12 @@ local autocmds = require("alien.elements.element-autocmds")
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
 
----@class ElementParams
+---@class BaseOpts
+---@field object_type? AlienObject
+
+---@class ElementParams: BaseOpts
 ---@field output_handler? fun(lines: string[]): string[]
 ---@field post_render? fun(bufnr: integer): nil
----@field object_type? AlienObject
 ---@field highlight? fun(bufnr: integer): nil
 
 ---@class Element: ElementParams
@@ -18,6 +20,13 @@ local autocmds = require("alien.elements.element-autocmds")
 ---@field child_elements? Element[]
 ---@field action Action
 ---@field highlight fun(bufnr: integer): nil
+---@field channel_id? string
+
+---@class TerminalElement
+---@field win? integer
+---@field bufnr integer
+---@field element_type? ElementType
+---@field child_elements? Element[]
 ---@field channel_id? string
 
 local M = {}
@@ -206,7 +215,7 @@ M.tab = function(cmd)
   local bufnr = result
   vim.cmd("tabnew")
   vim.api.nvim_win_set_buf(0, bufnr)
-  post_create_co()
+  post_create_co(bufnr)
   return bufnr
 end
 

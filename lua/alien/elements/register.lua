@@ -40,7 +40,7 @@ local element_schema = {
 }
 
 --- Register a new element
----@param params Element
+---@param params Element | TerminalElement
 M.register_element = function(params)
   require("alien.utils").validate(params, element_schema)
   params.child_elements = {}

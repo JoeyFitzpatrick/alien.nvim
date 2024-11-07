@@ -11,8 +11,7 @@ local M = {}
 ---@alias Action fun(): (ActionResult | nil)
 ---@alias AlienCommand string | fun(): string
 
----@class AlienOpts
----@field object_type AlienObject|nil
+---@class AlienOpts: BaseOpts
 ---@field trigger_redraw boolean|nil
 ---@field error_callbacks table<integer, function>|nil
 ---@field output_handler nil|fun(output: string[]):string[]
@@ -56,8 +55,9 @@ end
 
 --- Create an action with just a command (string or function)
 ---@param cmd string | fun(object: table, input: string | nil): string
----@param opts AlienOpts | nil
+---@param opts AlienOpts | BaseOpts |  nil
 M.action = function(cmd, opts)
+  ---@cast opts AlienOpts
   opts = opts or {}
   local input = opts.input
   local current_element = register.get_current_element()
