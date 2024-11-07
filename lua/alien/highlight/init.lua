@@ -32,7 +32,6 @@ local function get_colors(name)
 end
 
 M.get_palette = function()
-  vim.print(get_colors("Error"))
   return {
     bg = get_colors("Normal"),
     red = get_colors("Error"),
