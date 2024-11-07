@@ -197,7 +197,7 @@ M.set_keymaps = function(bufnr)
     vim.ui.select({ "staged" }, { prompt = "Stash type:" }, function(stash_type)
       vim.ui.input({ prompt = "Stash name: " }, function(input)
         local cmd = "git stash push --" .. stash_type .. " -m " .. input
-        action(cmd, alien_opts)()
+        action(cmd, alien_opts)
       end)
     end)
   end, opts)

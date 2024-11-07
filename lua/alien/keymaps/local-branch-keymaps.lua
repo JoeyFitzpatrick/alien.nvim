@@ -33,7 +33,7 @@ M.set_keymaps = function(bufnr)
       { prompt = "This branch is not fully merged. Are you sure you want to delete it?" },
       function(selection)
         if selection == "yes" then
-          action(delete_branch_cmd .. " -D", alien_opts)()
+          action(delete_branch_cmd .. " -D", alien_opts)
         end
       end
     )

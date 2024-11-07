@@ -56,6 +56,7 @@ end
 --- Create an action with just a command (string or function)
 ---@param cmd string | fun(object: table, input: string | nil): string
 ---@param opts AlienOpts | BaseOpts |  nil
+---@return ActionResult | nil
 M.action = function(cmd, opts)
   ---@cast opts AlienOpts
   opts = opts or {}
