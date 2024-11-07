@@ -204,7 +204,6 @@ M.set_keymaps = function(bufnr)
 
   map(keymaps.navigate_to_file, function()
     local filename = get_args().raw_filename
-    vim.api.nvim_win_close(0, true)
     vim.api.nvim_exec2("e " .. filename, {})
   end, opts)
 
