@@ -13,7 +13,7 @@ local function to_hex(dec)
   else
     new_hex = hex
   end
-  return new_hex
+  return "#" .. new_hex
 end
 
 local function get_colors(name)
@@ -32,6 +32,7 @@ local function get_colors(name)
 end
 
 M.get_palette = function()
+  vim.print(get_colors("Error"))
   return {
     bg = get_colors("Normal"),
     red = get_colors("Error"),
