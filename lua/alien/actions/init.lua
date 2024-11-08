@@ -1,6 +1,6 @@
 local commands = require("alien.actions.commands")
 local register = require("alien.elements.register")
-local get_translator = require("alien.translators").get_translator
+local get_extractor = require("alien.extractors.init").get_extractor
 
 local M = {}
 
@@ -63,8 +63,8 @@ M.action = function(cmd, opts)
   local input = opts.input
   local current_element = register.get_current_element()
   local current_object_type = current_element and current_element.object_type or opts.object_type
-  local translate = get_translator(current_object_type)
-  local get_args = translate and commands.get_args(translate) or nil
+  local extract = get_extractor(current_object_type)
+  local get_args = extract and commands.get_args(extract) or nil
   local command = commands.create_command(cmd, get_args, input, current_element)
   return M.run_action(command, opts)
 end

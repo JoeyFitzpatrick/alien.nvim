@@ -11,7 +11,7 @@ M.highlight = function(bufnr)
       vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienHead", i - 1, head_length, #second_word + head_length)
       vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienPushPullString", i - 1, #second_word + head_length + 1, -1)
     end
-    local local_file = require("alien.translators.local-file-translator").translate(line)
+    local local_file = require("alien.extractors.local-file-extractor").extract(line)
     if not local_file then
       goto continue
     end

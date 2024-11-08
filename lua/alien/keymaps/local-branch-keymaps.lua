@@ -7,8 +7,8 @@ local map = require("alien.keymaps").map
 local set_command_keymap = require("alien.keymaps").set_command_keymap
 local ERROR_CODES = require("alien.actions.error-codes")
 
-local translate = function()
-  return require("alien.translators.local-branch-translator").translate(vim.api.nvim_get_current_line())
+local extract = function()
+  return require("alien.extractors.local-branch-extractor").extract(vim.api.nvim_get_current_line())
 end
 
 ---@alias LocalBranch { branch_name: string }
@@ -66,7 +66,7 @@ M.set_keymaps = function(bufnr)
   end, alien_opts, opts)
 
   map(keymaps.log, function()
-    local branch = translate()
+    local branch = extract()
     if not branch then
       return
     end

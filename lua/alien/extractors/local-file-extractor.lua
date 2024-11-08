@@ -7,7 +7,7 @@ local M = {}
 --- Takes a line of text and attempts to return the file name and status
 ---@param str string
 ---@return LocalFile | nil
-M.translate = function(str)
+M.extract = function(str)
   local status_start = 1
   local status_end = 2
   local filename_start = 4

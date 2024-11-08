@@ -10,8 +10,8 @@ local map = require("alien.keymaps").map
 local map_action = require("alien.keymaps").map_action
 local map_action_with_input = require("alien.keymaps").map_action_with_input
 local set_command_keymap = require("alien.keymaps").set_command_keymap
-local translate = require("alien.translators.local-file-translator").translate
-local get_args = commands.get_args(translate)
+local extract = require("alien.extractors.local-file-extractor").extract
+local get_args = commands.get_args(extract)
 local utils = require("alien.utils")
 local STATUSES = require("alien.status").STATUSES
 
@@ -77,7 +77,7 @@ M.set_keymaps = function(bufnr)
   end, opts)
 
   map(keymaps.vimdiff, function()
-    local current_file = translate(vim.api.nvim_get_current_line())
+    local current_file = extract(vim.api.nvim_get_current_line())
     if not current_file then
       return
     end
@@ -125,7 +125,7 @@ M.set_keymaps = function(bufnr)
         local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
         local local_files = {}
         for _, line in ipairs(lines) do
-          local local_file = translate(line)
+          local local_file = extract(line)
           table.insert(local_files, local_file)
         end
         return local_files
@@ -150,7 +150,7 @@ M.set_keymaps = function(bufnr)
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         local local_files = {}
         for _, line in ipairs(lines) do
-          local local_file = translate(line)
+          local local_file = extract(line)
           table.insert(local_files, local_file)
         end
         return local_files

@@ -3,16 +3,16 @@ local keymaps = require("alien.config").config.keymaps.commit_file
 local config = require("alien.config").config.commit_file
 local commands = require("alien.actions.commands")
 local elements = require("alien.elements")
-local translate = require("alien.translators.commit-file-translator").translate
-local get_args = commands.get_args(translate)
+local extract = require("alien.extractors.commit-file-extractor").extract
+local get_args = commands.get_args(extract)
 local map = require("alien.keymaps").map
 
 local M = {}
 
 M.set_keymaps = function(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
-  local translate = function()
-    return require("alien.translators.commit-file-translator").translate(vim.api.nvim_get_current_line())
+  local extract = function()
+    return require("alien.extractors.commit-file-extractor").extract(vim.api.nvim_get_current_line())
   end
 
   vim.keymap.set("n", keymaps.scroll_diff_down, function()
@@ -92,7 +92,7 @@ M.set_keymaps = function(bufnr)
   -- file open functions
   map(keymaps.open_in_vertical_split, function()
     set_auto_diff(false)
-    local commit_file_from_action = translate()
+    local commit_file_from_action = extract()
     if not commit_file_from_action then
       return
     end
@@ -107,7 +107,7 @@ M.set_keymaps = function(bufnr)
 
   map(keymaps.open_in_horizontal_split, function()
     set_auto_diff(false)
-    local commit_file_from_action = translate()
+    local commit_file_from_action = extract()
     if not commit_file_from_action then
       return
     end
@@ -118,7 +118,7 @@ M.set_keymaps = function(bufnr)
   end, opts)
 
   map(keymaps.open_in_tab, function()
-    local commit_file_from_action = translate()
+    local commit_file_from_action = extract()
     if not commit_file_from_action then
       return
     end
@@ -128,7 +128,7 @@ M.set_keymaps = function(bufnr)
   end, opts)
 
   map(keymaps.open_in_window, function()
-    local commit_file_from_action = translate()
+    local commit_file_from_action = extract()
     if not commit_file_from_action then
       return
     end

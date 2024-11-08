@@ -3,7 +3,7 @@ local M = {}
 M.highlight_oneline_pretty = function(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   for i, line in ipairs(lines) do
-    local commit = require("alien.translators.commit-translator").translate(line)
+    local commit = require("alien.extractors.commit-extractor").extract(line)
     if commit then
       vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienCommitHash", i - 1, commit.start, commit.ending)
       local name = line:match("^[^\t]*\t[^\t]*\t([^\t]*)")

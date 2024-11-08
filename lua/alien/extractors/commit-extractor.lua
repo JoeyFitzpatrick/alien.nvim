@@ -21,7 +21,7 @@ end
 --- Takes a line of text and attempts to return the commit hash
 ---@param str string
 ---@return Commit | nil
-M.translate = function(str)
+M.extract = function(str)
   local first_word = str:match("%S+")
   if not first_word then
     return nil

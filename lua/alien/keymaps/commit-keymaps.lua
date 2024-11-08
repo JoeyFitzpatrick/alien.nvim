@@ -5,8 +5,8 @@ local map_action_with_input = require("alien.keymaps").map_action_with_input
 local map = require("alien.keymaps").map
 local commands = require("alien.actions.commands")
 
-local translate = function()
-  return require("alien.translators.commit-translator").translate(vim.api.nvim_get_current_line())
+local extract = function()
+  return require("alien.extractors.commit-extractor").extract(vim.api.nvim_get_current_line())
 end
 
 local M = {}
@@ -16,7 +16,7 @@ M.set_keymaps = function(bufnr)
   local alien_opts = { trigger_redraw = true }
 
   map(keymaps.commit_info, function()
-    local commit = translate()
+    local commit = extract()
     if not commit then
       return
     end
@@ -28,7 +28,7 @@ M.set_keymaps = function(bufnr)
   end, alien_opts, opts)
 
   map(keymaps.display_files, function()
-    local commit = translate()
+    local commit = extract()
     if not commit then
       return
     end

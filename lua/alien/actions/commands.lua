@@ -30,16 +30,16 @@ M.create_command = function(cmd, get_args, input, element)
 end
 
 --- Get the arguments to pass to create_command
----@param translate fun(string): table
+---@param extract fun(string): table
 ---@return fun(input: string | nil): (table | fun(): table)
-M.get_args = function(translate)
+M.get_args = function(extract)
   return function(input)
     if input then
       return function()
-        return translate(vim.api.nvim_get_current_line()), input
+        return extract(vim.api.nvim_get_current_line()), input
       end
     end
-    return translate(vim.api.nvim_get_current_line())
+    return extract(vim.api.nvim_get_current_line())
   end
 end
 

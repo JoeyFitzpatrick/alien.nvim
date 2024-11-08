@@ -3,7 +3,7 @@ local M = {}
 --- Takes a line of text and attempts to return the file name and status
 ---@param str string
 ---@return LocalBranch | nil
-M.translate = function(str)
+M.extract = function(str)
   local status_start = 1
   local status_end = 1
   local is_current_branch = str:sub(status_start, status_end) == "*"
