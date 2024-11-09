@@ -70,7 +70,7 @@ M.set_keymaps = function(bufnr)
     if not branch then
       return
     end
-    elements.buffer(
+    elements.window(
       "git log " .. branch.branch_name .. " --pretty=format:'%h\t%cr\t%an\t%s'",
       { highlight = require("alien.highlight.commit-highlight").highlight_oneline_pretty }
     )

@@ -1,5 +1,5 @@
 local commands = require("alien.actions.commands")
-local buffer = require("alien.elements").buffer
+local buffer = require("alien.elements").window
 local status_output_handler = require("alien.actions.output-handlers").status_output_handler
 
 local M = {}

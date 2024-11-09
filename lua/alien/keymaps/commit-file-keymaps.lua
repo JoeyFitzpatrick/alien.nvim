@@ -132,7 +132,7 @@ M.set_keymaps = function(bufnr)
     if not commit_file_from_action then
       return
     end
-    local buf = elements.buffer(get_show_command(commit_file_from_action), {})
+    local buf = elements.window(get_show_command(commit_file_from_action), {})
     vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
     set_commit_file_options(buf)
   end, opts)

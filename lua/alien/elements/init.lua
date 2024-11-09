@@ -181,12 +181,12 @@ M.split = function(cmd, opts, post_render)
   return bufnr
 end
 
---- Create a new buffer with the given action, and open it in a target window
+--- Create a new window with the given action
 ---@param cmd string
 ---@param opts ElementParams | nil
 ---@param post_render fun(win: integer, bufnr?: integer) | nil
 ---@return integer | nil
-M.buffer = function(cmd, opts, post_render)
+M.window = function(cmd, opts, post_render)
   opts = opts or {}
   local ok, result = xpcall(create, debug.traceback, cmd, vim.tbl_extend("error", { element_type = "buffer" }, opts))
   if not ok then

@@ -117,12 +117,12 @@ M.run_command = function(cmd, input_args)
   elseif strategy == DISPLAY_STRATEGIES.PRINT then
     print_output(cmd)
   elseif strategy == DISPLAY_STRATEGIES.UI then
-    require("alien.elements").buffer(cmd, output_handler)
+    require("alien.elements").window(cmd, output_handler)
   elseif strategy == DISPLAY_STRATEGIES.BLAME then
     require("alien.global-actions.blame").blame(cmd)
   elseif strategy == DISPLAY_STRATEGIES.SHOW then
     local show_cmd = cmd .. " | col -b"
-    require("alien.elements").buffer(
+    require("alien.elements").window(
       show_cmd,
       { output_handler = require("alien.actions.output-handlers").get_output_handler(show_cmd) }
     )

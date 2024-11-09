@@ -82,7 +82,7 @@ M.set_keymaps = function(bufnr)
       return
     end
     set_auto_diff(false)
-    local head_file_bufnr = elements.buffer(action(function(local_file)
+    local head_file_bufnr = elements.window(action(function(local_file)
       return "git show HEAD:" .. local_file.filename
     end, { object_type = "local_file" }))
     vim.cmd("diffthis")

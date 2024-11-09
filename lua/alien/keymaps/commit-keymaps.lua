@@ -34,7 +34,7 @@ M.set_keymaps = function(bufnr)
     end
 
     local tree_cmd = "git diff-tree --no-commit-id --name-only " .. commit.hash .. " -r"
-    elements.buffer(tree_cmd, {
+    elements.window(tree_cmd, {
       output_handler = function(lines)
         local new_lines =
           require("alien.utils").run_cmd("git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'")
