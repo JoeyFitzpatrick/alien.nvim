@@ -1,23 +1,23 @@
-local run_action = require("alien.actions").run_action
-local action = require("alien.actions").action
-local is_staged = require("alien.status").is_staged
-local elements = require("alien.elements")
-local keymaps = require("alien.config").config.keymaps.local_file
-local config = require("alien.config").config.local_file
-local commands = require("alien.actions.commands")
-local create_command = commands.create_command
-local map = require("alien.keymaps").map
-local map_action = require("alien.keymaps").map_action
-local map_action_with_input = require("alien.keymaps").map_action_with_input
-local set_command_keymap = require("alien.keymaps").set_command_keymap
-local extract = require("alien.extractors.local-file-extractor").extract
-local get_args = commands.get_args(extract)
-local utils = require("alien.utils")
-local STATUSES = require("alien.status").STATUSES
-
 local M = {}
 
 M.set_keymaps = function(bufnr)
+  local run_action = require("alien.actions").run_action
+  local action = require("alien.actions").action
+  local is_staged = require("alien.status").is_staged
+  local elements = require("alien.elements")
+  local keymaps = require("alien.config").config.keymaps.local_file
+  local config = require("alien.config").config.local_file
+  local commands = require("alien.actions.commands")
+  local create_command = commands.create_command
+  local map = require("alien.keymaps").map
+  local map_action = require("alien.keymaps").map_action
+  local map_action_with_input = require("alien.keymaps").map_action_with_input
+  local set_command_keymap = require("alien.keymaps").set_command_keymap
+  local extract = require("alien.extractors.local-file-extractor").extract
+  local get_args = commands.get_args(extract)
+  local utils = require("alien.utils")
+  local STATUSES = require("alien.status").STATUSES
+
   local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
   local alien_opts = { trigger_redraw = true }
 
@@ -82,9 +82,7 @@ M.set_keymaps = function(bufnr)
       return
     end
     set_auto_diff(false)
-    local head_file_bufnr = elements.window(action(function(local_file)
-      return "git show HEAD:" .. local_file.filename
-    end, { object_type = "local_file" }))
+    local head_file_bufnr = elements.window("git show HEAD:" .. current_file.filename, { object_type = "local_file" })
     vim.cmd("diffthis")
     vim.cmd("rightbelow vsplit " .. current_file.raw_filename)
     vim.cmd("diffthis")
@@ -183,6 +181,7 @@ M.set_keymaps = function(bufnr)
 
   set_command_keymap(keymaps.pull, "pull", opts)
   set_command_keymap(keymaps.push, "push", opts)
+  set_command_keymap(keymaps.amend, "commit --amend --reuse-message HEAD", opts)
 
   map(keymaps.commit, function()
     set_auto_diff(false)
@@ -203,13 +202,13 @@ M.set_keymaps = function(bufnr)
   end, opts)
 
   map(keymaps.navigate_to_file, function()
-    local filename = get_args().raw_filename
+    local current_file = require("alien.extractors").extract("local_file")
+    if not current_file then
+      return
+    end
+    local filename = current_file.raw_filename
     vim.api.nvim_exec2("e " .. filename, {})
   end, opts)
-
-  -- TODO: get this prefix from config
-  local command_mode_prefix = "G"
-  vim.keymap.set("n", keymaps.amend, "<cmd>" .. command_mode_prefix .. " commit --amend --reuse-message HEAD<CR>")
 
   local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
   vim.api.nvim_create_autocmd("CursorMoved", {
