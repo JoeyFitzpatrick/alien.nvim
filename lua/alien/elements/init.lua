@@ -1,7 +1,6 @@
-local keymaps = require("alien.keymaps")
 local get_object_type = require("alien.objects").get_object_type
 local register = require("alien.elements.register")
-local autocmds = require("alien.elements.element-autocmds")
+local autocmds = require("alien.autocmds")
 
 ---@alias ElementType "tab" | "split" | "float" | "buffer" | "terminal"
 
@@ -83,7 +82,6 @@ local setup_element = function(cmd, opts)
   vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
   highlight_element(bufnr, highlight)
   set_buf_options(bufnr)
-  autocmds.set_element_autocmds(bufnr)
   return bufnr, opts
 end
 
@@ -94,8 +92,9 @@ end
 ---@return integer
 local function create(cmd, opts)
   local new_bufnr, element = setup_element(cmd, opts)
-  keymaps.set_object_keymaps(new_bufnr, element.object_type)
-  keymaps.set_element_keymaps(new_bufnr, element.element_type)
+  require("alien.keymaps").set_object_keymaps(new_bufnr, element.object_type)
+  require("alien.keymaps").set_element_keymaps(new_bufnr, element.element_type)
+  autocmds.set_element_autocmds(new_bufnr)
   if opts.post_render then
     opts.post_render(new_bufnr)
   end
@@ -177,7 +176,6 @@ M.split = function(cmd, opts, post_render)
   if post_render then
     post_render(win, bufnr)
   end
-  -- post_create()
   return bufnr
 end
 
@@ -286,7 +284,7 @@ M.terminal = function(cmd, opts)
     object_type = object_type,
   })
   autocmds.set_element_autocmds(bufnr)
-  keymaps.set_element_keymaps(bufnr, "terminal")
+  require("alien.keymaps").set_element_keymaps(bufnr, "terminal")
   return bufnr
 end
 

@@ -65,13 +65,10 @@ local function print_output(cmd)
   require("alien.elements.register").redraw_elements()
 end
 
-local literal_commands = {
-  ["git status"] = function()
-    require("alien.actions.special_actions").stats_and_status()
-  end,
-}
-
 local patterns = {
+  ["^git status$"] = function()
+    return require("alien.actions.commands").status
+  end,
   ["^git log %-L"] = function(cmd, input_args)
     if utils.is_visual_range(input_args) then
       return cmd .. input_args.line1 .. "," .. input_args.line2 .. ":" .. vim.api.nvim_buf_get_name(0)
@@ -82,32 +79,24 @@ local patterns = {
 
 ---@param cmd string
 ---@param input_args { line1?: integer, line2?: integer, range?: integer }
----@return boolean, string
+---@return string
 local intercept = function(cmd, input_args)
-  if literal_commands[cmd] then
-    literal_commands[cmd]()
-    return false, cmd
-  end
   cmd = utils.populate_filename(cmd)
   for pattern, fn in pairs(patterns) do
     if cmd:find(pattern) then
       cmd = fn(cmd, input_args)
-      return true, cmd
+      return cmd
     end
   end
-  return true, cmd
+  return cmd
 end
 
 --- Runs the given git command with a command display strategy.
 ---@param cmd string
 ---@param input_args { line1?: integer, line2?: integer, range?: integer }
 M.run_command = function(cmd, input_args)
-  local should_continue, new_cmd = intercept(cmd, input_args)
-  if not should_continue then
-    return
-  end
-  cmd = new_cmd
   local strategy, custom_opts = M.get_command_strategy(cmd)
+  cmd = intercept(cmd, input_args)
   local output_handler_fn = require("alien.actions.output-handlers").get_output_handler(cmd)
   local output_handler = output_handler_fn and { output_handler = output_handler_fn } or nil
   if strategy == DISPLAY_STRATEGIES.TERMINAL then

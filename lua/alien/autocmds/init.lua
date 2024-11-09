@@ -12,4 +12,13 @@ M.set_element_autocmds = function(bufnr)
   })
 end
 
+--- Set object-type-specific autocmds
+---@param bufnr integer
+---@param object_type AlienObject | nil
+M.set_object_autocmds = function(bufnr, object_type)
+  if not object_type then
+    return
+  end
+end
+
 return M

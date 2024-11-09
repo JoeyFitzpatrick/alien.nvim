@@ -61,17 +61,11 @@ end
 ---@param bufnr integer
 ---@param object_type AlienObject
 M.set_object_keymaps = function(bufnr, object_type)
-  local object_keymaps_map = {
-    local_file = require("alien.keymaps.local_file-keymaps").set_keymaps,
-    local_branch = require("alien.keymaps.local-branch-keymaps").set_keymaps,
-    commit = require("alien.keymaps.commit-keymaps").set_keymaps,
-    commit_file = require("alien.keymaps.commit-file-keymaps").set_keymaps,
-    blame = require("alien.keymaps.blame-keymaps").set_keymaps,
-    stash = require("alien.keymaps.stash-keymaps").set_keymaps,
-  }
-  if object_keymaps_map[object_type] then
-    object_keymaps_map[object_type](bufnr)
+  local ok, result = pcall(require, "alien.keymaps." .. object_type:gsub("_", "-") .. "-keymaps")
+  if not ok or not result then
+    return
   end
+  result.set_keymaps(bufnr)
 end
 
 --- Set keymaps by element type for the given buffer
