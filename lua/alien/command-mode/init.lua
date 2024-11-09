@@ -135,8 +135,7 @@ function M.create_git_command()
     vim.api.nvim_create_user_command(
       command, -- Command name, e.g. "Git", "G"
       function(input_args)
-        local args = input_args.args
-        local git_command = "git " .. args
+        local git_command = "git " .. input_args.args
         M.run_command(git_command, input_args)
       end,
       {

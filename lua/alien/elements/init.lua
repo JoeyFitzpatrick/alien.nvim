@@ -195,7 +195,6 @@ M.window = function(cmd, opts, post_render)
   end
   local bufnr = result
   vim.api.nvim_win_set_buf(0, bufnr)
-  vim.cmd("silent only")
   if post_render then
     post_render(0, bufnr)
   end
