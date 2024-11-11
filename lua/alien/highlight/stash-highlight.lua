@@ -7,7 +7,7 @@ M.highlight = function(bufnr)
         if not stash then
             goto continue
         end
-        vim.api.nvim_buf_add_highlight(bufnr, -1, "AlienStashName", i - 1, stash.name_start, stash.name_end)
+        vim.api.nvim_buf_add_highlight(bufnr, -1, "WarningMsg", i - 1, stash.name_start, stash.name_end)
     end
     ::continue::
 end

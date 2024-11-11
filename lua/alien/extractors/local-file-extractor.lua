@@ -10,7 +10,6 @@ local M = {}
 M.extract = function(str)
     local status_start = 1
     local status_end = 2
-    local filename_start = 4
     local file_status = str:sub(status_start, status_end)
     if not status.is_valid_status(file_status) then
         return nil
@@ -20,8 +19,6 @@ M.extract = function(str)
         filename = "'" .. filename .. "'",
         raw_filename = filename,
         file_status = file_status,
-        filename_position = { start = filename_start - 1, ending = #str },
-        file_status_position = { start = status_start - 1, ending = status_end },
     }
 end
 

@@ -5,7 +5,6 @@ local M = {}
 config.config = vim.tbl_deep_extend("force", config.default_config, vim.g.alien_configuration or {})
 
 M.setup = function()
-    require("alien.highlight").setup_colors()
     require("alien.keymaps").set_global_keymaps()
     require("alien.command-mode").create_git_command()
     require("alien.nested-buffers").setup_nested_buffers()
