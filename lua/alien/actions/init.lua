@@ -21,13 +21,13 @@ local M = {}
 ---@param alien_command AlienCommand
 ---@return string
 M.parse_command = function(alien_command)
-  local cmd = nil
-  if type(alien_command) == "function" then
-    cmd = alien_command()
-  else
-    cmd = alien_command
-  end
-  return cmd
+    local cmd = nil
+    if type(alien_command) == "function" then
+        cmd = alien_command()
+    else
+        cmd = alien_command
+    end
+    return cmd
 end
 
 --- Takes a command and returns an Action function
@@ -35,22 +35,22 @@ end
 ---@param opts AlienOpts | nil
 ---@return ActionResult | nil
 M.run_action = function(cmd, opts)
-  opts = opts or {}
-  local ok, parsed_command = pcall(M.parse_command, cmd)
-  if not ok then
-    return nil
-  end
-  local output = require("alien.utils").run_cmd(parsed_command, opts.error_callbacks)
-  if opts.output_handler then
-    output = opts.output_handler(output)
-  end
-  if opts.trigger_redraw then
-    require("alien.elements.register").redraw_elements()
-  end
-  return {
-    output = output,
-    object_type = opts.object_type or require("alien.objects").get_object_type(parsed_command),
-  }
+    opts = opts or {}
+    local ok, parsed_command = pcall(M.parse_command, cmd)
+    if not ok then
+        return nil
+    end
+    local output = require("alien.utils").run_cmd(parsed_command, opts.error_callbacks)
+    if opts.output_handler then
+        output = opts.output_handler(output)
+    end
+    if opts.trigger_redraw then
+        require("alien.elements.register").redraw_elements()
+    end
+    return {
+        output = output,
+        object_type = opts.object_type or require("alien.objects").get_object_type(parsed_command),
+    }
 end
 
 --- Create an action with just a command (string or function)
@@ -58,15 +58,15 @@ end
 ---@param opts AlienOpts | BaseOpts |  nil
 ---@return ActionResult | nil
 M.action = function(cmd, opts)
-  ---@cast opts AlienOpts
-  opts = opts or {}
-  local input = opts.input
-  local current_element = register.get_current_element()
-  local current_object_type = current_element and current_element.object_type or opts.object_type
-  local extract = get_extractor(current_object_type)
-  local get_args = extract and commands.get_args(extract) or nil
-  local command = commands.create_command(cmd, get_args, input, current_element)
-  return M.run_action(command, opts)
+    ---@cast opts AlienOpts
+    opts = opts or {}
+    local input = opts.input
+    local current_element = register.get_current_element()
+    local current_object_type = current_element and current_element.object_type or opts.object_type
+    local extract = get_extractor(current_object_type)
+    local get_args = extract and commands.get_args(extract) or nil
+    local command = commands.create_command(cmd, get_args, input, current_element)
+    return M.run_action(command, opts)
 end
 
 return M

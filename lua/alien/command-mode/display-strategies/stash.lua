@@ -5,7 +5,7 @@ local M = {}
 ---@param cmd string
 ---@return DisplayStrategy
 M.get_strategy = function(cmd)
-  return DISPLAY_STRATEGIES.UI
+    return DISPLAY_STRATEGIES.UI
 end
 
 return M

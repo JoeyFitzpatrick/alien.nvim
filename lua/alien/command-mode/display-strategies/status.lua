@@ -6,11 +6,11 @@ local M = {}
 ---@param cmd string
 ---@return DisplayStrategy
 M.get_strategy = function(cmd)
-  local options = utils.parse_command_options(cmd)
-  if #options == 0 then
-    return DISPLAY_STRATEGIES.UI
-  end
-  return DISPLAY_STRATEGIES.PRINT
+    local options = utils.parse_command_options(cmd)
+    if #options == 0 then
+        return DISPLAY_STRATEGIES.UI
+    end
+    return DISPLAY_STRATEGIES.PRINT
 end
 
 return M
