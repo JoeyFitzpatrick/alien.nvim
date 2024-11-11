@@ -11,6 +11,7 @@ local function commit_hash_to_hex(hash)
 end
 
 M.highlight = function(bufnr)
+    local hlgroups = require("alien.highlight.constants").highlight_groups
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     for i, line in ipairs(lines) do
         local first_word = line:match("%S+")
@@ -30,7 +31,7 @@ M.highlight = function(bufnr)
         local timestamp_pattern = "%d%d%d%d/%d%d/%d%d %d%d:%d%d %a%a"
         local start_index, end_index = line:find(timestamp_pattern)
         if start_index and end_index then
-            vim.api.nvim_buf_add_highlight(bufnr, -1, "ErrorMsg", i - 1, start_index - 1, end_index)
+            vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_ERROR_MSG, i - 1, start_index - 1, end_index)
         end
     end
     ::continue::

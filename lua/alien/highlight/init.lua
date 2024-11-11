@@ -16,47 +16,26 @@ M.modify_color = function(hex, modification_level)
     r = math.floor(r * modification_level)
     g = math.floor(g * modification_level)
     b = math.floor(b * modification_level)
-    return rgbToHex(r, g, b)
-end
-
-local function to_hex(dec)
-    local hex = ""
-    if type(dec) == "string" then
-        hex = dec
-    else
-        hex = string.format("%x", dec)
-    end
-    local new_hex = ""
-    if #hex < 6 then
-        new_hex = string.rep("0", 6 - #hex) .. hex
-    else
-        new_hex = hex
-    end
-    return "#" .. new_hex
-end
-
----@param name string
----@return vim.api.keyset.get_hl_info | nil
-local function get_colors(name)
-    local success, color = pcall(vim.api.nvim_get_hl, 0, { name = name })
-    if not success then
-        return nil
-    end
-
-    if color["link"] then
-        return get_colors(color["link"])
-    end
-    return color
+    return rgbToHex(r, g, b):sub(1, 7)
 end
 
 M.setup_highlights = function()
     local hlgroup = require("alien.highlight.constants").highlight_groups
-    vim.api.nvim_set_hl(0, hlgroup.ALIEN_DIFF_ADD, { bg = M.modify_color(to_hex(get_colors("DiffAdd")["bg"]), 1.4) })
+    local is_light_background = vim.api.nvim_get_option_value("background", {}) == "light"
+    vim.api.nvim_set_hl(0, hlgroup.ALIEN_DIFF_ADD, { bg = is_light_background and "NvimLightGreen" or "NvimDarkGreen" })
+    vim.api.nvim_set_hl(0, hlgroup.ALIEN_DIFF_DELETE, { bg = is_light_background and "NvimLightRed" or "NvimDarkRed" })
+    vim.api.nvim_set_hl(0, hlgroup.ALIEN_TITLE, { fg = is_light_background and "NvimDarkCyan" or "NvimLightCyan" })
     vim.api.nvim_set_hl(
         0,
-        hlgroup.ALIEN_DIFF_DELETE,
-        { bg = M.modify_color(to_hex(get_colors("DiffDelete")["fg"]), 0.4) }
+        hlgroup.ALIEN_SECONDARY,
+        { fg = is_light_background and "NvimDarkMagenta" or "NvimLightYellow" }
     )
+    vim.api.nvim_set_hl(
+        0,
+        hlgroup.ALIEN_DIFF_TEXT,
+        { fg = is_light_background and "NvimDarkGrey3" or "NvimLightGrey3" }
+    )
+    vim.api.nvim_set_hl(0, hlgroup.ALIEN_ERROR_MSG, { fg = is_light_background and "NvimDarkRed" or "NvimLightRed" })
 end
 
 --- Get the highlight group by object type
