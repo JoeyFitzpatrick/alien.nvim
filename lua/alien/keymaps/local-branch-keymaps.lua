@@ -78,6 +78,23 @@ M.set_keymaps = function(bufnr)
 
     set_command_keymap(keymaps.pull, "pull", opts)
     set_command_keymap(keymaps.push, "push", opts)
+
+    -- Autocmds
+    local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
+    vim.api.nvim_create_autocmd("BufEnter", {
+        desc = "Move cursor to current branch",
+        buffer = bufnr,
+        callback = function()
+            local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+            for row, line in ipairs(lines) do
+                if line:sub(1, 1) == "*" then
+                    vim.api.nvim_win_set_cursor(0, { row, 0 })
+                    break
+                end
+            end
+        end,
+        group = alien_status_group,
+    })
 end
 
 return M
