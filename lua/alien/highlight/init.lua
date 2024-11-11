@@ -1,5 +1,24 @@
 local M = {}
 
+local function hexToRgb(hex)
+    local r = tonumber(hex:sub(2, 3), 16)
+    local g = tonumber(hex:sub(4, 5), 16)
+    local b = tonumber(hex:sub(6, 7), 16)
+    return r, g, b
+end
+
+local function rgbToHex(r, g, b)
+    return string.format("#%02X%02X%02X", r, g, b)
+end
+
+M.modify_color = function(hex, modification_level)
+    local r, g, b = hexToRgb(hex)
+    r = math.floor(r * modification_level) -- Decrease the intensity by 20%
+    g = math.floor(g * modification_level)
+    b = math.floor(b * modification_level)
+    return rgbToHex(r, g, b)
+end
+
 --- Get the highlight group by object type
 ---@param object_type AlienObject
 ---@return function
