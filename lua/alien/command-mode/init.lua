@@ -1,5 +1,4 @@
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
-local utils = require("alien.command-mode.utils")
 
 ---@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
 
@@ -70,7 +69,7 @@ local patterns = {
         return require("alien.actions.commands").status
     end,
     ["^git log %-L"] = function(cmd, input_args)
-        if utils.is_visual_range(input_args) then
+        if require("alien.command-mode.utils").is_visual_range(input_args) then
             return cmd .. input_args.line1 .. "," .. input_args.line2 .. ":" .. vim.api.nvim_buf_get_name(0)
         end
         return cmd
@@ -81,7 +80,7 @@ local patterns = {
 ---@param input_args { line1?: integer, line2?: integer, range?: integer }
 ---@return string
 local intercept = function(cmd, input_args)
-    cmd = utils.populate_filename(cmd)
+    cmd = require("alien.command-mode.utils").populate_filename(cmd)
     for pattern, fn in pairs(patterns) do
         if cmd:find(pattern) then
             cmd = fn(cmd, input_args)

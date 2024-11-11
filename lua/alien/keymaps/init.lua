@@ -1,6 +1,3 @@
-local register = require("alien.elements.register")
-local action = require("alien.actions").action
-
 local M = {}
 
 ---@param keys string
@@ -19,7 +16,7 @@ end
 ---@param opts? vim.keymap.set.Opts
 M.map_action = function(keys, cmd_fn, alien_opts, opts)
     M.map(keys, function()
-        return action(cmd_fn, alien_opts)
+        return require("alien.actions").action(cmd_fn, alien_opts)
     end, opts)
 end
 
@@ -36,7 +33,7 @@ M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
                     return
                 end
                 alien_opts.input = input
-                action(cmd_fn, alien_opts)
+                require("alien.actions").action(cmd_fn, alien_opts)
             end)
         end, opts)
     else
@@ -46,7 +43,7 @@ M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
                     return
                 end
                 alien_opts.input = input
-                action(cmd_fn, alien_opts)
+                require("alien.actions").action(cmd_fn, alien_opts)
             end)
         end, opts)
     end
@@ -73,11 +70,11 @@ end
 ---@param element_type ElementType
 M.set_element_keymaps = function(bufnr, element_type)
     vim.keymap.set("n", "q", function()
-        register.close_element(bufnr)
+        require("alien.elements.register").close_element(bufnr)
     end, { noremap = true, silent = true, buffer = bufnr })
     if element_type == "terminal" then
         vim.keymap.set("n", "<CR>", function()
-            register.close_element(bufnr)
+            require("alien.elements.register").close_element(bufnr)
         end, { noremap = true, silent = true, buffer = bufnr })
     end
 end
