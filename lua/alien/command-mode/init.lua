@@ -138,6 +138,39 @@ function M.create_git_command()
             }
         )
     end
+
+    local function run_git_log()
+        -- Open a new buffer to display the output
+        local buf = vim.api.nvim_create_buf(false, true) -- no listed, scratch
+
+        -- Set buffer options and dimensions
+        vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+        vim.api.nvim_set_current_buf(buf)
+
+        -- Define a callback for when the job outputs data
+        local function on_stdout(_, data, _)
+            if data then
+                -- Populate the buffer with the git log data
+                vim.api.nvim_buf_set_lines(buf, -1, -1, false, data)
+            end
+        end
+
+        -- Define a callback for when the job exits
+        local function on_exit(_, code, _)
+            if code ~= 0 then
+                print("git log command failed with exit code " .. code)
+            end
+        end
+
+        -- Start the asynchronous job
+        vim.fn.jobstart({ "git", "log" }, {
+            on_stdout = on_stdout,
+            on_stderr = on_stdout, -- Handle stderr the same way for simplicity
+            on_exit = on_exit,
+        })
+    end
+
+    vim.api.nvim_create_user_command("Gt", run_git_log, {})
 end
 
 return M
