@@ -1,3 +1,5 @@
+local keymaps = require("alien.config").config.keymaps.global
+
 local M = {}
 
 ---@param keys string
@@ -72,6 +74,11 @@ M.set_element_keymaps = function(bufnr, element_type)
     vim.keymap.set("n", "q", function()
         require("alien.elements.register").close_element(bufnr)
     end, { noremap = true, silent = true, buffer = bufnr })
+
+    vim.keymap.set("n", keymaps.toggle_keymap_display, function()
+        require("alien.keymaps.toggle-help-float").toggle_keymap_display()
+    end, { noremap = true, silent = true, buffer = bufnr })
+
     if element_type == "terminal" then
         vim.keymap.set("n", "<CR>", function()
             require("alien.elements.register").close_element(bufnr)
