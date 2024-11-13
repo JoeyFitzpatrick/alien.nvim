@@ -12,7 +12,7 @@ M.set_keymaps = function(bufnr)
     local get_args = commands.get_args(extract)
     local utils = require("alien.utils")
     local STATUSES = require("alien.status").STATUSES
-    local local_file_builtins = require("alien.config.local_file_builtins")
+    local local_file_builtins = require("alien.config.builtins").local_file_builtins
 
     local mappings = {}
 
@@ -237,27 +237,7 @@ M.set_keymaps = function(bufnr)
         vim.api.nvim_exec2("e " .. filename, {})
     end
 
-    for keys, mapping in pairs(require("alien.config").config.keymaps.local_file) do
-        local local_opts = opts
-        local_opts["desc"] = mapping.desc
-        if type(mapping.fn) == "function" then
-            vim.keymap.set("n", keys, mapping.fn, local_opts)
-        end
-
-        assert(type(mapping.fn) == "string")
-        local builtin_mapping = mappings[mapping.fn]
-        if not builtin_mapping then
-            vim.keymap.set("n", keys, mapping.fn, local_opts)
-        else
-            if type(builtin_mapping) == "table" then
-                for mode, fn in pairs(builtin_mapping) do
-                    vim.keymap.set(mode, keys, fn, local_opts)
-                end
-            else
-                vim.keymap.set("n", keys, builtin_mapping, local_opts)
-            end
-        end
-    end
+    require("alien.keymaps").apply_mappings(require("alien.config").config.keymaps.local_file, mappings, opts)
 
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
     vim.api.nvim_create_autocmd("CursorMoved", {

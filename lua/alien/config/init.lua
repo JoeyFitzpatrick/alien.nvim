@@ -1,4 +1,9 @@
-local local_file_builtins = require("alien.config.local_file_builtins")
+local local_file_builtins = require("alien.config.builtins").local_file_builtins
+local local_branch_builtins = require("alien.config.builtins").local_branch_builtins
+local blame_builtins = require("alien.config.builtins").blame_builtins
+local commit_builtins = require("alien.config.builtins").commit_builtins
+local commit_file_builtins = require("alien.config.builtins").commit_file_builtins
+local stash_builtins = require("alien.config.builtins").stash_builtins
 
 local M = {}
 M.default_config = {
@@ -35,43 +40,49 @@ M.default_config = {
             ["<leader>am"] = { fn = local_file_builtins.AMEND, desc = "Amend last commit" },
         },
         local_branch = {
-            switch = "s",
-            new_branch = "n",
-            delete = "d",
-            rename = "R",
-            merge = "m",
-            rebase = "r",
-            log = "<enter>",
-            pull = "p",
-            push = "<leader>p",
+            ["s"] = { fn = local_branch_builtins.SWITCH, desc = "Switch to branch" },
+            ["n"] = { fn = local_branch_builtins.NEW_BRANCH, desc = "Create new branch" },
+            ["d"] = { fn = local_branch_builtins.DELETE, desc = "Delete branch" },
+            ["R"] = { fn = local_branch_builtins.RENAME, desc = "Rename branch" },
+            ["m"] = { fn = local_branch_builtins.MERGE, desc = "Merge into current branch" },
+            ["r"] = { fn = local_branch_builtins.REBASE, desc = "Rebase onto current branch" },
+            ["<enter>"] = { fn = local_branch_builtins.LOG, desc = "Display branch log" },
+            ["p"] = { fn = local_branch_builtins.PULL, desc = "Pull branch" },
+            ["<leader>p"] = { fn = local_branch_builtins.PUSH, desc = "Push branch" },
         },
         blame = {
-            display_files = "<enter>",
-            copy_commit_url = "o",
-            commit_info = "i",
+            ["<enter>"] = { fn = blame_builtins.DISPLAY_FILES, desc = "Display files in commit" },
+            ["o"] = { fn = blame_builtins.COPY_COMMIT_URL, desc = "Copy commit URL to clipboard" },
+            ["i"] = { fn = blame_builtins.COMMIT_INFO, desc = "Display commit info" },
         },
         commit = {
-            display_files = "<enter>",
-            reword = "rw",
-            revert = "rv",
-            reset = "rs",
-            copy_commit_url = "o",
-            commit_info = "i",
+            ["<enter>"] = { fn = commit_builtins.DISPLAY_FILES, desc = "Display files in commit" },
+            ["rw"] = { fn = commit_builtins.REWORD, desc = "Reword commit" },
+            ["rv"] = { fn = commit_builtins.REVERT, desc = "Revert commit" },
+            ["rs"] = { fn = commit_builtins.RESET, desc = "Reset to commit" },
+            ["o"] = { fn = commit_builtins.COPY_COMMIT_URL, desc = "Copy commit URL to clipboard" },
+            ["i"] = { fn = commit_builtins.COMMIT_INFO, desc = "Display commit info" },
         },
         commit_file = {
-            scroll_diff_down = "J",
-            scroll_diff_up = "K",
-            vimdiff = "D",
-            toggle_auto_diff = "t",
-            open_in_vertical_split = "<C-v>",
-            open_in_horizontal_split = "<C-h>",
-            open_in_tab = "<C-t>",
-            open_in_window = "<C-w>",
+            ["J"] = { fn = commit_file_builtins.SCROLL_DIFF_DOWN, desc = "Scroll down diff" },
+            ["K"] = { fn = commit_file_builtins.SCROLL_DIFF_UP, desc = "Scroll up diff" },
+            ["D"] = { fn = commit_file_builtins.VIMDIFF, desc = "Detailed diff" },
+            ["t"] = { fn = commit_file_builtins.TOGGLE_AUTO_DIFF, desc = "Toggle auto diff" },
+            ["<C-v>"] = {
+                fn = commit_file_builtins.OPEN_IN_VERTICAL_SPLIT,
+                desc = "Open commit file in vertical split",
+            },
+            ["<C-h>"] = {
+                fn = commit_file_builtins.OPEN_IN_HORIZONTAL_SPLIT,
+                desc = "Open commit file in horizontal split",
+            },
+            ["<C-t>"] = { fn = commit_file_builtins.OPEN_IN_TAB, desc = "Open commit file in tab" },
+            ["<C-w>"] = { fn = commit_file_builtins.OPEN_IN_WINDOW, desc = "Open commit file in window" },
         },
         stash = {
-            pop = "p",
-            apply = "a",
-            drop = "d",
+            ["p"] = { fn = stash_builtins.POP, desc = "Pop stash" },
+            ["a"] = { fn = stash_builtins.APPLY, desc = "Apply stash" },
+            ["d"] = { fn = stash_builtins.DROP, desc = "Drop stash" },
         },
     },
 }
