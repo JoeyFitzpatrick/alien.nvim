@@ -1,3 +1,5 @@
+local local_file_builtins = require("alien.config.local_file_builtins")
+
 local M = {}
 M.default_config = {
     command_mode_commands = { "Git", "G" },
@@ -13,20 +15,24 @@ M.default_config = {
             toggle_keymap_display = "g?",
         },
         local_file = {
-            stage_or_unstage = "<enter>",
-            stage_or_unstage_all = "a",
-            restore = "d",
-            pull = "p",
-            push = "<leader>p",
-            commit = "c",
-            navigate_to_file = "o",
-            toggle_auto_diff = "t",
-            scroll_diff_down = "J",
-            scroll_diff_up = "K",
-            vimdiff = "D",
-            stash = "<leader>s",
-            stash_with_flags = "<leader>S",
-            amend = "<leader>am",
+            ["<enter>"] = {
+                fn = local_file_builtins.STAGE_OR_UNSTAGE,
+                desc = "Stage/unstage a file",
+                modes = { "n", "v" },
+            },
+            ["a"] = { fn = local_file_builtins.STAGE_OR_UNSTAGE_ALL, desc = "Stage/unstage all files" },
+            ["d"] = { fn = local_file_builtins.RESTORE, desc = "Restore (delete) a file" },
+            ["p"] = { fn = local_file_builtins.PULL, desc = "Git pull" },
+            ["<leader>p"] = { fn = local_file_builtins.PUSH, desc = "Git push" },
+            ["c"] = { fn = local_file_builtins.COMMIT, desc = "Git commit" },
+            ["o"] = { fn = local_file_builtins.NAVIGATE_TO_FILE, desc = "Open file in editor" },
+            ["t"] = { fn = local_file_builtins.TOGGLE_AUTO_DIFF, desc = "Toggle auto diff" },
+            ["J"] = { fn = local_file_builtins.SCROLL_DIFF_DOWN, desc = "Scroll down diff" },
+            ["K"] = { fn = local_file_builtins.SCROLL_DIFF_UP, desc = "Scroll up diff" },
+            ["D"] = { fn = local_file_builtins.VIMDIFF, desc = "Detailed diff" },
+            ["<leader>s"] = { fn = local_file_builtins.STASH, desc = "Stash current changes" },
+            ["<leader>S"] = { fn = local_file_builtins.STASH_WITH_FLAGS, desc = "Git stash with options" },
+            ["<leader>am"] = { fn = local_file_builtins.AMEND, desc = "Amend last commit" },
         },
         local_branch = {
             switch = "s",

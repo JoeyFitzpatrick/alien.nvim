@@ -15,18 +15,24 @@ M.toggle_keymap_display = function()
     if not element_keymaps then
         return
     end
+
     local max_keymap_length = 0
-    for _, mapping in pairs(element_keymaps) do
-        max_keymap_length = math.max(max_keymap_length, #mapping)
+    local keys = {}
+    for key, mapping in pairs(element_keymaps) do
+        max_keymap_length = math.max(max_keymap_length, #mapping["desc"])
+        table.insert(keys, key)
     end
     local parsed_keymaps = {}
-    for key, value in pairs(element_keymaps) do
+    for _, map_keys in ipairs(keys) do
         local padding = ""
-        for _ = 1, max_keymap_length - #value, 1 do
+        local mapping = element_keymaps[map_keys]
+        for _ = 1, max_keymap_length - #mapping["desc"], 1 do
             padding = padding .. " "
         end
-        table.insert(parsed_keymaps, string.format("%s:%s %s", value, padding, key))
+        table.insert(parsed_keymaps, string.format("%s:%s %s", mapping["desc"], padding, map_keys))
     end
+
+    table.sort(parsed_keymaps)
 
     local width = math.floor(vim.o.columns * 0.5)
     local height = math.floor(vim.o.lines * 0.5)
@@ -48,7 +54,16 @@ M.toggle_keymap_display = function()
         style = "minimal",
         border = "rounded",
     })
-    keymaps_toggle = true
+
+    local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
+    vim.api.nvim_create_autocmd("WinClosed", {
+        desc = "Toggle off help float",
+        buffer = bufnr,
+        callback = function()
+            keymaps_toggle = false
+        end,
+        group = alien_status_group,
+    })
 end
 
 return M
