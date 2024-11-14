@@ -5,19 +5,21 @@ M.set_keymaps = function(bufnr)
     local action = require("alien.actions").action
     local is_staged = require("alien.status").is_staged
     local elements = require("alien.elements")
+    local keymaps = require("alien.config").config.keymaps.local_file
     local config = require("alien.config").config.local_file
     local commands = require("alien.actions.commands")
     local create_command = commands.create_command
+    local map = require("alien.keymaps").map
+    local map_action = require("alien.keymaps").map_action
+    local map_action_with_input = require("alien.keymaps").map_action_with_input
+    local set_command_keymap = require("alien.keymaps").set_command_keymap
     local extract = require("alien.extractors.local-file-extractor").extract
     local get_args = commands.get_args(extract)
     local utils = require("alien.utils")
     local STATUSES = require("alien.status").STATUSES
-    local local_file_builtins = require("alien.config.local_file_builtins")
-
-    local mappings = {}
 
     local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
-    local action_opts = { trigger_redraw = true }
+    local alien_opts = { trigger_redraw = true }
 
     local diff_native = commands.create_command(function(local_file)
         local status = local_file.file_status
@@ -52,27 +54,29 @@ M.set_keymaps = function(bufnr)
         end
     end
 
-    mappings[local_file_builtins.TOGGLE_AUTO_DIFF] = function()
+    local toggle_auto_diff = function()
         set_auto_diff(not AUTO_DISPLAY_DIFF)
     end
 
-    mappings[local_file_builtins.SCROLL_DIFF_DOWN] = function()
+    vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
+
+    vim.keymap.set("n", keymaps.scroll_diff_down, function()
         local buffers = elements.register.get_child_elements({ object_type = "diff" })
         local buffer = buffers[1]
         if #buffers == 1 and buffer.channel_id then
             pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
         end
-    end
+    end, opts)
 
-    mappings[local_file_builtins.SCROLL_DIFF_DOWN] = function()
+    vim.keymap.set("n", keymaps.scroll_diff_up, function()
         local buffers = elements.register.get_child_elements({ object_type = "diff" })
         local buffer = buffers[1]
         if #buffers == 1 and buffer.channel_id then
             pcall(vim.api.nvim_chan_send, buffer.channel_id, "kk")
         end
-    end
+    end, opts)
 
-    mappings[local_file_builtins.VIMDIFF] = function()
+    map(keymaps.vimdiff, function()
         local current_file = extract(vim.api.nvim_get_current_line())
         if not current_file then
             return
@@ -85,9 +89,9 @@ M.set_keymaps = function(bufnr)
         vim.cmd("diffthis")
         local filetype = vim.api.nvim_get_option_value("filetype", { buf = 0 })
         vim.api.nvim_set_option_value("filetype", filetype, { buf = head_file_bufnr })
-    end
+    end, opts)
 
-    local stage_or_unstage_inner = function(local_file)
+    map_action(keymaps.stage_or_unstage, function(local_file)
         local filename = local_file.filename
         local status = local_file.file_status
         if not is_staged(status) then
@@ -95,13 +99,9 @@ M.set_keymaps = function(bufnr)
         else
             return "git reset HEAD -- " .. filename
         end
-    end
+    end, alien_opts, opts)
 
-    local stage_or_unstage = function()
-        action(stage_or_unstage_inner, action_opts)
-    end
-
-    local visual_stage_or_unstage_inner_fn = function(local_files)
+    local visual_stage_or_unstage_fn = function(local_files)
         local should_stage = false
         local filenames = ""
         for _, local_file in ipairs(local_files) do
@@ -117,9 +117,9 @@ M.set_keymaps = function(bufnr)
         return "git reset " .. filenames
     end
 
-    local stage_or_unstage_v = function()
+    vim.keymap.set("v", keymaps.stage_or_unstage, function()
         run_action(
-            create_command(visual_stage_or_unstage_inner_fn, function()
+            create_command(visual_stage_or_unstage_fn, function()
                 local start_line, end_line = utils.get_visual_line_nums()
                 local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
                 local local_files = {}
@@ -131,9 +131,7 @@ M.set_keymaps = function(bufnr)
             end),
             { trigger_redraw = true }
         )
-    end
-
-    mappings[local_file_builtins.STAGE_OR_UNSTAGE] = { n = stage_or_unstage, v = stage_or_unstage_v }
+    end, opts)
 
     local stage_or_unstage_all_fn = function(local_files)
         for _, local_file in ipairs(local_files) do
@@ -145,7 +143,7 @@ M.set_keymaps = function(bufnr)
         return "git reset"
     end
 
-    mappings[local_file_builtins.STAGE_OR_UNSTAGE_ALL] = function()
+    map(keymaps.stage_or_unstage_all, function()
         run_action(
             create_command(stage_or_unstage_all_fn, function()
                 local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -158,9 +156,9 @@ M.set_keymaps = function(bufnr)
             end),
             { trigger_redraw = true }
         )
-    end
+    end, opts)
 
-    local restore = function(local_file, restore_type)
+    map_action_with_input(keymaps.restore, function(local_file, restore_type)
         local filename = local_file.filename
         local status = local_file.file_status
         if restore_type == "just this file" then
@@ -177,87 +175,41 @@ M.set_keymaps = function(bufnr)
         elseif restore_type == "soft reset" then
             return "git reset --soft HEAD"
         end
-    end
+    end, {
+        prompt = "restore type: ",
+        items = { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
+    }, alien_opts, opts)
 
-    mappings[local_file_builtins.RESTORE] = function()
-        vim.ui.select(
-            { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
-            { prompt = "restore type: " },
-            function(input)
-                if not input then
-                    return
-                end
-                local local_action_opts = action_opts
-                local_action_opts.input = input
-                action(restore, local_action_opts)
-            end
-        )
-    end
+    set_command_keymap(keymaps.pull, "pull", opts)
+    set_command_keymap(keymaps.push, "push", opts)
+    set_command_keymap(keymaps.amend, "commit --amend --reuse-message HEAD", opts)
 
-    mappings[local_file_builtins.PULL] = require("alien.keymaps.utils").get_alien_command("pull")
-    mappings[local_file_builtins.PUSH] = require("alien.keymaps.utils").get_alien_command("push")
-    mappings[local_file_builtins.AMEND] =
-        require("alien.keymaps.utils").get_alien_command("commit --amend --reuse-message HEAD")
-
-    mappings[local_file_builtins.COMMIT] = function()
+    map(keymaps.commit, function()
         set_auto_diff(false)
         elements.terminal("git commit", { enter = true, window = { split = "right" } })
-    end
+    end, opts)
 
-    local stash = function(_, stash_name)
+    map_action_with_input(keymaps.stash, function(_, stash_name)
         return "git stash push -m " .. stash_name
-    end
+    end, { prompt = "Stash name: " }, alien_opts, opts)
 
-    mappings[local_file_builtins.STASH] = function()
-        vim.ui.input({ prompt = "Stash name: " }, function(input)
-            if not input then
-                return
-            end
-            local local_action_opts = action_opts
-            local_action_opts.input = input
-            action(stash, local_action_opts)
-        end)
-    end
-
-    mappings[local_file_builtins.STASH_WITH_FLAGS] = function()
+    map(keymaps.stash_with_flags, function()
         vim.ui.select({ "staged" }, { prompt = "Stash type:" }, function(stash_type)
             vim.ui.input({ prompt = "Stash name: " }, function(input)
                 local cmd = "git stash push --" .. stash_type .. " -m " .. input
-                action(cmd, action_opts)
+                action(cmd, alien_opts)
             end)
         end)
-    end
+    end, opts)
 
-    mappings[local_file_builtins.NAVIGATE_TO_FILE] = function()
+    map(keymaps.navigate_to_file, function()
         local current_file = require("alien.extractors").extract("local_file")
         if not current_file then
             return
         end
         local filename = current_file.raw_filename
         vim.api.nvim_exec2("e " .. filename, {})
-    end
-
-    for keys, mapping in pairs(require("alien.config").config.keymaps.local_file) do
-        local local_opts = opts
-        local_opts["desc"] = mapping.desc
-        if type(mapping.fn) == "function" then
-            vim.keymap.set("n", keys, mapping.fn, local_opts)
-        end
-
-        assert(type(mapping.fn) == "string")
-        local builtin_mapping = mappings[mapping.fn]
-        if not builtin_mapping then
-            vim.keymap.set("n", keys, mapping.fn, local_opts)
-        else
-            if type(builtin_mapping) == "table" then
-                for mode, fn in pairs(builtin_mapping) do
-                    vim.keymap.set(mode, keys, fn, local_opts)
-                end
-            else
-                vim.keymap.set("n", keys, builtin_mapping, local_opts)
-            end
-        end
-    end
+    end, opts)
 
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
     vim.api.nvim_create_autocmd("CursorMoved", {
