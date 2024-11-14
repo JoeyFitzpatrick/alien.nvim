@@ -47,9 +47,13 @@ M.set_keymaps = function(bufnr)
         })
     end, vim.tbl_extend("force", opts, { desc = "Display commit files" }))
 
-    map_action(keymaps.copy_commit_url, function(commit)
+    map(keymaps.copy_commit_url, function()
+        local commit = extract()
+        if not commit then
+            return
+        end
         commands.copy_git_commit_url(commit.hash)
-    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Copy commit url" }))
+    end, vim.tbl_extend("force", opts, { desc = "Copy commit url" }))
 
     map_action_with_input(
         keymaps.reset,
