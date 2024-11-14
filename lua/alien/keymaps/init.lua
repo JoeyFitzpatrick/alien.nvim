@@ -6,9 +6,7 @@ local M = {}
 ---@param fn function
 ---@param opts? vim.keymap.set.Opts
 M.map = function(keys, fn, opts)
-    vim.keymap.set("n", keys, function()
-        fn()
-    end, opts)
+    vim.keymap.set("n", keys, fn, opts)
 end
 
 --- Cleaner way to map an action to a keymap

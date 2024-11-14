@@ -58,7 +58,12 @@ M.set_keymaps = function(bufnr)
         set_auto_diff(not AUTO_DISPLAY_DIFF)
     end
 
-    vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
+    vim.keymap.set(
+        "n",
+        keymaps.toggle_auto_diff,
+        toggle_auto_diff,
+        vim.tbl_extend("force", opts, { desc = "Toggle auto diff" })
+    )
 
     vim.keymap.set("n", keymaps.scroll_diff_down, function()
         local buffers = elements.register.get_child_elements({ object_type = "diff" })
@@ -66,7 +71,7 @@ M.set_keymaps = function(bufnr)
         if #buffers == 1 and buffer.channel_id then
             pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
         end
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Scroll diff down" }))
 
     vim.keymap.set("n", keymaps.scroll_diff_up, function()
         local buffers = elements.register.get_child_elements({ object_type = "diff" })
@@ -74,7 +79,7 @@ M.set_keymaps = function(bufnr)
         if #buffers == 1 and buffer.channel_id then
             pcall(vim.api.nvim_chan_send, buffer.channel_id, "kk")
         end
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Scroll diff up" }))
 
     map(keymaps.vimdiff, function()
         local current_file = extract(vim.api.nvim_get_current_line())
@@ -89,7 +94,7 @@ M.set_keymaps = function(bufnr)
         vim.cmd("diffthis")
         local filetype = vim.api.nvim_get_option_value("filetype", { buf = 0 })
         vim.api.nvim_set_option_value("filetype", filetype, { buf = head_file_bufnr })
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Diff (detailed)" }))
 
     map_action(keymaps.stage_or_unstage, function(local_file)
         local filename = local_file.filename
@@ -99,7 +104,7 @@ M.set_keymaps = function(bufnr)
         else
             return "git reset HEAD -- " .. filename
         end
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Stage/unstage file" }))
 
     local visual_stage_or_unstage_fn = function(local_files)
         local should_stage = false
@@ -131,7 +136,7 @@ M.set_keymaps = function(bufnr)
             end),
             { trigger_redraw = true }
         )
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Stage/unstage file in visual mode" }))
 
     local stage_or_unstage_all_fn = function(local_files)
         for _, local_file in ipairs(local_files) do
@@ -156,7 +161,7 @@ M.set_keymaps = function(bufnr)
             end),
             { trigger_redraw = true }
         )
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Stage/unstage all files" }))
 
     map_action_with_input(keymaps.restore, function(local_file, restore_type)
         local filename = local_file.filename
@@ -178,20 +183,24 @@ M.set_keymaps = function(bufnr)
     end, {
         prompt = "restore type: ",
         items = { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
-    }, alien_opts, opts)
+    }, alien_opts, vim.tbl_extend("force", opts, { desc = "Restore (delete) file" }))
 
-    set_command_keymap(keymaps.pull, "pull", opts)
-    set_command_keymap(keymaps.push, "push", opts)
-    set_command_keymap(keymaps.amend, "commit --amend --reuse-message HEAD", opts)
+    set_command_keymap(keymaps.pull, "pull", vim.tbl_extend("force", opts, { desc = "Pull" }))
+    set_command_keymap(keymaps.push, "push", vim.tbl_extend("force", opts, { desc = "Push" }))
+    set_command_keymap(
+        keymaps.amend,
+        "commit --amend --reuse-message HEAD",
+        vim.tbl_extend("force", opts, { desc = "Amend last commit" })
+    )
 
     map(keymaps.commit, function()
         set_auto_diff(false)
         elements.terminal("git commit", { enter = true, window = { split = "right" } })
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Commit" }))
 
     map_action_with_input(keymaps.stash, function(_, stash_name)
         return "git stash push -m " .. stash_name
-    end, { prompt = "Stash name: " }, alien_opts, opts)
+    end, { prompt = "Stash name: " }, alien_opts, vim.tbl_extend("force", opts, { desc = "Stash current changes" }))
 
     map(keymaps.stash_with_flags, function()
         vim.ui.select({ "staged" }, { prompt = "Stash type:" }, function(stash_type)
@@ -200,7 +209,7 @@ M.set_keymaps = function(bufnr)
                 action(cmd, alien_opts)
             end)
         end)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Stash with options" }))
 
     map(keymaps.navigate_to_file, function()
         local current_file = require("alien.extractors").extract("local_file")
@@ -209,7 +218,7 @@ M.set_keymaps = function(bufnr)
         end
         local filename = current_file.raw_filename
         vim.api.nvim_exec2("e " .. filename, {})
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Open file in editor" }))
 
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
     vim.api.nvim_create_autocmd("CursorMoved", {
