@@ -50,4 +50,16 @@ M.get_object_type = function(cmd)
     return verb_to_status[git_verb]
 end
 
+--- Get a description from an object type, e.g. "local_file" -> "Local File"
+---@param object_type AlienObject
+M.get_object_type_desc = function(object_type)
+    if not object_type then
+        return
+    end
+    object_type = object_type:gsub("_", " ")
+    return (object_type:gsub("(%l)(%w*)", function(a, b)
+        return a:upper() .. b
+    end))
+end
+
 return M
