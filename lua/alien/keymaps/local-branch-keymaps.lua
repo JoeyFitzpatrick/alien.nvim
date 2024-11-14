@@ -81,7 +81,7 @@ M.set_keymaps = function(bufnr)
 
     -- Autocmds
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
-    vim.api.nvim_create_autocmd("BufEnter", {
+    vim.api.nvim_create_autocmd("BufWinEnter", {
         desc = "Move cursor to current branch",
         buffer = bufnr,
         callback = function()
