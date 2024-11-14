@@ -1,0 +1,16 @@
+return {
+    STAGE_OR_UNSTAGE = "stage_or_unstage",
+    STAGE_OR_UNSTAGE_ALL = "stage_or_unstage_all",
+    RESTORE = "restore",
+    PULL = "pull",
+    PUSH = "push",
+    COMMIT = "commit",
+    NAVIGATE_TO_FILE = "navigate_to_file",
+    TOGGLE_AUTO_DIFF = "toggle_auto_diff",
+    SCROLL_DIFF_DOWN = "scroll_diff_down",
+    SCROLL_DIFF_UP = "scroll_diff_up",
+    VIMDIFF = "vimdiff",
+    STASH = "stash",
+    STASH_WITH_FLAGS = "stash_with_flags",
+    AMEND = "amend",
+}

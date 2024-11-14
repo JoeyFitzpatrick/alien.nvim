@@ -90,32 +90,4 @@ M.set_global_keymaps = function()
     require("alien.keymaps.global-keymaps").set_global_keymaps()
 end
 
---- Apply config mappings using a mapping table
----@param config table<string, string|function>
----@param mappings table<string, function>
----@param opts table<string, any>
-M.apply_mappings = function(config, mappings, opts)
-    for keys, mapping in pairs(config) do
-        local local_opts = opts
-        local_opts["desc"] = mapping.desc
-        if type(mapping.fn) == "function" then
-            vim.keymap.set("n", keys, mapping.fn, local_opts)
-        end
-
-        assert(type(mapping.fn) == "string")
-        local builtin_mapping = mappings[mapping.fn]
-        if not builtin_mapping then
-            vim.keymap.set("n", keys, mapping.fn, local_opts)
-        else
-            if type(builtin_mapping) == "table" then
-                for mode, fn in pairs(builtin_mapping) do
-                    vim.keymap.set(mode, keys, fn, local_opts)
-                end
-            else
-                vim.keymap.set("n", keys, builtin_mapping, local_opts)
-            end
-        end
-    end
-end
-
 return M
