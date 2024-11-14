@@ -21,11 +21,11 @@ M.set_keymaps = function(bufnr)
 
     map_action(keymaps.switch, function(branch)
         return "git switch " .. branch.branch_name
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Switch to branch" }))
 
     map_action_with_input(keymaps.new_branch, function(branch, new_branch_name)
         return "git switch --create " .. new_branch_name .. " " .. branch.branch_name
-    end, { prompt = "New branch name: " }, alien_opts, opts)
+    end, { prompt = "New branch name: " }, alien_opts, vim.tbl_extend("force", opts, { desc = "Create new branch" }))
 
     local delete_branch_prompt = function(delete_branch_cmd)
         vim.ui.select(
@@ -50,20 +50,20 @@ M.set_keymaps = function(bufnr)
         end,
         { items = { "local", "remote" }, prompt = "Delete local or remote: " },
         { trigger_redraw = true, error_callbacks = { [ERROR_CODES.BRANCH_NOT_FULLY_MERGED] = delete_branch_prompt } },
-        opts
+        vim.tbl_extend("force", opts, { desc = "Delete branch" })
     )
 
     map_action_with_input(keymaps.rename, function(branch, new_branch_name)
         return "git branch -m " .. branch.branch_name .. " " .. new_branch_name
-    end, { prompt = "Rename branch: " }, alien_opts, opts)
+    end, { prompt = "Rename branch: " }, alien_opts, vim.tbl_extend("force", opts, { desc = "Rename branch" }))
 
     map_action(keymaps.merge, function(branch)
         return "git merge " .. branch.branch_name
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Merge into current branch" }))
 
     map_action(keymaps.rebase, function(branch)
         return "git rebase " .. branch.branch_name
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Rebase onto current branch" }))
 
     map(keymaps.log, function()
         local branch = extract()
@@ -74,10 +74,10 @@ M.set_keymaps = function(bufnr)
             "git log " .. branch.branch_name .. " --pretty=format:'%h\t%cr\t%an\t%s'",
             { highlight = require("alien.highlight.commit-highlight").highlight_oneline_pretty }
         )
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Open branch commits (log)" }))
 
-    set_command_keymap(keymaps.pull, "pull", opts)
-    set_command_keymap(keymaps.push, "push", opts)
+    set_command_keymap(keymaps.pull, "pull", vim.tbl_extend("force", opts, { desc = "Pull" }))
+    set_command_keymap(keymaps.push, "push", vim.tbl_extend("force", opts, { desc = "Push" }))
 
     -- Autocmds
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })

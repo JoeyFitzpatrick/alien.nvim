@@ -3,8 +3,8 @@ local keymaps = require("alien.config").config.keymaps.commit_file
 local config = require("alien.config").config.commit_file
 local commands = require("alien.actions.commands")
 local elements = require("alien.elements")
-local extract = require("alien.extractors.commit-file-extractor").extract
-local get_args = commands.get_args(extract)
+local commit_file_extract = require("alien.extractors.commit-file-extractor").extract
+local get_args = commands.get_args(commit_file_extract)
 local map = require("alien.keymaps").map
 
 local M = {}
@@ -21,14 +21,14 @@ M.set_keymaps = function(bufnr)
         if #buffers == 1 and buffer.channel_id then
             pcall(vim.api.nvim_chan_send, buffer.channel_id, "jj")
         end
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Scroll diff down" }))
     vim.keymap.set("n", keymaps.scroll_diff_up, function()
         local buffers = elements.register.get_child_elements({ object_type = "diff" })
         local buffer = buffers[1]
         if #buffers == 1 and buffer.channel_id then
             pcall(vim.api.nvim_chan_send, buffer.channel_id, "kk")
         end
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Scroll diff up" }))
 
     local diff_native = commands.create_command(function(commit_file)
         return "git show " .. commit_file.hash .. " -- " .. commit_file.filename
@@ -59,7 +59,12 @@ M.set_keymaps = function(bufnr)
         set_auto_diff(not AUTO_DISPLAY_DIFF)
     end
 
-    vim.keymap.set("n", keymaps.toggle_auto_diff, toggle_auto_diff, opts)
+    vim.keymap.set(
+        "n",
+        keymaps.toggle_auto_diff,
+        toggle_auto_diff,
+        vim.tbl_extend("force", opts, { desc = "Toggle auto diff" })
+    )
 
     local ALIEN_FILENAME_PREFIX = "Alien://"
     local function get_tmp_name(hash, filename)
@@ -103,7 +108,7 @@ M.set_keymaps = function(bufnr)
             )
             set_commit_file_options(buf)
         end)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Open file in vertical split" }))
 
     map(keymaps.open_in_horizontal_split, function()
         set_auto_diff(false)
@@ -115,7 +120,7 @@ M.set_keymaps = function(bufnr)
             vim.api.nvim_buf_set_name(0, commit_file_from_action.hash .. "-" .. commit_file_from_action.filename)
             set_commit_file_options(buf)
         end)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Open file in horizontal split" }))
 
     map(keymaps.open_in_tab, function()
         local commit_file_from_action = extract()
@@ -125,7 +130,7 @@ M.set_keymaps = function(bufnr)
         local buf = elements.tab(get_show_command(commit_file_from_action))
         vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
         set_commit_file_options(buf)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Open file in tab" }))
 
     map(keymaps.open_in_window, function()
         local commit_file_from_action = extract()
@@ -135,7 +140,7 @@ M.set_keymaps = function(bufnr)
         local buf = elements.window(get_show_command(commit_file_from_action), {})
         vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
         set_commit_file_options(buf)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Open file in window" }))
 
     -- Autocmds
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })

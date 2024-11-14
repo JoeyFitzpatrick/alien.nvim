@@ -21,11 +21,11 @@ M.set_keymaps = function(bufnr)
             return
         end
         elements.float("git log -n 1 " .. commit.hash)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Display commit info" }))
 
     map_action(keymaps.revert, function(commit)
         return "git revert " .. commit.hash .. " --no-commit"
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Revert commit" }))
 
     map(keymaps.display_files, function()
         local commit = extract()
@@ -45,15 +45,21 @@ M.set_keymaps = function(bufnr)
                 return new_lines
             end,
         })
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Display commit files" }))
 
     map_action(keymaps.copy_commit_url, function(commit)
         commands.copy_git_commit_url(commit.hash)
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Copy commit url" }))
 
-    map_action_with_input(keymaps.reset, function(commit, reset_type)
-        return "git reset --" .. reset_type .. " " .. commit.hash
-    end, { prompt = "Git reset type", items = { "mixed", "soft", "hard" } }, alien_opts, opts)
+    map_action_with_input(
+        keymaps.reset,
+        function(commit, reset_type)
+            return "git reset --" .. reset_type .. " " .. commit.hash
+        end,
+        { prompt = "Git reset type", items = { "mixed", "soft", "hard" } },
+        alien_opts,
+        vim.tbl_extend("force", opts, { desc = "Reset to commit" })
+    )
 end
 
 return M

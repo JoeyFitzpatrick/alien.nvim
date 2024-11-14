@@ -20,7 +20,7 @@ M.set_keymaps = function(bufnr)
             return
         end
         elements.float("git log -n 1 " .. commit.hash)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Display commit info" }))
 
     map(keymaps.display_files, function()
         local commit = extract()
@@ -40,11 +40,11 @@ M.set_keymaps = function(bufnr)
                 return new_lines
             end,
         })
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Display commit files" }))
 
     map_action(keymaps.copy_commit_url, function(commit)
         commands.copy_git_commit_url(commit.hash)
-    end, alien_opts, opts)
+    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Copy commit url" }))
 end
 
 return M
