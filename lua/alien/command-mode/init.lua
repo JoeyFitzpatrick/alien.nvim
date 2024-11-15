@@ -6,7 +6,7 @@ local M = {}
 
 local GIT_PREFIXES = { "git", "gitk", "gitweb" }
 local PORCELAIN_COMMAND_STRATEGY_MAP = {
-    add = DISPLAY_STRATEGIES.PRINT,
+    add = require("alien.command-mode.display-strategies.add").get_strategy,
     blame = DISPLAY_STRATEGIES.BLAME,
     branch = require("alien.command-mode.display-strategies.branch").get_strategy,
     commit = require("alien.command-mode.display-strategies.commit").get_strategy,
