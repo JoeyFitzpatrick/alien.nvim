@@ -7,6 +7,7 @@ M.highlight_groups = {
     ALIEN_SECONDARY = "AlienSecondary",
     ALIEN_DIFF_TEXT = "AlienDiffText",
     ALIEN_ERROR_MSG = "AlienErrorMsg",
+    ALIEN_HELP = "AlienHelp",
 }
 
 return M

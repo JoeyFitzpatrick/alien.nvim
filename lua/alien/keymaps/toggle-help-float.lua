@@ -35,6 +35,12 @@ local function get_keymaps_as_sorted_strings(keymaps, max_keymap_length)
     return parsed_keymaps
 end
 
+---@param input string
+local function get_text_after_colon(input)
+    local start, ending, str = input:find(":%s*(%S.*)")
+    return start, ending, str
+end
+
 local function set_help_window_keymaps(bufnr)
     local opts = { noremap = true, silent = true, buffer = bufnr }
     vim.keymap.set("n", "q", function()
@@ -46,14 +52,30 @@ local function set_help_window_keymaps(bufnr)
     end, opts)
 
     vim.keymap.set("n", "<enter>", function()
-        local function get_text_after_colon(input)
-            local _, _, result = input:find(":%s*(%S.*)")
-            return result
-        end
-        local keys = get_text_after_colon(vim.api.nvim_get_current_line())
+        local _, _, keys = get_text_after_colon(vim.api.nvim_get_current_line())
         vim.cmd("q")
-        vim.api.nvim_input(keys)
+        if keys then
+            vim.api.nvim_input(keys)
+        end
     end, opts)
+end
+
+local function highlight_help_window(bufnr)
+    for line_num, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
+        local map_start, _, _ = get_text_after_colon(line)
+        if map_start == nil then
+            goto continue
+        end
+        vim.api.nvim_buf_add_highlight(
+            bufnr,
+            -1,
+            require("alien.highlight.constants").highlight_groups.ALIEN_TITLE,
+            line_num - 1,
+            map_start,
+            -1
+        )
+        ::continue::
+    end
 end
 
 M.toggle_keymap_display = function()
@@ -84,6 +106,8 @@ M.toggle_keymap_display = function()
 
     local bufnr = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, parsed_keymaps)
+
+    highlight_help_window(bufnr)
     set_help_window_keymaps(bufnr)
 
     vim.api.nvim_open_win(bufnr, true, {
@@ -94,7 +118,7 @@ M.toggle_keymap_display = function()
         row = row,
         style = "minimal",
         border = "rounded",
-        title = "Help -- " .. require("alien.objects").get_object_type_desc(element.object_type),
+        title = require("alien.objects").get_object_type_desc(element.object_type) .. " Keymaps",
     })
     keymaps_toggle = true
 
