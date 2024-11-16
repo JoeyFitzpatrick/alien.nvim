@@ -11,6 +11,7 @@ local autocmds = require("alien.autocmds")
 ---@field output_handler? fun(lines: string[]): string[]
 ---@field post_render? fun(bufnr: integer): nil
 ---@field highlight? fun(bufnr: integer): nil
+---@field buffer_name? string: nil
 
 ---@class Element: ElementParams
 ---@field win? integer
@@ -64,6 +65,18 @@ M._set_element_opts = function(cmd, opts, bufnr, result, highlight)
     return opts
 end
 
+--- Set buffer name
+---@param bufnr integer
+---@param object_type AlienObject
+---@param buffer_name? string
+local function set_buffer_name(bufnr, object_type, buffer_name)
+    if buffer_name ~= nil then
+        vim.api.nvim_buf_set_name(bufnr, "alien://" .. os.tmpname() .. "/" .. buffer_name)
+    else
+        vim.api.nvim_buf_set_name(bufnr, "alien://" .. os.tmpname() .. "/" .. object_type)
+    end
+end
+
 ---@param cmd string
 ---@param opts ElementParams
 ---@return integer, Element
@@ -98,6 +111,7 @@ local function create(cmd, opts)
     if opts.post_render then
         opts.post_render(new_bufnr)
     end
+    set_buffer_name(new_bufnr, element.object_type, opts.buffer_name)
     return new_bufnr
 end
 
@@ -166,7 +180,7 @@ M.split = function(cmd, opts, post_render)
         split = "right",
     }
     local split_opts = vim.tbl_extend("force", default_split_opts, opts and opts.split_opts or {})
-    local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "split" }, opts)
+    local ok, result = xpcall(create, debug.traceback, cmd, vim.tbl_extend("error", { element_type = "split" }, opts))
     if not ok then
         vim.notify(result, vim.log.levels.ERROR)
         return nil

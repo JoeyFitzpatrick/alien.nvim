@@ -1,6 +1,6 @@
 local commands = require("alien.actions.commands")
 local register = require("alien.elements.register")
-local get_extractor = require("alien.extractors.init")._get_extractor
+local get_extractor = require("alien.extractors")._get_extractor
 
 local M = {}
 

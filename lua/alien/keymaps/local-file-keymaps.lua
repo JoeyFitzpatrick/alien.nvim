@@ -81,19 +81,13 @@ M.set_keymaps = function(bufnr)
         end
     end, vim.tbl_extend("force", opts, { desc = "Scroll diff up" }))
 
-    map(keymaps.vimdiff, function()
+    map(keymaps.detailed_diff, function()
         local current_file = extract(vim.api.nvim_get_current_line())
         if not current_file then
             return
         end
         set_auto_diff(false)
-        local head_file_bufnr =
-            elements.window("git show HEAD:" .. current_file.filename, { object_type = "local_file" })
-        vim.cmd("diffthis")
-        vim.cmd("rightbelow vsplit " .. current_file.raw_filename)
-        vim.cmd("diffthis")
-        local filetype = vim.api.nvim_get_option_value("filetype", { buf = 0 })
-        vim.api.nvim_set_option_value("filetype", filetype, { buf = head_file_bufnr })
+        require("alien.global-actions.detailed-diff").display_detailed_diff(current_file)
     end, vim.tbl_extend("force", opts, { desc = "Diff (detailed)" }))
 
     map_action(keymaps.stage_or_unstage, function(local_file)
