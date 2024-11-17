@@ -1,7 +1,6 @@
 local keymaps = require("alien.config").config.keymaps.blame
 local elements = require("alien.elements")
 local map = require("alien.keymaps").map
-local map_action = require("alien.keymaps").map_action
 local commands = require("alien.actions.commands")
 
 local M = {}
@@ -12,7 +11,6 @@ end
 
 M.set_keymaps = function(bufnr)
     local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
-    local alien_opts = { trigger_redraw = true }
 
     map(keymaps.commit_info, function()
         local commit = extract()

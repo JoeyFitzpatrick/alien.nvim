@@ -81,14 +81,14 @@ M.set_keymaps = function(bufnr)
         end
     end, vim.tbl_extend("force", opts, { desc = "Scroll diff up" }))
 
-    map(keymaps.detailed_diff, function()
+    map(keymaps.staging_area, function()
         local current_file = extract(vim.api.nvim_get_current_line())
         if not current_file then
             return
         end
         set_auto_diff(false)
         require("alien.global-actions.detailed-diff").display_detailed_diff(current_file)
-    end, vim.tbl_extend("force", opts, { desc = "Diff (detailed)" }))
+    end, vim.tbl_extend("force", opts, { desc = "Enter staging area" }))
 
     map_action(keymaps.stage_or_unstage, function(local_file)
         local filename = local_file.filename

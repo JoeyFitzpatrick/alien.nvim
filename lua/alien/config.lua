@@ -23,7 +23,7 @@ M.default_config = {
             toggle_auto_diff = "t",
             scroll_diff_down = "J",
             scroll_diff_up = "K",
-            detailed_diff = "D",
+            staging_area = "D",
             stash = "<leader>s",
             stash_with_flags = "<leader>S",
             amend = "<leader>am",
@@ -55,7 +55,6 @@ M.default_config = {
         commit_file = {
             scroll_diff_down = "J",
             scroll_diff_up = "K",
-            detailed_diff = "D",
             toggle_auto_diff = "t",
             open_in_vertical_split = "<C-v>",
             open_in_horizontal_split = "<C-h>",
@@ -66,6 +65,14 @@ M.default_config = {
             pop = "p",
             apply = "a",
             drop = "d",
+        },
+        diff = {
+            staging_area = {
+                stage_hunk = "<enter>",
+                stage_line = "s",
+                next_hunk = "i",
+                previous_hunk = "p",
+            },
         },
     },
 }

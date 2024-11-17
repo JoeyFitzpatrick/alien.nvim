@@ -12,11 +12,11 @@ end
 --- Cleaner way to map an action to a keymap
 ---@param keys string
 ---@param cmd_fn function
----@param alien_opts? AlienOpts
+---@param action_opts? AlienOpts
 ---@param opts? vim.keymap.set.Opts
-M.map_action = function(keys, cmd_fn, alien_opts, opts)
+M.map_action = function(keys, cmd_fn, action_opts, opts)
     M.map(keys, function()
-        return require("alien.actions").action(cmd_fn, alien_opts)
+        return require("alien.actions").action(cmd_fn, action_opts)
     end, opts)
 end
 
