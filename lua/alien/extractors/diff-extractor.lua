@@ -42,7 +42,25 @@ M.extract = function()
         return nil
     end
 
-    return { hunk_start = hunk_start, hunk_end = hunk_end, hunk_first_changed_line = hunk_first_changed_line }
+    -- First few lines of diff are like this:
+    -- diff --git a/lua/alien/keymaps/diff-keymaps.lua b/lua/alien/keymaps/diff-keymaps.lua
+    -- index 3dcb93a..8da090a 100644
+    -- --- a/lua/alien/keymaps/diff-keymaps.lua
+    -- +++ b/lua/alien/keymaps/diff-keymaps.lua
+    -- @@ -9,7 +9,7 @@ M.set_unstaged_diff_keymaps = function(bufnr)
+
+    local patch_lines = { lines[3], lines[4] }
+
+    for i = hunk_start - 1, hunk_end, 1 do
+        table.insert(patch_lines, lines[i])
+    end
+
+    return {
+        hunk_start = hunk_start,
+        hunk_end = hunk_end,
+        hunk_first_changed_line = hunk_first_changed_line,
+        patch_lines = patch_lines,
+    }
 end
 
 return M

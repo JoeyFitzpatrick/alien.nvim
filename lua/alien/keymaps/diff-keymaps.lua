@@ -9,7 +9,7 @@ M.set_unstaged_diff_keymaps = function(bufnr)
 
     -- Get line nums from hunk. This currently returns the line num after the first @@ line, so we may need
     -- to add another property for the @@ line, and the lines at the top of the file that show the diff info
-    -- Add these changes to a temp file. This will be a .patch file.
+    -- make these changes into a string, then pass it as stdin to git apply patch. Check out gitsigns for an example.
     -- Should be formatted like this:
     --
     -- diff --git a/lua/alien/config.lua b/lua/alien/config.lua
@@ -26,7 +26,8 @@ M.set_unstaged_diff_keymaps = function(bufnr)
     --              stash_with_flags = "<leader>S",
     --              amend = "<leader>am",
     --
-    --
+    -- Then apply this patch.
+    -- To unstage, should be able to do the reverse as well via git apply --reversed
     map_action(keymaps.staging_area.stage_hunk, function(hunk)
         return "git status --short"
     end, action_opts, opts)

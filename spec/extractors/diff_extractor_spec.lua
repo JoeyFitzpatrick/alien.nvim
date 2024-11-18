@@ -87,4 +87,20 @@ describe("diff extractor", function()
         place_cursor_on_line(10)
         assert.are.equal(9, extract().hunk_first_changed_line)
     end)
+    it("should return correct patch lines when cursor is in first hunk", function()
+        place_cursor_on_line(6)
+        local expected = {}
+        for i = 3, 13, 1 do
+            table.insert(expected, mock_lines[i])
+        end
+        assert.are.same(expected, extract().patch_lines)
+    end)
+    it("should return correct patch lines when cursor is in second hunk", function()
+        place_cursor_on_line(15)
+        local expected = { mock_lines[3], mock_lines[4] }
+        for i = 14, 21, 1 do
+            table.insert(expected, mock_lines[i])
+        end
+        assert.are.same(expected, extract().patch_lines)
+    end)
 end)
