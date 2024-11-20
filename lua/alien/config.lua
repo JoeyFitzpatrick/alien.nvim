@@ -67,11 +67,11 @@ M.default_config = {
             drop = "d",
         },
         diff = {
+            next_hunk = "i",
+            previous_hunk = "p",
             staging_area = {
                 stage_hunk = "<enter>",
                 stage_line = "s",
-                next_hunk = "i",
-                previous_hunk = "p",
             },
         },
     },

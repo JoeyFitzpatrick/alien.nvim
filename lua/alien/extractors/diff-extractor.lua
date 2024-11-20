@@ -3,6 +3,8 @@
 ---@field hunk_end integer
 ---@field hunk_first_changed_line integer
 ---@field patch_lines string[]
+---@field next_hunk_start? integer
+---@field previous_hunk_start? integer
 
 local M = {}
 
@@ -43,6 +45,19 @@ M.extract = function()
         return nil
     end
 
+    local next_hunk_start, previous_hunk_start = nil, nil
+    for i = hunk_start - 2, 1, -1 do -- -2 represents the line before the @@ line of the current hunk
+        if lines[i]:sub(1, 2) == "@@" then
+            previous_hunk_start = i + 1
+            break
+        end
+    end
+
+    local not_in_last_line = lines[hunk_end + 1] and lines[hunk_end + 2]
+    if not_in_last_line and lines[hunk_end + 1]:sub(1, 2) == "@@" then
+        next_hunk_start = hunk_end + 2
+    end
+
     -- First few lines of diff are like this:
     -- diff --git a/lua/alien/keymaps/diff-keymaps.lua b/lua/alien/keymaps/diff-keymaps.lua
     -- index 3dcb93a..8da090a 100644
@@ -64,6 +79,8 @@ M.extract = function()
         hunk_end = hunk_end,
         hunk_first_changed_line = hunk_first_changed_line,
         patch_lines = patch_lines,
+        next_hunk_start = next_hunk_start,
+        previous_hunk_start = previous_hunk_start,
     }
 end
 
