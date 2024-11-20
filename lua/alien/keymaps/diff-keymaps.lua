@@ -22,7 +22,7 @@ M.set_staging_keymaps = function(bufnr, is_staged)
             cmd = "git apply --cached --whitespace=nowarn -"
         end
         require("alien.actions").action(cmd, action_opts)
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Stage/unstage hunk" }))
 end
 
 M.set_keymaps = function(bufnr)
@@ -45,7 +45,7 @@ M.set_keymaps = function(bufnr)
         end
         local cursor = vim.api.nvim_win_get_cursor(0)
         vim.api.nvim_win_set_cursor(0, { hunk.next_hunk_start, cursor[2] })
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Go to next hunk" }))
 
     map(keymaps.previous_hunk, function()
         local hunk = extract()
@@ -54,7 +54,7 @@ M.set_keymaps = function(bufnr)
         end
         local cursor = vim.api.nvim_win_get_cursor(0)
         vim.api.nvim_win_set_cursor(0, { hunk.previous_hunk_start, cursor[2] })
-    end, opts)
+    end, vim.tbl_extend("force", opts, { desc = "Go to previous hunk" }))
 end
 
 return M
