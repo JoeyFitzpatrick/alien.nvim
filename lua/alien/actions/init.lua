@@ -16,6 +16,7 @@ local M = {}
 ---@field error_callbacks table<integer, function>|nil
 ---@field output_handler nil|fun(output: string[]):string[]
 ---@field input string|nil
+---@field stdin string[]|nil
 
 --- Converts an AlienCommand (string | function) to a string if it is a function
 ---@param alien_command AlienCommand
@@ -40,7 +41,7 @@ M.run_action = function(cmd, opts)
     if not ok then
         return nil
     end
-    local output = require("alien.utils").run_cmd(parsed_command, opts.error_callbacks)
+    local output = require("alien.utils").run_cmd(parsed_command, opts)
     if opts.output_handler then
         output = opts.output_handler(output)
     end

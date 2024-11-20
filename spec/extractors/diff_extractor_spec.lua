@@ -93,6 +93,7 @@ describe("diff extractor", function()
         for i = 3, 13, 1 do
             table.insert(expected, mock_lines[i])
         end
+        table.insert(expected, "") -- we need to insert an empty line to ensure the patch applies correctly
         assert.are.same(expected, extract().patch_lines)
     end)
     it("should return correct patch lines when cursor is in second hunk", function()
@@ -101,6 +102,7 @@ describe("diff extractor", function()
         for i = 14, 21, 1 do
             table.insert(expected, mock_lines[i])
         end
+        table.insert(expected, "") -- we need to insert an empty line to ensure the patch applies correctly
         assert.are.same(expected, extract().patch_lines)
     end)
 end)

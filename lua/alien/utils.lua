@@ -31,13 +31,21 @@ end
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
----@param error_callbacks? table<integer, function>
+---@param opts AlienOpts
 ---@return string[]
-M.run_cmd = function(cmd, error_callbacks)
+M.run_cmd = function(cmd, opts)
+    opts = opts or {}
+    local error_callbacks = opts.error_callbacks
+    local stdin = opts.stdin
     if cmd == "" then
         return {}
     end
-    local output = vim.fn.systemlist(cmd)
+    local output = nil
+    if stdin ~= nil then
+        output = vim.fn.systemlist(cmd, stdin)
+    else
+        output = vim.fn.systemlist(cmd)
+    end
     if vim.v.shell_error ~= 0 then
         if error_callbacks and error_callbacks[vim.v.shell_error] then
             return error_callbacks[vim.v.shell_error](cmd)

@@ -2,6 +2,7 @@
 ---@field hunk_start integer
 ---@field hunk_end integer
 ---@field hunk_first_changed_line integer
+---@field patch_lines string[]
 
 local M = {}
 
@@ -54,6 +55,9 @@ M.extract = function()
     for i = hunk_start - 1, hunk_end, 1 do
         table.insert(patch_lines, lines[i])
     end
+
+    -- TODO: figure out why this is needed to make applying patches not fail due to corrupt patch errors
+    table.insert(patch_lines, "")
 
     return {
         hunk_start = hunk_start,

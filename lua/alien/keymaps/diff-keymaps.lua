@@ -1,36 +1,28 @@
 local keymaps = require("alien.config").config.keymaps.diff
-local map_action = require("alien.keymaps").map_action
+local map = require("alien.keymaps").map
+local extract = require("alien.extractors.diff-extractor").extract
 
 local M = {}
 
-M.set_unstaged_diff_keymaps = function(bufnr)
+M.set_staging_keymaps = function(bufnr, is_staged)
     local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
     local action_opts = { trigger_redraw = true }
 
-    -- Get line nums from hunk. This currently returns the line num after the first @@ line, so we may need
-    -- to add another property for the @@ line, and the lines at the top of the file that show the diff info
-    -- make these changes into a string, then pass it as stdin to git apply patch. Check out gitsigns for an example.
-    -- Should be formatted like this:
-    --
-    -- diff --git a/lua/alien/config.lua b/lua/alien/config.lua
-    -- index 465055b..1c4b9c1 100644
-    -- --- a/lua/alien/config.lua
-    -- +++ b/lua/alien/config.lua
-    -- @@ -23,7 +23,7 @@ M.default_config = {
-    --              toggle_auto_diff = "t",
-    --              scroll_diff_down = "J",
-    --              scroll_diff_up = "K",
-    -- -            detailed_diff = "D",
-    -- +            staging_area = "D",
-    --              stash = "<leader>s",
-    --              stash_with_flags = "<leader>S",
-    --              amend = "<leader>am",
-    --
-    -- Then apply this patch.
-    -- To unstage, should be able to do the reverse as well via git apply --reversed
-    map_action(keymaps.staging_area.stage_hunk, function(hunk)
-        return "git status --short"
-    end, action_opts, opts)
+    map(keymaps.staging_area.stage_hunk, function()
+        local hunk = extract()
+        if not hunk then
+            return
+        end
+        local local_opts = action_opts
+        local_opts.stdin = hunk.patch_lines
+        local cmd
+        if is_staged then
+            cmd = "git apply --reverse --cached --whitespace=nowarn -"
+        else
+            cmd = "git apply --cached --whitespace=nowarn -"
+        end
+        require("alien.actions").action(cmd, action_opts)
+    end, opts)
 end
 
 M.set_keymaps = function(bufnr) end
