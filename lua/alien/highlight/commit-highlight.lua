@@ -10,7 +10,9 @@ M.highlight_oneline_pretty = function(bufnr)
             local name = line:match("^[^\t]*\t[^\t]*\t([^\t]*)")
             if name then
                 local name_start, name_end = line:find(name)
-                vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_TITLE, i - 1, name_start - 1, name_end)
+                if name_start ~= nil and name_end ~= nil then
+                    vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_TITLE, i - 1, name_start - 1, name_end)
+                end
             end
         end
     end
