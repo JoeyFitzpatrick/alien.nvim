@@ -1,4 +1,4 @@
-local convert_to_tree_view = require("alien.utils.tree-view").convert_to_tree_view
+local get_status_output_tree = require("alien.utils.tree-view").get_status_output_tree
 
 local status_output = {
     " M lua/alien/elements/init.lua",
@@ -9,16 +9,18 @@ local status_output = {
 }
 
 local tree_output = {
-    "  lua/alien",
+    "   lua/alien",
     "      elements",
-    "      M init.lua",
+    "         M init.lua",
     "      utils",
-    "     ?? init.lua",
-    "     ?? tree-view.lua",
-    "    D utils.lua",
-    "    spec/utils",
-    "   ?? tree_view_spec.lua",
+    "        ?? init.lua",
+    "        ?? tree-view.lua",
+    "     D utils.lua",
+    "   spec/utils",
+    "    ?? tree_view_spec.lua",
 }
--- describe("convert status output to tree", function()
---     assert.are.same(tree_output, convert_to_tree_view(status_output))
--- end)
+describe("convert status output to tree", function()
+    it("should convert a basic tree", function()
+        assert.are.same(tree_output, get_status_output_tree(status_output))
+    end)
+end)
