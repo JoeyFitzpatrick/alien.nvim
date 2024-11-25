@@ -8,32 +8,17 @@ local FILE = "file"
 
 local M = {}
 
----@param path_parts string[]
----@return Node
-local function create_node(path_parts)
-    local node = nil
-    local current_node = nil
-    for i, part in ipairs(path_parts) do
-        local type = i == #path_parts and FILE or DIR
-        local new_node = { name = part, type = type, children = {} }
-        if not node then
-            node = new_node
-            current_node = node
-        else
-            assert(current_node, "Alien: somehow this node was not defined")
-            table.insert(current_node.children, new_node)
-            current_node = new_node
-        end
-    end
-    return node
-end
-
 --- Flatten a node, such that nodes with a single dir child are concatenated together
 ---@param node Node
 local function flatten_node(node)
     while #node.children == 1 and node.children[1].type == "dir" do
         local subdir_child = node.children[1]
-        node.name = node.name .. "/" .. subdir_child.name
+        if node.name == nil then
+            node.name = ""
+        else
+            node.name = node.name .. "/"
+        end
+        node.name = node.name .. subdir_child.name
         node.children = subdir_child.children
         node.type = subdir_child.type
     end
@@ -85,7 +70,7 @@ M._convert_to_tree_view = function(filepaths)
         end
         local current_node = nodes
         for i, part in ipairs(path_parts) do
-            local type = (i == #path_parts) and "file" or "dir"
+            local type = (i == #path_parts) and FILE or DIR
             current_node = find_or_create_node(current_node, part, type)
         end
     end
@@ -112,7 +97,7 @@ M._node_to_file_tree = function(node, prefix)
             for _, l in ipairs(dir_lines) do
                 table.insert(lines, l)
             end
-        elseif child.type == "file" then
+        elseif child.type == FILE then
             line = prefix .. child.name
             table.insert(lines, line)
         end
