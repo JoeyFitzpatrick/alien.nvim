@@ -27,6 +27,12 @@ M.set_keymaps = function(bufnr)
         if status == STATUSES.UNTRACKED then
             return "git diff --no-index /dev/null " .. filename
         end
+        if require("alien.status").is_deleted(status) then
+            if is_staged(status) then
+                return "git diff --cached -- " .. filename
+            end
+            return "git diff -- " .. filename
+        end
         if is_staged(status) then
             return "git diff --staged " .. filename
         end
