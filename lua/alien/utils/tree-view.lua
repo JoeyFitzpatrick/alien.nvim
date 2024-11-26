@@ -100,7 +100,7 @@ M._node_to_file_tree = function(node, prefix)
         if child.type == DIR then
             line = prefix .. "   " .. child.name
             table.insert(lines, line)
-            local dir_lines = M._node_to_file_tree(child, prefix .. "    ")
+            local dir_lines = M._node_to_file_tree(child, prefix .. require("alien.constants").TREE_SPACING)
             for _, l in ipairs(dir_lines) do
                 table.insert(lines, l)
             end

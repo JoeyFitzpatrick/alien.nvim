@@ -1,6 +1,5 @@
 local M = {}
 
-M.ORIGINAL_BUFNR = "original_bufnr"
-M.NEW_BUFNR = "new_bufnr"
+M.TREE_SPACING = "    "
 
 return M
