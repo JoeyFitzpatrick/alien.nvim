@@ -71,7 +71,7 @@ M.set_keymaps = function(bufnr)
             return
         end
         elements.window(
-            "git log " .. branch.branch_name .. " --pretty=format:'%h\t%cr\t%an\t%s'",
+            "git log " .. branch.branch_name .. " --pretty=format:'%h %<(25)%cr %<(25)%an %<(25)%s'",
             { highlight = require("alien.highlight.commit-highlight").highlight_oneline_pretty }
         )
     end, vim.tbl_extend("force", opts, { desc = "Open branch commits (log)" }))

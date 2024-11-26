@@ -7,12 +7,9 @@ M.highlight_oneline_pretty = function(bufnr)
         local commit = require("alien.extractors.commit-extractor").extract(line)
         if commit then
             vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_SECONDARY, i - 1, commit.start, commit.ending)
-            local name = line:match("^[^\t]*\t[^\t]*\t([^\t]*)")
-            if name then
-                local name_start, name_end = line:find(name)
-                if name_start ~= nil and name_end ~= nil then
-                    vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_TITLE, i - 1, name_start - 1, name_end)
-                end
+            local name_start, name_end = line:find("%s%s+(.-)%s%s+")
+            if name_start ~= nil and name_end ~= nil then
+                vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_TITLE, i - 1, name_start - 1, name_end)
             end
         end
     end
