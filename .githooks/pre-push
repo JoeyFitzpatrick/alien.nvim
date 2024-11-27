@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Running tests with busted..."
+
+if ! busted; then
+  echo "Tests failed. Push aborted."
+  exit 1
+fi
+
+exit 0

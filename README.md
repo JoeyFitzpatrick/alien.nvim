@@ -49,6 +49,14 @@ After that, using Alien is as simple as calling git commands via the `:Git` comm
 
 ## Development
 
+I always welcome contributors of any experience level. If you'd like to contribute, you can start by cloning the repo and running the setup script. This script should handle everything you need to get started making contributions, including setting up git hooks.
+
+```bash
+git clone https://github.com/JoeyFitzpatrick/alien.nvim.git
+cd alien.nvim
+sh scripts/setup-development.sh
+```
+
 ### Run tests
 
 
