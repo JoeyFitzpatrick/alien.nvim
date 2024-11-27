@@ -34,7 +34,6 @@ M._find_filename = function(line)
         end
         ::continue::
     end
-    print("filename", filename)
     return filename
 end
 

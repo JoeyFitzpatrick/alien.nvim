@@ -79,12 +79,12 @@ end
 
 ---@param cmd string
 ---@param opts ElementParams
----@return integer, Element
+---@return integer?, Element?
 local setup_element = function(cmd, opts)
     local bufnr = vim.api.nvim_create_buf(false, true)
     local result = require("alien.actions").action(cmd, opts)
     if not result then
-        error("action returned nil")
+        return
     end
     local highlight = opts.highlight and opts.highlight
         or require("alien.highlight").get_highlight_by_object(result.object_type)
@@ -102,9 +102,12 @@ end
 --- Also do some side effects, like setting keymaps, highlighting, and buffer local vars.
 ---@param cmd string
 ---@param opts ElementParams
----@return integer
+---@return integer | nil
 local function create(cmd, opts)
     local new_bufnr, element = setup_element(cmd, opts)
+    if new_bufnr == nil or element == nil then
+        return
+    end
     require("alien.keymaps").set_object_keymaps(new_bufnr, element.object_type)
     require("alien.keymaps").set_element_keymaps(new_bufnr, element.element_type)
     autocmds.set_element_autocmds(new_bufnr)
@@ -164,6 +167,9 @@ M.float = function(cmd, opts)
         return nil
     end
     local bufnr = result
+    if not bufnr then
+        return
+    end
     vim.api.nvim_open_win(bufnr, true, float_opts)
     -- post_create()
     return bufnr
@@ -180,12 +186,16 @@ M.split = function(cmd, opts, post_render)
         split = "right",
     }
     local split_opts = vim.tbl_extend("force", default_split_opts, opts and opts.split_opts or {})
-    local ok, result = xpcall(create, debug.traceback, cmd, vim.tbl_extend("error", { element_type = "split" }, opts))
+    local ok, result = pcall(create, cmd, vim.tbl_extend("error", { element_type = "split" }, opts))
+    -- local ok, result = xpcall(create, debug.traceback, cmd, vim.tbl_extend("error", { element_type = "split" }, opts))
     if not ok then
         vim.notify(result, vim.log.levels.ERROR)
         return nil
     end
     local bufnr = result
+    if not bufnr then
+        return
+    end
     local win = vim.api.nvim_open_win(bufnr, true, split_opts)
     if post_render then
         post_render(win, bufnr)
@@ -206,6 +216,9 @@ M.window = function(cmd, opts, post_render)
         return nil
     end
     local bufnr = result
+    if not bufnr then
+        return
+    end
     vim.api.nvim_win_set_buf(0, bufnr)
     if post_render then
         post_render(0, bufnr)
@@ -224,6 +237,9 @@ M.tab = function(cmd)
         return nil
     end
     local bufnr = result
+    if not bufnr then
+        return
+    end
     vim.cmd("tabnew")
     vim.api.nvim_win_set_buf(0, bufnr)
     post_create_co(bufnr)

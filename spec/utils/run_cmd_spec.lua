@@ -28,12 +28,14 @@ describe("run_cmd", function()
         assert.are.same({}, run_cmd(""))
     end)
 
-    it("returns the error message if command fails without callbacks", function()
+    it("errors if command fails without callbacks", function()
         vim.fn.systemlist = function(_)
             return { "error_output" }
         end
         vim.v.shell_error = 1
-        assert.are.same({ "error_output" }, run_cmd("some_failing_command"))
+        local ok, result = pcall(run_cmd, "some_failing_command")
+        assert.are.equal(false, ok)
+        assert.are.same({ "error_output" }, result)
     end)
 
     it("calls error callback if command fails with error callbacks", function()
@@ -72,8 +74,7 @@ describe("run_cmd", function()
             return { "error_output" }
         end
         vim.v.shell_error = 1
-        run_cmd("some_failing_command")
-
+        pcall(run_cmd, "some_failing_command")
         assert.is_true(notify_called)
     end)
 end)

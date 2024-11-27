@@ -31,7 +31,7 @@ end
 
 --- Run a command, with side effects, such as displaying errors
 ---@param cmd string
----@param opts AlienOpts
+---@param opts AlienOpts?
 ---@return string[]
 M.run_cmd = function(cmd, opts)
     opts = opts or {}
@@ -51,6 +51,7 @@ M.run_cmd = function(cmd, opts)
             return error_callbacks[vim.v.shell_error](cmd)
         else
             vim.notify(table.concat(output, "\n"), vim.log.levels.ERROR)
+            error(output)
         end
     end
     return output

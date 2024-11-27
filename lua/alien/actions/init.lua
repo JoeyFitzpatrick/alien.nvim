@@ -37,11 +37,14 @@ end
 ---@return ActionResult | nil
 M.run_action = function(cmd, opts)
     opts = opts or {}
-    local ok, parsed_command = pcall(M.parse_command, cmd)
-    if not ok then
+    local parse_cmd_ok, parsed_command = pcall(M.parse_command, cmd)
+    if not parse_cmd_ok then
         return nil
     end
-    local output = require("alien.utils").run_cmd(parsed_command, opts)
+    local run_cmd_ok, output = pcall(require("alien.utils").run_cmd, parsed_command, opts)
+    if not run_cmd_ok then
+        return nil
+    end
     if opts.output_handler then
         output = opts.output_handler(output)
     end

@@ -26,10 +26,8 @@ M.blame = function(cmd)
     }
     local current_line_num = vim.api.nvim_win_get_cursor(original_win)[1]
     setup_blame_window(original_win)
-    local parsed_cmd = cmd
-        .. " '"
-        .. vim.api.nvim_buf_get_name(0)
-        .. "' --date=format-local:'%Y/%m/%d %I:%M %p' | sed -E 's/ +[0-9]+\\)/)/'"
+    local parsed_cmd = cmd .. " '" .. vim.api.nvim_buf_get_name(0) .. "' --date=format-local:'%Y/%m/%d %I:%M %p'"
+    -- .. "' --date=format-local:'%Y/%m/%d %I:%M %p' | sed -E 's/ +[0-9]+\\)/)/'"
 
     elements.split(parsed_cmd, { split_opts = { split = "left" }, output_handler = blame_output_handler }, function(win)
         local closing_paren = string.find(vim.api.nvim_get_current_line(), ")")
