@@ -3,6 +3,12 @@
 ---@field name string
 ---@field children Node[]
 
+---@class StatusData
+---@field display_name string
+---@field name string
+---@field type "dir" | "file"
+---@field status Status
+
 local DIR = "dir"
 local FILE = "file"
 
@@ -117,22 +123,6 @@ end
 ---@param filepaths string[]
 M.get_file_tree = function(filepaths)
     return M._node_to_file_tree(M._convert_to_tree_view(filepaths))
-end
-
---- Turn the output of "git status --porcelain" into a file tree
----@param filepaths string[]
-M.get_status_output_tree = function(filepaths)
-    local parsed_filepaths = {}
-    for _, path in ipairs(filepaths) do
-        local last_slash_index = path:match(".*()/")
-        if last_slash_index == nil then
-            goto continue
-        end
-        local status = path:sub(1, 2)
-        table.insert(parsed_filepaths, path:sub(4, last_slash_index) .. status .. " " .. path:sub(last_slash_index + 1))
-        ::continue::
-    end
-    return M.get_file_tree(parsed_filepaths)
 end
 
 return M

@@ -1,4 +1,4 @@
-local get_status_output_tree = require("alien.utils.tree-view").get_status_output_tree
+local get_status_output_tree = require("alien.utils.tree-view.status-tree-view").get_status_output_tree
 
 describe("convert status output to tree", function()
     it("should convert a tree with multiple outputs", function()

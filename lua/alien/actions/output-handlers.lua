@@ -18,7 +18,7 @@ M.status_output_handler = function(output)
 
     local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
     local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
-    local new_output = require("alien.utils.tree-view").get_status_output_tree(output)
+    local new_output = require("alien.utils.tree-view.status-tree-view").get_status_output_tree(output)
     table.insert(new_output, 1, "HEAD: " .. head .. " " .. pull_str .. push_str)
     table.insert(new_output, 2, staged_stats)
     return new_output

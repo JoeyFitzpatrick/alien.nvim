@@ -1,5 +1,8 @@
+---@alias Status "A " | "AA" | " A" | "C " | " C" | "DD" | "DM" | "D " | " D" | "MM" | "M " | " M" | "R " | " R" | "UU" | "??"
+
 local M = {}
 
+---@type table<string, Status>
 M.STATUSES = {
     ADDED = "A ",
     ADDED_BOTH_STAGED_UNSTAGED = "AA",
@@ -19,6 +22,8 @@ M.STATUSES = {
     UNTRACKED = "??",
 }
 
+---@param status string
+---@return boolean
 M.is_valid_status = function(status)
     for _, valid_status in pairs(M.STATUSES) do
         if valid_status == status then
@@ -28,6 +33,8 @@ M.is_valid_status = function(status)
     return false
 end
 
+---@param status string
+---@return boolean
 M.is_staged = function(status)
     local staged_statuses = {
         M.STATUSES.MODIFIED_STAGED,
@@ -41,6 +48,7 @@ end
 
 --- Returns true for a git status that represents a deleted file, and false otherwise.
 ---@param status string
+---@return boolean
 M.is_deleted = function(status)
     local deleted_statuses = {
         M.STATUSES.DELETED_BOTH_STAGED_UNSTAGED,
