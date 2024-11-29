@@ -1,13 +1,8 @@
 ---@class Node
 ---@field type "dir" | "file"
 ---@field name string
+---@field full_name string
 ---@field children Node[]
-
----@class StatusData
----@field display_name string
----@field name string
----@field type "dir" | "file"
----@field status Status
 
 local DIR = "dir"
 local FILE = "file"
@@ -16,23 +11,19 @@ local M = {}
 
 --- Flatten a node, such that nodes with a single dir child are concatenated together
 ---@param base_node Node
-local function flatten_node(base_node)
+M._flatten_node = function(base_node)
     for _, node in ipairs(base_node.children) do
         while #node.children == 1 and node.children[1].type == "dir" do
             local subdir_child = node.children[1]
-            if node.name == nil then
-                node.name = ""
-            else
-                node.name = node.name .. "/"
-            end
+            node.name = node.name and node.name .. "/" or ""
+            node.full_name = node.full_name and node.full_name .. "/" or ""
             node.name = node.name .. subdir_child.name
+            node.full_name = subdir_child.full_name
             node.children = subdir_child.children
             node.type = subdir_child.type
         end
     end
 end
-
-M._flatten_node = flatten_node
 
 --- Sort a node. Dirs before files at the same level, then sort alphabetically
 ---@param node Node
@@ -52,13 +43,21 @@ local function sort_node(node)
     end
 end
 
+M._sort_node = sort_node
+
+---@param current_node Node
+---@param part string
+---@param type "file" | "dir"
+---@return Node
 M._find_or_create_node = function(current_node, part, type)
     for _, child in ipairs(current_node.children) do
         if child.name == part then
             return child
         end
     end
-    local new_node = { name = part, type = type, children = {} }
+    local parent_name = current_node.full_name and current_node.full_name .. "/" or ""
+    ---@type Node
+    local new_node = { name = part, full_name = parent_name .. part, type = type, children = {} }
     table.insert(current_node.children, new_node)
     return new_node
 end
@@ -68,7 +67,6 @@ end
 ---@return Node
 M._create_nodes = function(filepaths)
     local nodes = { children = {} }
-
     for _, filepath in ipairs(filepaths) do
         local path_parts = {}
         for path_part in filepath:gmatch("[^/]+") do
@@ -100,7 +98,7 @@ M._node_to_file_tree = function(node, prefix)
     local lines = {}
     prefix = prefix or ""
 
-    sort_node(node)
+    M._sort_node(node)
     for _, child in ipairs(node.children) do
         local line
         if child.type == DIR then
