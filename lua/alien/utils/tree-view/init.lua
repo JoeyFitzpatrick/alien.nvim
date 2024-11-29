@@ -4,9 +4,6 @@
 ---@field full_name string
 ---@field children Node[]
 
-local DIR = "dir"
-local FILE = "file"
-
 local M = {}
 
 --- Flatten a node, such that nodes with a single dir child are concatenated together
@@ -60,67 +57,6 @@ M._find_or_create_node = function(current_node, part, type)
     local new_node = { name = part, full_name = parent_name .. part, type = type, children = {} }
     table.insert(current_node.children, new_node)
     return new_node
-end
-
---- Convert filepaths to nodes
----@param filepaths string[]
----@return Node
-M._create_nodes = function(filepaths)
-    local nodes = { children = {} }
-    for _, filepath in ipairs(filepaths) do
-        local path_parts = {}
-        for path_part in filepath:gmatch("[^/]+") do
-            table.insert(path_parts, path_part)
-        end
-        local current_node = nodes
-        for i, part in ipairs(path_parts) do
-            local type = (i == #path_parts) and FILE or DIR
-            current_node = M._find_or_create_node(current_node, part, type)
-        end
-    end
-    return nodes
-end
-
---- Convert filepaths to tree view
----@param filepaths string[]
----@return Node
-M._convert_to_tree_view = function(filepaths)
-    local nodes = M._create_nodes(filepaths)
-    M._flatten_node(nodes)
-    return nodes
-end
-
---- Get a file tree from a base node.
----@param node Node
----@param prefix? string
----@return string[]
-M._node_to_file_tree = function(node, prefix)
-    local lines = {}
-    prefix = prefix or ""
-
-    M._sort_node(node)
-    for _, child in ipairs(node.children) do
-        local line
-        if child.type == DIR then
-            line = prefix .. "   " .. child.name
-            table.insert(lines, line)
-            local dir_lines = M._node_to_file_tree(child, prefix .. require("alien.constants").TREE_SPACING)
-            for _, l in ipairs(dir_lines) do
-                table.insert(lines, l)
-            end
-        elseif child.type == FILE then
-            line = prefix .. child.name
-            table.insert(lines, line)
-        end
-    end
-
-    return lines
-end
-
---- Get a file tree from a list of filepaths, by converting them to a node first.
----@param filepaths string[]
-M.get_file_tree = function(filepaths)
-    return M._node_to_file_tree(M._convert_to_tree_view(filepaths))
 end
 
 return M

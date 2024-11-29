@@ -21,6 +21,7 @@ local autocmds = require("alien.autocmds")
 ---@field action Action
 ---@field highlight fun(bufnr: integer): nil
 ---@field channel_id? string
+---@field state? table<string, any>
 
 ---@class TerminalElement
 ---@field win? integer

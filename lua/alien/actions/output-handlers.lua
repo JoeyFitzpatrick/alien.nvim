@@ -18,7 +18,9 @@ M.status_output_handler = function(output)
 
     local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
     local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
-    local new_output = require("alien.utils.tree-view.status-tree-view").get_status_output_tree(output)
+    local status_file_tree = require("alien.utils.tree-view.status-tree-view").render_status_file_tree(output)
+    require("alien.elements.register").set_state(vim.api.nvim_get_current_buf(), status_file_tree.status_data)
+    local new_output = status_file_tree.lines
     table.insert(new_output, 1, "HEAD: " .. head .. " " .. pull_str .. push_str)
     table.insert(new_output, 2, staged_stats)
     return new_output

@@ -37,10 +37,30 @@ M._find_filename = function(line)
     return filename
 end
 
+local status_state = function(current_status_state)
+    local line_num = vim.api.nvim_win_get_cursor(0)[1] - 2 -- Adding 2 becuase the status output currently adds two lines
+    if line_num <= 0 then
+        return nil
+    end
+    local status_line = current_status_state[line_num]
+    return {
+        filename = "'" .. status_line.name .. "'",
+        raw_filename = status_line.name,
+        file_status = status_line.status,
+    }
+end
+
 --- Takes a line of text and attempts to return the file name and status
 ---@param str string
 ---@return LocalFile | nil
 M.extract = function(str)
+    -- local current_status_state = require("alien.elements.register").get_state(vim.api.nvim_get_current_buf())
+    -- if current_status_state then
+    --     local state = status_state(current_status_state)
+    --     if state then
+    --         return state
+    --     end
+    -- end
     local filename = M._find_filename(str)
     local status_start = 1
     local status_end = 2
