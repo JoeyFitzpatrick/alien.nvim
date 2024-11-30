@@ -6,7 +6,7 @@ M.elements = {}
 
 ---@param bufnr integer
 ---@return Element | nil
-local get_element = function(bufnr)
+M.get_element = function(bufnr)
     return vim.tbl_filter(function(element)
         return element.bufnr == bufnr
     end, M.elements)[1]
@@ -17,7 +17,7 @@ M.get_current_element = function()
     local bufnr = vim.api.nvim_get_current_buf()
     local win = vim.api.nvim_get_current_win()
     local result = nil
-    result = get_element(bufnr)
+    result = M.get_element(bufnr)
     if not result then
         result = vim.tbl_filter(function(element)
             return element.win == win
@@ -128,6 +128,7 @@ M.redraw_elements_logic = function()
         vim.api.nvim_set_option_value("modifiable", true, { buf = element.bufnr })
         vim.api.nvim_buf_set_lines(element.bufnr, 0, -1, false, result.output)
         vim.api.nvim_set_option_value("modifiable", false, { buf = element.bufnr })
+        element.state = result.state
         if element.highlight then
             element.highlight(element.bufnr)
         end
@@ -138,38 +139,6 @@ end
 --TODO: Make this function redraw current element immediately, then redraw the rest async
 M.redraw_elements = function()
     vim.schedule(M.redraw_elements_logic)
-end
-
---- Set state on an element.
---- This state will be a table, which is merged with the element's state.
---- Previous state values are overwritten.
---- Returns true if state was set successfully, and false otherwise.
----@param bufnr integer
----@param state table<string, any>
----@return boolean
-M.set_state = function(bufnr, state)
-    local set_state_successful = false
-    local element = get_element(bufnr)
-    if not element then
-        return set_state_successful
-    end
-    if not element.state then
-        element.state = {}
-    end
-    element.state = vim.tbl_deep_extend("force", element.state, state)
-    set_state_successful = true
-    return set_state_successful
-end
-
---- Get state for an element.
----@param bufnr integer
----@return table<string, any> | nil
-M.get_state = function(bufnr)
-    local element = get_element(bufnr)
-    if not element then
-        return nil
-    end
-    return element.state
 end
 
 return M

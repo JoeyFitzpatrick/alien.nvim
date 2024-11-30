@@ -55,10 +55,14 @@ M.get_status_data = function(node, prefix)
                 table.insert(status_data, dir_data)
             end
         elseif child.type == FILE then
+            local child_full_name = child.full_name:match("%S+$")
+            if child_full_name == nil then
+                child_full_name = ""
+            end
             ---@type StatusData
             local data = {
                 display_name = prefix .. child.name,
-                name = parent_name .. child.full_name:match("%S+$"),
+                name = parent_name .. child_full_name,
                 type = FILE,
                 status = child.name:match("^(..)%s"),
             }

@@ -11,14 +11,15 @@ local autocmds = require("alien.autocmds")
 ---@field output_handler? fun(lines: string[]): string[]
 ---@field post_render? fun(bufnr: integer): nil
 ---@field highlight? fun(bufnr: integer): nil
----@field buffer_name? string: nil
+---@field buffer_name? string
+---@field state? table<string, any>
 
 ---@class Element: ElementParams
 ---@field win? integer
 ---@field bufnr integer
 ---@field element_type? ElementType
 ---@field child_elements? Element[]
----@field action Action
+---@field action AlienAction
 ---@field highlight fun(bufnr: integer): nil
 ---@field channel_id? string
 ---@field state? table<string, any>
@@ -63,6 +64,7 @@ M._set_element_opts = function(cmd, opts, bufnr, result, highlight)
     if not opts.object_type then
         opts.object_type = result.object_type
     end
+    opts.state = result.state
     return opts
 end
 

@@ -7,8 +7,9 @@ local M = {}
 ---@class ActionResult
 ---@field output string[]
 ---@field object_type AlienObject
+---@field state? table<string, any>
 
----@alias Action fun(): (ActionResult | nil)
+---@alias AlienAction fun(): (ActionResult | nil)
 ---@alias AlienCommand string | fun(): string
 
 ---@class AlienOpts: BaseOpts
@@ -17,6 +18,7 @@ local M = {}
 ---@field output_handler nil|fun(output: string[]):string[]
 ---@field input string|nil
 ---@field stdin string[]|nil
+---@field set_state? fun(output: string[]): table<string, any>
 
 --- Converts an AlienCommand (string | function) to a string if it is a function
 ---@param alien_command AlienCommand
@@ -45,15 +47,22 @@ M.run_action = function(cmd, opts)
     if not run_cmd_ok then
         return nil
     end
+    local state
+    if opts.set_state then
+        -- Note that we are setting state before using output handler
+        state = opts.set_state(output)
+    end
     if opts.output_handler then
         output = opts.output_handler(output)
     end
     if opts.trigger_redraw then
         require("alien.elements.register").redraw_elements()
     end
+
     return {
         output = output,
         object_type = opts.object_type or require("alien.objects").get_object_type(parsed_command),
+        state = state,
     }
 end
 
@@ -70,6 +79,7 @@ M.action = function(cmd, opts)
     local extract = get_extractor(current_object_type)
     local get_args = extract and commands.get_args(extract) or nil
     local command = commands.create_command(cmd, get_args, input, current_element)
+    opts.set_state = require("alien.elements.register.state").get_state_setter(cmd)
     return M.run_action(command, opts)
 end
 
