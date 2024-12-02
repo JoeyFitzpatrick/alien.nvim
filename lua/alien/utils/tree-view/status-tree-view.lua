@@ -3,9 +3,13 @@
 ---@field name string
 ---@field type "dir" | "file"
 ---@field status? Status
+---@field dir_status? "unstaged" | "staged" | "modified"
 
 local DIR = "dir"
 local FILE = "file"
+local STATUS_STAGED = "staged"
+local STATUS_UNSTAGED = "unstaged"
+local STATUS_MODIFIED = "modified"
 
 local M = {}
 
@@ -33,6 +37,26 @@ M._create_nodes = function(filepaths)
     return nodes
 end
 
+local function get_dir_status(dir_status, file_status)
+    local is_staged_file_status = require("alien.status").is_staged(file_status) or file_status == STATUS_STAGED
+    if not dir_status then
+        return is_staged_file_status and STATUS_STAGED or STATUS_UNSTAGED
+    end
+    if is_staged_file_status then
+        if dir_status == STATUS_UNSTAGED or dir_status == STATUS_MODIFIED then
+            return STATUS_MODIFIED
+        else
+            return STATUS_STAGED
+        end
+    else
+        if dir_status == STATUS_STAGED or dir_status == STATUS_MODIFIED then
+            return STATUS_MODIFIED
+        else
+            return STATUS_UNSTAGED
+        end
+    end
+end
+
 ---@param node Node
 ---@param prefix? string
 ---@return StatusData[]
@@ -49,8 +73,13 @@ M.get_status_data = function(node, prefix)
                 name = child.full_name,
                 type = DIR,
             }
-            table.insert(status_data, data)
+
             local dir_lines = M.get_status_data(child, prefix .. require("alien.constants").TREE_SPACING)
+            for _, dir_data in ipairs(dir_lines) do
+                data.status = get_dir_status(data.status, dir_data.status)
+            end
+
+            table.insert(status_data, data)
             for _, dir_data in ipairs(dir_lines) do
                 table.insert(status_data, dir_data)
             end

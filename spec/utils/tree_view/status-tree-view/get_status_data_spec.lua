@@ -8,6 +8,7 @@ describe("convert a node representing status output to status data", function()
                 name = "lua/alien",
                 display_name = "   lua/alien",
                 type = "dir",
+                status = "unstaged",
             },
             {
                 name = "lua/alien/init.lua",
@@ -28,11 +29,13 @@ describe("convert a node representing status output to status data", function()
                 name = "lua/alien",
                 display_name = "   lua/alien",
                 type = "dir",
+                status = "modified",
             },
             {
                 name = "lua/alien/elements",
                 display_name = "       elements",
                 type = "dir",
+                status = "staged",
             },
             {
                 name = "lua/alien/elements/init.lua",
