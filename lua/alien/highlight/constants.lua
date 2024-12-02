@@ -2,6 +2,7 @@ local M = {}
 
 M.highlight_groups = {
     ALIEN_DIFF_ADD = "AlienDiffAdd",
+    ALIEN_DIFF_MODIFIED = "AlienDiffModified",
     ALIEN_DIFF_DELETE = "AlienDiffDelete",
     ALIEN_TITLE = "AlienTitle",
     ALIEN_SECONDARY = "AlienSecondary",

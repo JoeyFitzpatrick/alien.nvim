@@ -13,12 +13,14 @@ M.highlight = function(bufnr)
             vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_TITLE, i - 1, head_length, head_end)
             vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_SECONDARY, i - 1, head_end + 1, -1)
         end
-        local local_file = require("alien.extractors.local-file-extractor").extract(line, i)
+        local local_file = require("alien.extractors.local-file-extractor").extract(bufnr, i)
         if not local_file then
             goto continue
         end
         if require("alien.status").is_staged(local_file.file_status) then
             vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_DIFF_ADD, i - 1, 0, -1)
+        elseif require("alien.status").is_modified(local_file.file_status) then
+            vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_DIFF_MODIFIED, i - 1, 0, -1)
         else
             vim.api.nvim_buf_add_highlight(bufnr, -1, hlgroups.ALIEN_DIFF_DELETE, i - 1, 0, -1)
         end

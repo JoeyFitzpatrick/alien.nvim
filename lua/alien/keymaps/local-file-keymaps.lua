@@ -14,12 +14,15 @@ M.set_keymaps = function(bufnr)
     local map_action_with_input = require("alien.keymaps").map_action_with_input
     local set_command_keymap = require("alien.keymaps").set_command_keymap
     local extract = require("alien.extractors.local-file-extractor").extract
-    local get_args = commands.get_args(extract)
     local utils = require("alien.utils")
     local STATUSES = require("alien.status").STATUSES
 
+    local get_args = function()
+        return extract(bufnr)
+    end
+
     local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
-    local alien_opts = { trigger_redraw = true }
+    local action_opts = { trigger_redraw = true }
 
     local diff_native = commands.create_command(function(local_file)
         local status = local_file.file_status
@@ -88,7 +91,7 @@ M.set_keymaps = function(bufnr)
     end, vim.tbl_extend("force", opts, { desc = "Scroll diff up" }))
 
     map(keymaps.staging_area, function()
-        local current_file = extract(vim.api.nvim_get_current_line())
+        local current_file = extract(bufnr)
         if not current_file then
             return
         end
@@ -96,25 +99,29 @@ M.set_keymaps = function(bufnr)
         require("alien.global-actions.detailed-diff").display_detailed_diff(current_file)
     end, vim.tbl_extend("force", opts, { desc = "Enter staging area" }))
 
-    map_action(keymaps.stage_or_unstage, function(local_file)
+    map(keymaps.stage_or_unstage, function()
+        local local_file = extract(bufnr)
+        if not local_file then
+            return
+        end
         local filename = local_file.filename
         local status = local_file.file_status
         if not is_staged(status) then
-            return "git add -- " .. filename
+            action("git add -- " .. filename, action_opts)
         else
-            return "git reset HEAD -- " .. filename
+            action("git reset HEAD -- " .. filename, action_opts)
         end
-    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Stage/unstage file" }))
+    end, vim.tbl_extend("force", opts, { desc = "Stage/unstage file" }))
 
     local visual_stage_or_unstage_fn = function(local_files)
         local should_stage = false
         local filenames = ""
         for _, local_file in ipairs(local_files) do
-            local status = local_file.file_status
+            local status = local_file.status
             if not is_staged(status) then
                 should_stage = true
             end
-            filenames = filenames .. " " .. local_file.filename
+            filenames = filenames .. " '" .. local_file.name .. "'"
         end
         if should_stage then
             return "git add " .. filenames
@@ -125,12 +132,14 @@ M.set_keymaps = function(bufnr)
     vim.keymap.set("v", keymaps.stage_or_unstage, function()
         run_action(
             create_command(visual_stage_or_unstage_fn, function()
+                local status_data = require("alien.elements.register.state").get_state(bufnr)
+                if not status_data then
+                    return
+                end
                 local start_line, end_line = utils.get_visual_line_nums()
-                local lines = vim.api.nvim_buf_get_lines(0, start_line, end_line, false)
                 local local_files = {}
-                for _, line in ipairs(lines) do
-                    local local_file = extract(line)
-                    table.insert(local_files, local_file)
+                for i = start_line - 2, end_line - 2 do -- subtract 2 because the first two local file lines are not considered
+                    table.insert(local_files, status_data[i])
                 end
                 return local_files
             end),
@@ -138,10 +147,11 @@ M.set_keymaps = function(bufnr)
         )
     end, vim.tbl_extend("force", opts, { desc = "Stage/unstage file in visual mode" }))
 
+    ---@param local_files StatusData
     local stage_or_unstage_all_fn = function(local_files)
         for _, local_file in ipairs(local_files) do
-            local status = local_file.file_status
-            if not is_staged(status) then
+            local status = local_file.status
+            if local_file.type == "file" and not is_staged(status) then
                 return "git add -A"
             end
         end
@@ -151,13 +161,7 @@ M.set_keymaps = function(bufnr)
     map(keymaps.stage_or_unstage_all, function()
         run_action(
             create_command(stage_or_unstage_all_fn, function()
-                local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-                local local_files = {}
-                for _, line in ipairs(lines) do
-                    local local_file = extract(line)
-                    table.insert(local_files, local_file)
-                end
-                return local_files
+                return require("alien.elements.register.state").get_state(bufnr)
             end),
             { trigger_redraw = true }
         )
@@ -183,7 +187,7 @@ M.set_keymaps = function(bufnr)
     end, {
         prompt = "restore type: ",
         items = { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
-    }, alien_opts, vim.tbl_extend("force", opts, { desc = "Restore (delete) file" }))
+    }, action_opts, vim.tbl_extend("force", opts, { desc = "Restore (delete) file" }))
 
     set_command_keymap(keymaps.pull, "pull", vim.tbl_extend("force", opts, { desc = "Pull" }))
     set_command_keymap(keymaps.push, "push", vim.tbl_extend("force", opts, { desc = "Push" }))
@@ -200,19 +204,19 @@ M.set_keymaps = function(bufnr)
 
     map_action_with_input(keymaps.stash, function(_, stash_name)
         return "git stash push -m " .. stash_name
-    end, { prompt = "Stash name: " }, alien_opts, vim.tbl_extend("force", opts, { desc = "Stash current changes" }))
+    end, { prompt = "Stash name: " }, action_opts, vim.tbl_extend("force", opts, { desc = "Stash current changes" }))
 
     map(keymaps.stash_with_flags, function()
         vim.ui.select({ "staged" }, { prompt = "Stash type:" }, function(stash_type)
             vim.ui.input({ prompt = "Stash name: " }, function(input)
                 local cmd = "git stash push --" .. stash_type .. " -m " .. input
-                action(cmd, alien_opts)
+                action(cmd, action_opts)
             end)
         end)
     end, vim.tbl_extend("force", opts, { desc = "Stash with options" }))
 
     map(keymaps.navigate_to_file, function()
-        local current_file = require("alien.extractors").extract("local_file")
+        local current_file = extract(bufnr)
         if not current_file then
             return
         end

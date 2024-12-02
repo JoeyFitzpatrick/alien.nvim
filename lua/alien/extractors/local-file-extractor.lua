@@ -54,32 +54,32 @@ local status_state = function(current_status_state, line_num)
 end
 
 --- Takes a line of text and attempts to return the file name and status
----@param str string
+---@param bufnr integer
 ---@param line_num integer?
 ---@return LocalFile | nil
-M.extract = function(str, line_num)
-    -- local current_status_state = require("alien.elements.register.state").get_state(vim.api.nvim_get_current_buf())
-    -- if current_status_state then
-    --     local state = status_state(current_status_state, line_num)
-    --     if state then
-    --         return state
-    --     end
+M.extract = function(bufnr, line_num)
+    local current_status_state = require("alien.elements.register.state").get_state(bufnr)
+    if current_status_state then
+        local state = status_state(current_status_state, line_num)
+        if state then
+            return state
+        end
+    end
+    -- local filename = M._find_filename(str)
+    -- local status_start = 1
+    -- local status_end = 2
+    -- while str:len() > 4 and str:sub(1, 4) == require("alien.constants").TREE_SPACING do
+    --     str = str:sub(5)
     -- end
-    local filename = M._find_filename(str)
-    local status_start = 1
-    local status_end = 2
-    while str:len() > 4 and str:sub(1, 4) == require("alien.constants").TREE_SPACING do
-        str = str:sub(5)
-    end
-    local file_status = str:sub(status_start, status_end)
-    if not status.is_valid_status(file_status) then
-        return nil
-    end
-    return {
-        filename = "'" .. filename .. "'",
-        raw_filename = filename,
-        file_status = file_status,
-    }
+    -- local file_status = str:sub(status_start, status_end)
+    -- if not status.is_valid_status(file_status) then
+    --     return nil
+    -- end
+    -- return {
+    --     filename = "'" .. filename .. "'",
+    --     raw_filename = filename,
+    --     file_status = file_status,
+    -- }
 end
 
 return M

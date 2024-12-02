@@ -27,7 +27,11 @@ end
 local function sort_node(node)
     table.sort(node.children, function(a, b)
         if a.type == b.type then
-            return a.name < b.name
+            if a.type == "file" then
+                return a.name:sub(4) < b.name:sub(4) -- don't account for status when sorting
+            else
+                return a.name < b.name
+            end
         else
             return a.type == "dir"
         end

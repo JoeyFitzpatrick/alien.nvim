@@ -22,6 +22,12 @@ M.STATUSES = {
     UNTRACKED = "??",
 }
 
+M.EXTRA_STATUSES = {
+    STATUS_STAGED = "staged",
+    STATUS_UNSTAGED = "unstaged",
+    STATUS_MODIFIED = "modified",
+}
+
 ---@param status string
 ---@return boolean
 M.is_valid_status = function(status)
@@ -42,8 +48,22 @@ M.is_staged = function(status)
         M.STATUSES.DELETED_STAGED,
         M.STATUSES.RENAMED_STAGED,
         M.STATUSES.COPIED_STAGED,
+        M.EXTRA_STATUSES.STATUS_STAGED,
     }
     return vim.tbl_contains(staged_statuses, status)
+end
+
+---@param status string
+---@return boolean
+M.is_modified = function(status)
+    local modified_statuses = {
+        M.STATUSES.ADDED_BOTH_STAGED_UNSTAGED,
+        M.STATUSES.DELETED_BOTH_STAGED_UNSTAGED,
+        M.STATUSES.DELETED_MODIFIED_UNSTAGED,
+        M.STATUSES.MODIFIED_PARTIALLY_STAGED,
+        M.EXTRA_STATUSES.STATUS_MODIFIED,
+    }
+    return vim.tbl_contains(modified_statuses, status)
 end
 
 --- Returns true for a git status that represents a deleted file, and false otherwise.

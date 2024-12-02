@@ -7,9 +7,6 @@
 
 local DIR = "dir"
 local FILE = "file"
-local STATUS_STAGED = "staged"
-local STATUS_UNSTAGED = "unstaged"
-local STATUS_MODIFIED = "modified"
 
 local M = {}
 
@@ -38,6 +35,9 @@ M._create_nodes = function(filepaths)
 end
 
 local function get_dir_status(dir_status, file_status)
+    local STATUS_STAGED = require("alien.status").EXTRA_STATUSES.STATUS_STAGED
+    local STATUS_UNSTAGED = require("alien.status").EXTRA_STATUSES.STATUS_UNSTAGED
+    local STATUS_MODIFIED = require("alien.status").EXTRA_STATUSES.STATUS_MODIFIED
     local is_staged_file_status = require("alien.status").is_staged(file_status) or file_status == STATUS_STAGED
     if not dir_status then
         return is_staged_file_status and STATUS_STAGED or STATUS_UNSTAGED
