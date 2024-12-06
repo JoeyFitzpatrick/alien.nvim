@@ -27,6 +27,7 @@ M.default_config = {
             stash = "<leader>s",
             stash_with_flags = "<leader>S",
             amend = "<leader>am",
+            fold = "z",
         },
         local_branch = {
             switch = "s",

@@ -63,24 +63,35 @@ end
 M.get_status_data = function(node, prefix)
     local status_data = {} ---@type StatusData[]
     prefix = prefix or ""
+    local state = require("alien.elements.register.state").get_state(vim.api.nvim_get_current_buf())
 
     for _, child in ipairs(node.children) do
         local parent_name = node.full_name and node.full_name .. "/" or ""
+        local file_state_exists = state ~= nil
+            and state.specific_state ~= nil
+            and state.specific_state[child.full_name] ~= nil
+        local is_folded = file_state_exists == true and state.specific_state[child.full_name].folded == true
+
         if child.type == DIR then
+            local display_name = is_folded and prefix .. "   " .. child.name
+                or prefix .. "   " .. child.name
             ---@type StatusData
             local data = {
-                display_name = prefix .. "   " .. child.name,
+                display_name = display_name,
                 name = child.full_name,
                 type = DIR,
             }
 
+            table.insert(status_data, data)
             local dir_lines = M.get_status_data(child, prefix .. require("alien.constants").TREE_SPACING)
             for _, dir_data in ipairs(dir_lines) do
                 data.status = get_dir_status(data.status, dir_data.status)
             end
 
-            table.insert(status_data, data)
             for _, dir_data in ipairs(dir_lines) do
+                if is_folded then
+                    dir_data.display_name = nil
+                end
                 table.insert(status_data, dir_data)
             end
         elseif child.type == FILE then
@@ -106,7 +117,9 @@ end
 M.render_status_data = function(status_data)
     local lines = {}
     for _, data in ipairs(status_data) do
-        table.insert(lines, data.display_name)
+        if data.display_name ~= nil then
+            table.insert(lines, data.display_name)
+        end
     end
     return lines
 end
@@ -121,6 +134,15 @@ M.render_status_file_tree = function(filepaths)
         lines = lines,
         status_data = status_data,
     }
+end
+
+---@param status_data StatusData[]
+---@param line_num integer
+M._map_line_num_to_status_data = function(status_data, line_num)
+    local filtered_status_data = vim.tbl_filter(function(data)
+        return data.display_name ~= nil
+    end, status_data)
+    return filtered_status_data[line_num]
 end
 
 return M

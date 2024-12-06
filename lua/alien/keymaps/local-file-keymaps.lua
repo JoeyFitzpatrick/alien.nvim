@@ -10,7 +10,6 @@ M.set_keymaps = function(bufnr)
     local commands = require("alien.actions.commands")
     local create_command = commands.create_command
     local map = require("alien.keymaps").map
-    local map_action = require("alien.keymaps").map_action
     local map_action_with_input = require("alien.keymaps").map_action_with_input
     local set_command_keymap = require("alien.keymaps").set_command_keymap
     local extract = require("alien.extractors.local-file-extractor").extract
@@ -132,7 +131,7 @@ M.set_keymaps = function(bufnr)
     vim.keymap.set("v", keymaps.stage_or_unstage, function()
         run_action(
             create_command(visual_stage_or_unstage_fn, function()
-                local status_data = require("alien.elements.register.state").get_state(bufnr)
+                local status_data = require("alien.elements.register.state").get_state(bufnr).status_data
                 if not status_data then
                     return
                 end
@@ -161,20 +160,22 @@ M.set_keymaps = function(bufnr)
     map(keymaps.stage_or_unstage_all, function()
         run_action(
             create_command(stage_or_unstage_all_fn, function()
-                return require("alien.elements.register.state").get_state(bufnr)
+                return require("alien.elements.register.state").get_state(bufnr).status_data
             end),
             { trigger_redraw = true }
         )
     end, vim.tbl_extend("force", opts, { desc = "Stage/unstage all files" }))
 
-    map_action_with_input(keymaps.restore, function(local_file, restore_type)
-        local filename = local_file.filename
-        local status = local_file.file_status
+    map_action_with_input(keymaps.restore, function(_, restore_type)
         if restore_type == "just this file" then
-            if status == STATUSES.UNTRACKED then
-                return "git clean -f -- " .. filename
+            local current_file = extract(bufnr)
+            if not current_file then
+                return
             end
-            return "git restore -- " .. filename
+            if current_file.file_status == STATUSES.UNTRACKED then
+                return "git clean -f -- " .. current_file.filename
+            end
+            return "git restore -- " .. current_file.filename
         elseif restore_type == "nuke working tree" then
             return "git reset --hard HEAD && git clean -fd"
         elseif restore_type == "hard reset" then
@@ -223,6 +224,28 @@ M.set_keymaps = function(bufnr)
         local filename = current_file.raw_filename
         vim.api.nvim_exec2("e " .. filename, {})
     end, vim.tbl_extend("force", opts, { desc = "Open file in editor" }))
+
+    map(keymaps.fold, function()
+        local current_file = extract(bufnr)
+        if not current_file then
+            return
+        end
+        local state = require("alien.elements.register.state").get_state(bufnr)
+        if not state then
+            return
+        end
+        local current_fold = false
+        if
+            state.specific_state[current_file.raw_filename] and state.specific_state[current_file.raw_filename].folded
+        then
+            current_fold = true
+        end
+        require("alien.elements.register.state").set_state(
+            bufnr,
+            { specific_state = { [current_file.raw_filename] = { folded = not current_fold } } }
+        )
+        require("alien.elements.register").redraw_elements()
+    end, vim.tbl_extend("force", opts, { desc = "Fold dir" }))
 
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })
     vim.api.nvim_create_autocmd("CursorMoved", {
