@@ -166,29 +166,40 @@ M.set_keymaps = function(bufnr)
         )
     end, vim.tbl_extend("force", opts, { desc = "Stage/unstage all files" }))
 
-    map_action_with_input(keymaps.restore, function(_, restore_type)
-        if restore_type == "just this file" then
-            local current_file = extract(bufnr)
-            if not current_file then
-                return
+    map(keymaps.restore, function()
+        local current_file = extract(bufnr)
+        vim.ui.select(
+            { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
+            { prompt = "restore type: " },
+            function(restore_type)
+                if not restore_type then
+                    return
+                end
+                local cmd
+                if restore_type == "just this file" then
+                    if not current_file then
+                        return
+                    end
+                    if current_file.file_status == STATUSES.UNTRACKED then
+                        cmd = "git clean -f -- " .. current_file.filename
+                    else
+                        cmd = "git restore -- " .. current_file.filename
+                    end
+                elseif restore_type == "nuke working tree" then
+                    cmd = "git reset --hard HEAD && git clean -fd"
+                elseif restore_type == "hard reset" then
+                    cmd = "git reset --hard HEAD"
+                elseif restore_type == "mixed reset" then
+                    cmd = "git reset --mixed HEAD"
+                elseif restore_type == "soft reset" then
+                    cmd = "git reset --soft HEAD"
+                end
+                local local_action_opts = action_opts
+                local_action_opts.input = restore_type
+                require("alien.actions").action(cmd, local_action_opts)
             end
-            if current_file.file_status == STATUSES.UNTRACKED then
-                return "git clean -f -- " .. current_file.filename
-            end
-            return "git restore -- " .. current_file.filename
-        elseif restore_type == "nuke working tree" then
-            return "git reset --hard HEAD && git clean -fd"
-        elseif restore_type == "hard reset" then
-            return "git reset --hard HEAD"
-        elseif restore_type == "mixed reset" then
-            return "git reset --mixed HEAD"
-        elseif restore_type == "soft reset" then
-            return "git reset --soft HEAD"
-        end
-    end, {
-        prompt = "restore type: ",
-        items = { "just this file", "nuke working tree", "hard reset", "mixed reset", "soft reset" },
-    }, action_opts, vim.tbl_extend("force", opts, { desc = "Restore (delete) file" }))
+        )
+    end, vim.tbl_extend("force", opts, { desc = "Restore (delete) file" }))
 
     set_command_keymap(keymaps.pull, "pull", vim.tbl_extend("force", opts, { desc = "Pull" }))
     set_command_keymap(keymaps.push, "push", vim.tbl_extend("force", opts, { desc = "Push" }))
