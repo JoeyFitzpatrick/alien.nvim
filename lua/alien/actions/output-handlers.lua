@@ -2,25 +2,41 @@ local commands = require("alien.actions.commands")
 local run_cmd = require("alien.utils").run_cmd
 local ERROR_CODES = require("alien.actions.error-codes")
 
-local num_commits_error_handler = {
-    [ERROR_CODES.NO_UPSTREAM_ERROR] = function()
-        return { "0" }
-    end,
+local run_cmd_opts = {
+    error_callbacks = {
+        [ERROR_CODES.NO_UPSTREAM_ERROR] = function()
+            return { "0" }
+        end,
+    },
 }
 
 local M = {}
 
+---@param branch? string
+---@return string, string
+local function get_num_commits(branch)
+    local pull_ok, num_commits_to_pull = pcall(run_cmd, commands.num_commits_to_pull(branch), run_cmd_opts)
+    local pull_str = ""
+    if pull_ok and num_commits_to_pull[1] ~= "0" then
+        pull_str = "↓" .. num_commits_to_pull[1]
+    end
+
+    local push_ok, num_commits_to_push = pcall(run_cmd, commands.num_commits_to_push(branch), run_cmd_opts)
+    local push_str = ""
+    if push_ok and num_commits_to_push[1] ~= "0" then
+        push_str = "↑" .. num_commits_to_push[1]
+    end
+    return pull_str, push_str
+end
+
 M.status_output_handler = function(output)
     local head = run_cmd(commands.current_head)[1]
     local staged_stats = run_cmd(commands.staged_stats)[1]
-    local num_commits_to_pull = run_cmd(commands.num_commits_to_pull(), num_commits_error_handler)[1]
-    local num_commits_to_push = run_cmd(commands.num_commits_to_push(), num_commits_error_handler)[1]
+    local num_commits_to_pull, num_commits_to_push = get_num_commits()
 
-    local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
-    local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
     local status_file_tree = require("alien.utils.tree-view.status-tree-view").render_status_file_tree(output)
     local new_output = status_file_tree.lines
-    table.insert(new_output, 1, "HEAD: " .. head .. " " .. pull_str .. push_str)
+    table.insert(new_output, 1, "HEAD: " .. head .. " " .. num_commits_to_pull .. num_commits_to_push)
     table.insert(new_output, 2, staged_stats)
     return new_output
 end
@@ -30,11 +46,8 @@ M.branch_output_handler = function(lines)
     local new_output = {}
     for _, line in ipairs(lines) do
         local branch = string.sub(line, 3)
-        local num_commits_to_pull = run_cmd(commands.num_commits_to_pull(branch), num_commits_error_handler)[1]
-        local num_commits_to_push = run_cmd(commands.num_commits_to_push(branch), num_commits_error_handler)[1]
-        local pull_str = num_commits_to_pull == "0" and "" or "↓" .. num_commits_to_pull
-        local push_str = num_commits_to_push == "0" and "" or "↑" .. num_commits_to_push
-        table.insert(new_output, line .. " " .. push_str .. pull_str)
+        local num_commits_to_pull, num_commits_to_push = get_num_commits(branch)
+        table.insert(new_output, line .. " " .. num_commits_to_pull .. num_commits_to_push)
     end
     return new_output
 end
