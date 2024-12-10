@@ -54,7 +54,7 @@ M.num_commits_to_pull = function(branch)
     if not branch then
         return "git rev-list --count HEAD..@{u}"
     end
-    return "git rev-list --count " .. branch .. "..@{u}"
+    return string.format("git rev-list --count origin/%s..%s", branch, branch)
 end
 
 ---@param branch? string
@@ -62,7 +62,7 @@ M.num_commits_to_push = function(branch)
     if not branch then
         return "git rev-list --count @{u}..HEAD"
     end
-    return "git rev-list --count @{u}.." .. branch
+    return string.format("git rev-list --count %s..origin/%s", branch, branch)
 end
 
 ---@param branch? string
