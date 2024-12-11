@@ -136,12 +136,11 @@ local function post_create_co(bufnr)
     end)
 
     vim.system({ "git", "fetch", "--dry-run" }, { text = true }, function(result)
-        if result.stderr and result.code == 0 then
+        if result.stderr:len() > 0 and result.code == 0 then
             should_run_fetch = true
+            coroutine.resume(co)
         end
     end)
-
-    coroutine.resume(co)
 end
 
 --- Create a new buffer with the given action, and open it in a floating window

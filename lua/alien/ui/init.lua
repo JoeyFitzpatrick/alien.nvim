@@ -16,7 +16,6 @@ M.start_spinner = function(bufnr, line_num)
         if not spinner_started then
             local line_length = vim.api.nvim_buf_get_lines(bufnr, line_num, line_num + 1, false)[1]:len() - 1
             position = { line_num, line_length }
-            vim.print(vim.inspect(position))
             vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
             vim.api.nvim_buf_set_text(bufnr, position[1], position[2], position[1], position[2] + 1, { "  " })
             local namespace = vim.api.nvim_create_namespace("AlienSpinner")
