@@ -24,7 +24,7 @@ local print_options = {
 ---@param cmd string
 ---@return DisplayStrategy
 M.get_strategy = function(cmd)
-    return DISPLAY_STRATEGIES.PRINT
+    return DISPLAY_STRATEGIES.TERMINAL
 end
 
 return M

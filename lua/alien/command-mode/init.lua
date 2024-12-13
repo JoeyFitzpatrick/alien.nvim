@@ -53,17 +53,6 @@ M.get_command_strategy = function(cmd)
     return DISPLAY_STRATEGIES.TERMINAL
 end
 
----@param cmd string
-local function print_output(cmd)
-    local output = vim.fn.system(cmd)
-    if vim.v.shell_error ~= 0 then
-        vim.notify(output, vim.log.levels.ERROR)
-    else
-        vim.notify(output, vim.log.levels.INFO)
-    end
-    require("alien.elements.register").redraw_elements()
-end
-
 local patterns = {
     ["^git status$"] = function()
         return require("alien.actions.commands").status
@@ -102,8 +91,6 @@ M.run_command = function(cmd, input_args)
         local default_opts = { enter = true, dynamic_resize = true, window = { split = "below" } }
         local opts = vim.tbl_deep_extend("force", default_opts, custom_opts or {})
         require("alien.elements").terminal(cmd, opts)
-    elseif strategy == DISPLAY_STRATEGIES.PRINT then
-        print_output(cmd)
     elseif strategy == DISPLAY_STRATEGIES.UI then
         require("alien.elements").window(cmd, output_handler)
     elseif strategy == DISPLAY_STRATEGIES.BLAME then

@@ -2,9 +2,9 @@ local get_branch_strategy = require("alien.command-mode.display-strategies.branc
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
 
 describe("get_branch_strategy", function()
-    it("returns 'print' for commands that should print output", function()
+    it("returns 'terminal' for commands that should print output", function()
         local result = get_branch_strategy("git branch --delete mockbranch")
-        assert.are.equal(result, DISPLAY_STRATEGIES.PRINT)
+        assert.are.equal(result, DISPLAY_STRATEGIES.TERMINAL)
     end)
     it("returns 'ui' for commands that have no options", function()
         local result = get_branch_strategy("git branch")

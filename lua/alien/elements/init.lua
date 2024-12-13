@@ -295,7 +295,7 @@ M.terminal = function(cmd, opts)
                         end, lines)
                         vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
                         vim.api.nvim_buf_set_lines(bufnr, #lines - #lines - 2, -1, false, {})
-                        vim.api.nvim_win_set_height(window, #lines - #lines_to_delete + 1)
+                        vim.api.nvim_win_set_height(window, #lines - #lines_to_delete + 2)
                         vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
                         if not opts.skip_redraw then
                             register.redraw_elements()

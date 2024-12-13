@@ -2,7 +2,6 @@ local M = {}
 
 ---@alias DisplayStrategy "print" | "ui" | "show" | "diff" | "blame" | "mergetool" | "terminal"
 M.DISPLAY_STRATEGIES = {
-    PRINT = "print",
     UI = "ui",
     SHOW = "show",
     DIFF = "diff",

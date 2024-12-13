@@ -10,7 +10,7 @@ M.get_strategy = function(cmd)
     if #options == 0 then
         return DISPLAY_STRATEGIES.UI
     end
-    return DISPLAY_STRATEGIES.PRINT
+    return DISPLAY_STRATEGIES.TERMINAL
 end
 
 return M
