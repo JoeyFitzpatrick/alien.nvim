@@ -274,6 +274,7 @@ M.terminal = function(cmd, opts)
             })
         else
             local height = 2
+            local max_height = math.floor(vim.o.lines * 0.5)
             vim.api.nvim_win_set_height(window, height)
             channel_id = vim.fn.termopen(cmd, {
                 on_stdout = function()
@@ -281,25 +282,30 @@ M.terminal = function(cmd, opts)
                     local empty_lines = vim.tbl_filter(function(line)
                         return line == ""
                     end, lines)
-                    if #lines - #empty_lines + 1 > height then
+                    if #lines - #empty_lines + 1 > height and not (height > max_height) then
                         height = #lines - #empty_lines + 1
                     end
                     vim.api.nvim_win_set_height(window, height)
                 end,
                 on_exit = function()
-                    vim.schedule(function()
+                    local trim_terminal_output = function()
                         local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
                         local lines_to_delete = vim.tbl_filter(function(line)
-                            return line == ""
+                            return line == "" or line == "[Process exited 0]"
                         end, lines)
                         vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
-                        vim.api.nvim_buf_set_lines(bufnr, #lines - #lines_to_delete, -1, false, {})
+                        vim.api.nvim_buf_set_lines(bufnr, #lines - #lines - 2, -1, false, {})
                         vim.api.nvim_win_set_height(window, #lines - #lines_to_delete + 1)
                         vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-                    end)
-                    if not opts.skip_redraw then
-                        register.redraw_elements()
+                        if not opts.skip_redraw then
+                            register.redraw_elements()
+                        end
                     end
+                    -- Sometimes this function runs before "[Process exited 0]" is in the buffer, and it doesn't get removed.
+                    -- A small pause here ensures that it gets cleaned up consistently. We might need to adjust the time though.
+                    vim.defer_fn(function()
+                        pcall(trim_terminal_output)
+                    end, 100)
                 end,
             })
         end
