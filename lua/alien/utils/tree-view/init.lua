@@ -9,7 +9,10 @@ local M = {}
 --- Flatten a node, such that nodes with a single dir child are concatenated together
 ---@param base_node Node
 M._flatten_node = function(base_node)
-    for _, node in ipairs(base_node.children) do
+    local function flatten(node)
+        for _, child in ipairs(node.children) do
+            flatten(child)
+        end
         while #node.children == 1 and node.children[1].type == "dir" do
             local subdir_child = node.children[1]
             node.name = node.name and node.name .. "/" or ""
@@ -20,6 +23,7 @@ M._flatten_node = function(base_node)
             node.type = subdir_child.type
         end
     end
+    flatten(base_node)
 end
 
 --- Sort a node. Dirs before files at the same level, then sort alphabetically

@@ -10,12 +10,41 @@ local FILE = "file"
 
 local M = {}
 
+--- If a file is renamed, change it to make it easier to work with.
+--- This means making it the same structure as non-renamed filepaths.
+---@param filepath string
+---@return string
+local function parse_if_renamed(filepath)
+    local status = filepath:sub(1, 2)
+    if not require("alien.status").is_renamed(status) or not filepath:find("/") then
+        return filepath
+    end
+    local split_files = vim.split(filepath:sub(4), " -> ", { plain = true })
+    local old_file = split_files[1]
+    local new_file = split_files[2]
+    if not old_file or old_file:len() == 0 or not new_file or new_file:len() == 0 then
+        error("Could not parse renamed file")
+    end
+    local filename_pattern = "/?[^%s/]+$"
+    old_file = old_file:match(filename_pattern)
+    if old_file:sub(1, 1) == "/" then
+        old_file = old_file:sub(2)
+    end
+    new_file = new_file:match(filename_pattern)
+    if new_file:sub(1, 1) == "/" then
+        new_file = new_file:sub(2)
+    end
+    local new_dir_path = filepath:match("%s([^%s]+/)[^/]*$")
+    return string.format("%s %s%s -> %s", status, new_dir_path, old_file, new_file)
+end
+
 --- Convert filepaths to nodes
 ---@param filepaths string[]
 ---@return Node
 M._create_nodes = function(filepaths)
     local nodes = { children = {} }
     for _, filepath in ipairs(filepaths) do
+        filepath = parse_if_renamed(filepath)
         local path_parts = {} ---@type string[]
         for path_part in filepath:gmatch("[^/]+") do
             table.insert(path_parts, path_part)

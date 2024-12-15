@@ -182,6 +182,11 @@ M.set_keymaps = function(bufnr)
                     end
                     if current_file.file_status == STATUSES.UNTRACKED then
                         cmd = "git clean -f -- " .. current_file.filename
+                    elseif is_staged(current_file.file_status) then
+                        cmd = "git reset -- "
+                            .. current_file.filename
+                            .. " && git clean -f -- "
+                            .. current_file.filename
                     else
                         cmd = "git restore -- " .. current_file.filename
                     end

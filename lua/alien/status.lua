@@ -79,4 +79,15 @@ M.is_deleted = function(status)
     return vim.tbl_contains(deleted_statuses, status)
 end
 
+--- Returns true for a git status that represents a deleted file, and false otherwise.
+---@param status string
+---@return boolean
+M.is_renamed = function(status)
+    local renamed_statuses = {
+        M.STATUSES.RENAMED_STAGED,
+        M.STATUSES.RENAMED_UNSTAGED,
+    }
+    return vim.tbl_contains(renamed_statuses, status)
+end
+
 return M

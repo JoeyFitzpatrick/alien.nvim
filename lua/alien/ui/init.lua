@@ -61,7 +61,7 @@ M.stop_spinner = function(bufnr)
             timer:stop()
             timer:close()
             vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
-            vim.api.nvim_buf_set_text(bufnr, position[1], position[2], position[1], position[2] + 1, { "" })
+            vim.api.nvim_buf_set_text(bufnr, position[1], position[2], position[1], position[2] + 1, { " " })
             vim.api.nvim_buf_clear_namespace(bufnr, namespace, 0, -1)
             vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
         end
