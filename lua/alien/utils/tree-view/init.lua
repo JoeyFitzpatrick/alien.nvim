@@ -23,7 +23,10 @@ M._flatten_node = function(base_node)
             node.type = subdir_child.type
         end
     end
-    flatten(base_node)
+    for _, child in ipairs(base_node.children) do
+        flatten(child)
+    end
+    -- return { children = { base_node } }
 end
 
 --- Sort a node. Dirs before files at the same level, then sort alphabetically
