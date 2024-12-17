@@ -58,6 +58,9 @@ end
 ---@param bufnr integer
 ---@param object_type AlienObject
 M.set_object_keymaps = function(bufnr, object_type)
+    if not object_type then
+        return
+    end
     local ok, result = pcall(require, "alien.keymaps." .. object_type:gsub("_", "-") .. "-keymaps")
     if not ok or not result then
         return

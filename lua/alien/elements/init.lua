@@ -72,11 +72,14 @@ end
 ---@param bufnr integer
 ---@param object_type AlienObject
 ---@param buffer_name? string
-local function set_buffer_name(bufnr, object_type, buffer_name)
+---@param cmd string
+local function set_buffer_name(bufnr, object_type, buffer_name, cmd)
     if buffer_name ~= nil then
         vim.api.nvim_buf_set_name(bufnr, "alien://" .. os.tmpname() .. "/" .. buffer_name)
-    else
+    elseif object_type ~= nil then
         vim.api.nvim_buf_set_name(bufnr, "alien://" .. os.tmpname() .. "/" .. object_type)
+    else
+        vim.api.nvim_buf_set_name(bufnr, "alien://" .. os.tmpname() .. "/" .. cmd)
     end
 end
 
@@ -117,7 +120,7 @@ local function create(cmd, opts)
     if opts.post_render then
         opts.post_render(new_bufnr)
     end
-    set_buffer_name(new_bufnr, element.object_type, opts.buffer_name)
+    set_buffer_name(new_bufnr, element.object_type, opts.buffer_name, cmd)
     return new_bufnr
 end
 
@@ -248,9 +251,15 @@ M.tab = function(cmd)
     return bufnr
 end
 
+---@class TerminalOpts
+---@field window? vim.api.keyset.win_config
+---@field enter? boolean
+---@field dynamic_resize? boolean
+---@field skip_redraw? boolean
+
 --- Run a command in a new terminal
 ---@param cmd string | nil
----@param opts {window: vim.api.keyset.win_config | nil, enter: boolean | nil, dynamic_resize: boolean | nil, skip_redraw: boolean | nil } | nil
+---@param opts? TerminalOpts
 ---@return integer | nil
 M.terminal = function(cmd, opts)
     if not cmd then
@@ -264,6 +273,8 @@ M.terminal = function(cmd, opts)
     local window = vim.api.nvim_open_win(bufnr, opts.enter, terminal_opts)
     local channel_id = nil
     vim.api.nvim_buf_call(bufnr, function()
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
         if not opts.dynamic_resize then
             channel_id = vim.fn.termopen(cmd, {
                 on_exit = function()
