@@ -176,43 +176,6 @@ M.PORCELAIN_COMMANDS = {
     "write-tree",
 }
 
-M.BASE_COMMANDS = {
-    "add",
-    "bisect",
-    "blame",
-    "branch",
-    "checkout",
-    "cherry-pick",
-    "clean",
-    "clone",
-    "commit",
-    "diff",
-    "difftool",
-    "fetch",
-    "gc",
-    "grep",
-    "help",
-    "init",
-    "log",
-    "merge",
-    "mergetool",
-    "mv",
-    "pull",
-    "push",
-    "rebase",
-    "reflog",
-    "remote",
-    "reset",
-    "revert",
-    "rm",
-    "show",
-    "stash",
-    "status",
-    "switch",
-    "tag",
-    "worktree",
-}
-
 M.SUBCOMMAND_FLAGS = require("alien.command-mode.constants.command-options")
 
 return M

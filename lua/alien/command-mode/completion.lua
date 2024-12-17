@@ -2,11 +2,6 @@ local constants = require("alien.command-mode.constants")
 
 local M = {}
 
----@return string[]
-local function base_subcommands()
-    return constants.BASE_COMMANDS
-end
-
 ---@param subcommand string
 ---@return table<string, string>
 local function subcommand_flags(subcommand)
@@ -52,7 +47,7 @@ M.complete_git_command = function(arglead, cmdline)
         space_count = space_count + 1
     end
     if space_count == 1 then
-        return base_subcommands()
+        return constants.PORCELAIN_COMMANDS
     end
     if space_count > 1 then
         local subcommand = get_subcommand(cmdline)
