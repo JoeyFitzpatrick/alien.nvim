@@ -70,8 +70,13 @@ M.get_output_handler = function(cmd)
         return nil
     end
     local word = cmd:match("%s[^%-]%S+")
+    if not word then
+        return nil
+    end
     local git_verb = word:match("%S+")
-    return verb_to_output_handler[git_verb]
+    if git_verb then
+        return verb_to_output_handler[git_verb]
+    end
 end
 
 return M

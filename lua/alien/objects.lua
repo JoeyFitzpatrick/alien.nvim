@@ -46,6 +46,9 @@ M.get_object_type = function(cmd)
         return nil
     end
     local word = cmd:match("%s[^%-]%S+")
+    if not word then
+        return nil
+    end
     local git_verb = word:match("%S+")
     return verb_to_status[git_verb]
 end

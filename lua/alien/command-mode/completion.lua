@@ -8,9 +8,9 @@ local function base_subcommands()
 end
 
 ---@param subcommand string
----@return
+---@return table<string, string>
 local function subcommand_flags(subcommand)
-    return constants.SUBCOMMAND_FLAGS[subcommand]
+    return constants.SUBCOMMAND_FLAGS[subcommand].options
 end
 
 local function get_subcommand(cmdline)
