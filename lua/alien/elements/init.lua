@@ -164,6 +164,7 @@ M.float = function(cmd, opts)
         col = col,
         row = row,
         style = "minimal",
+        border = "rounded",
     }
     local float_opts = vim.tbl_extend("force", default_float_opts, opts or {})
     local ok, result = xpcall(create, debug.traceback, cmd, { element_type = "float" })

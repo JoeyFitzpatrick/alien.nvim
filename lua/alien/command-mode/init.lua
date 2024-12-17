@@ -4,7 +4,6 @@ local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRAT
 
 local M = {}
 
-local GIT_PREFIXES = { "git", "gitk", "gitweb" }
 local PORCELAIN_COMMAND_STRATEGY_MAP = {
     add = require("alien.command-mode.display-strategies.add").get_strategy,
     blame = DISPLAY_STRATEGIES.BLAME,
@@ -28,7 +27,7 @@ local PORCELAIN_COMMAND_STRATEGY_MAP = {
 ---@return string
 M.get_subcommand = function(cmd)
     local first_word = cmd:match("%w+")
-    if not first_word or not vim.tbl_contains(GIT_PREFIXES, first_word) then
+    if not first_word or not first_word == "git" then
         error("Error: called parse with a non-git command")
     end
     local second_word = cmd:match("%S+%s+(%S+)")
