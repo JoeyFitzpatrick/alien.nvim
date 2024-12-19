@@ -1,4 +1,5 @@
 local parsed_commands = {}
+local cmd_option_pattern = "%-%-[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9%-]*"
 
 local cmds = require("alien.command-mode.constants").PORCELAIN_COMMANDS
 for _, cmd in ipairs(cmds) do
@@ -7,7 +8,6 @@ for _, cmd in ipairs(cmds) do
     if not help_text or help_text:len() == 0 then
         help_text = help_text_obj.stderr
     end
-    local cmd_option_pattern = "%-%-[a-zA-Z0-9%-]+"
     local cmd_options = help_text:gmatch(cmd_option_pattern)
     local parsed_options = {}
     for option in cmd_options do
@@ -15,6 +15,14 @@ for _, cmd in ipairs(cmds) do
     end
     parsed_commands[cmd] = { options = parsed_options }
 end
+
+local log_help = require("scripts.constants").log_help
+local cmd_options = log_help:gmatch(cmd_option_pattern)
+local parsed_options = {}
+for option in cmd_options do
+    parsed_options[option] = option
+end
+parsed_commands.log = { options = parsed_options }
 
 local function write_table_to_file(tbl, filename)
     local file = io.open(filename, "w")
