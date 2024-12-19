@@ -302,12 +302,17 @@ M.terminal = function(cmd, opts)
                 on_exit = function()
                     local trim_terminal_output = function()
                         local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-                        local lines_to_delete = vim.tbl_filter(function(line)
-                            return line == "" or line == "[Process exited 0]"
-                        end, lines)
+                        local num_lines_to_trim = 0
+                        for i = #lines, 1, -1 do
+                            if lines[i] == "" or lines[i]:find("[Process exited", 1, true) ~= nil then
+                                num_lines_to_trim = num_lines_to_trim + 1
+                            else
+                                break
+                            end
+                        end
                         vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
-                        vim.api.nvim_buf_set_lines(bufnr, #lines - #lines - 2, -1, false, {})
-                        vim.api.nvim_win_set_height(window, math.min(#lines - #lines_to_delete + 2, max_height))
+                        vim.api.nvim_buf_set_lines(bufnr, -num_lines_to_trim, -1, false, {})
+                        vim.api.nvim_win_set_height(window, math.min(#lines - (num_lines_to_trim - 1), max_height))
                         vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
                         if not opts.skip_redraw then
                             register.redraw_elements()
