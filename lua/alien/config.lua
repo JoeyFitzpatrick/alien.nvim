@@ -47,7 +47,6 @@ M.default_config = {
         },
         commit = {
             display_files = "<enter>",
-            reword = "rw",
             revert = "rv",
             reset = "rs",
             copy_commit_url = "o",

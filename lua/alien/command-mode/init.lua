@@ -41,6 +41,9 @@ end
 ---@param cmd string
 ---@return string, DisplayStrategyOpts
 M.get_command_strategy = function(cmd)
+    if cmd:find(" -h", 0, true) or cmd:find(" --help", 0, true) then
+        return DISPLAY_STRATEGIES.SHOW
+    end
     local subcommand = M.get_subcommand(cmd)
     local strategy = PORCELAIN_COMMAND_STRATEGY_MAP[subcommand]
     if type(strategy) == "string" then

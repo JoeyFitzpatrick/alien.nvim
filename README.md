@@ -40,6 +40,143 @@ After that, using Alien is as simple as calling git commands via the `:Git` comm
 - `Git log -n 10`
 - `Git commit -m "initial commit"`
 
+
+## Usage
+1. To use this plugin, simply call git commands from command mode, using the command(s) specified in your configuration (`G` and `Git` by default). Most commands will simply call the git command in terminal mode, with some improvements:
+* The terminal will only take as much space as it needs, resizing as command output streams into the terminal
+* The terminal can be remove by pressing "Enter", to make it very convenient to remove the terminal once you're done with the output
+* There are no line numbers, for a cleaner look, similar to an actual terminal
+
+There are some advantages to using terminal mode for these commands, as opposed to a regular buffer or printing command output:
+* Command output will sometimes be mangled when translated to a buffer or printed, this is avoided with a terminal
+* Command output keeps it's coloring
+* Existing tools such as `delta` that improve git output can still be leveraged
+
+### Default Configuration
+Here is the default configuration for the plugin, as well as what each option does:
+
+```lua
+default_config = {
+    command_mode_commands = { "Git", "G" }, -- The commands used for the command mode API, e.g. :Git status
+    local_file = {
+        auto_display_diff = true, -- Toggle autodiff on by default in the status ui
+    },
+    commit_file = {
+        auto_display_diff = true, -- Toggle autodiff on by default in the commit file ui
+    },
+    keymaps = {
+        global = {
+            branch_picker = "<leader>B", -- a telescope picker to switch to a git branch
+            toggle_keymap_display = "g?", -- the keymap to toggle keymap help for a command's UI
+        },
+        local_file = {
+            stage_or_unstage = "<enter>",    -- unstage a file if it is staged, stage it otherwise
+            stage_or_unstage_all = "a",      -- unstage all files if they are all staged, stage all files otherwise
+            restore = "d",                   -- restore a single file or reset the working tree
+            pull = "p",                      -- run git pull
+            push = "<leader>p",              -- run git push
+            commit = "c",                    -- run git commit
+            navigate_to_file = "o",          -- open file in the editor
+            scroll_diff_down = "J",          -- scroll the diff window down
+            scroll_diff_up = "K",            -- scroll the diff window up
+            toggle_auto_diff = "t",          -- toggle autodiff on or off
+            staging_area = "D",              -- enter a staging area, to stage hunks instead of the entire file
+            stash = "<leader>s",             -- run git stash
+            stash_with_flags = "<leader>S",  -- run git stash, with options
+            amend = "<leader>am",            -- amend the last commit with current staged changes
+            fold = "z",                      -- toggle folding on a directory
+        },
+        local_branch = {
+            switch = "s",       -- switch to the branch under the cursor
+            new_branch = "n",   -- create a new branch off of the branch under the cursor
+            delete = "d",       -- delete a branch
+            rename = "R",       -- rename a branch
+            merge = "m",        -- merge the branch under the cursor into the current branch
+            rebase = "r",       -- merge the branch under the cursor into the current branch
+            log = "<enter>",    -- enter the log UI for a branch
+            pull = "p",         -- run git pull
+            push = "<leader>p", -- run git push
+        },
+        blame = {
+            display_files = "<enter>",  -- enter the commit file UI for a commit
+            copy_commit_url = "o",      -- copy the commit url to the system clipboard
+            commit_info = "i",          -- display the commit message in a floating window
+        },
+        commit = {
+            display_files = "<enter>",  -- enter the commit file UI for a commit
+            revert = "rv",              -- revert a given commit
+            reset = "rs",               -- reset to a given commit
+            copy_commit_url = "o",      -- copy the commit url to the system clipboard
+            commit_info = "i",          -- display the commit message in a floating window
+        },
+        commit_file = {
+            scroll_diff_down = "J",             -- scroll the diff window down
+            scroll_diff_up = "K",               -- scroll the diff window up
+            toggle_auto_diff = "t",             -- toggle autodiff on or off
+            open_in_vertical_split = "<C-v>",   -- open a file at the given commit in a vertical split
+            open_in_horizontal_split = "<C-h>", -- open a file at the given commit in a horizontal split
+            open_in_tab = "<C-t>",              -- open a file at the given commit in a tab
+            open_in_window = "<C-w>",           -- open a file at the given commit in the current window
+        },
+        stash = {
+            pop = "p",      -- pop the stash
+            apply = "a",    -- apply the stash
+            drop = "d",     -- drop the stash
+        },
+        diff = {
+            next_hunk = "i",            -- navigate to the next hunk
+            previous_hunk = "p",        -- navigate to the previous hunk
+            staging_area = {
+                stage_hunk = "<enter>", -- stage/unstage the current hunk
+                stage_line = "s",       -- stage/unstage the given line
+            },
+        },
+    },
+}
+```
+
+### Special Commands
+
+Some commands that are often used, or are normally cumbersome to use, are handled differently than just running the command in terminal mode. This typically means opening a buffer that serves as a UI for the command. Here are the special commands:
+* `git status`
+* `git branch`
+* `git log`
+* `git commit`
+* `git blame`
+* `git status`
+* `git stash list`
+
+Note that for any command that brings up a UI:
+* You can close the UI by pressing `q`, in addition to the normal methods, such as `:q`
+* The jumplist still works like normal `<C-i>` and `<C-o>`
+* You can view keymaps by pressing `g?`
+
+### Git Status
+Using the `:Git status` command brings up a list of all staged and unstaged changes. By default, autodiff is toggled on, meaning that when your cursor moves to a file, a diff of that file is automatically displayed. This can be toggled off by default from your config, by passing an option to the plugin:
+
+```lua
+-- Example for lazy.nvim
+{
+  "joeyfitzpatrick/alien.nvim",
+  config = function()
+        require("alien").setup({
+            local_file = {
+                auto_display_diff = true,
+            },
+        })
+  end
+}
+```
+
+The [default configuration section](#default-configuration) shows the keymaps for the status UI, under the `local_file` keymaps. Note that these keymaps work on both directories and single files.
+
+If you want to see the normal output of "git status" instead of the UI, you can pass any flags to the command, and it will display the normal output of that command, instead of displaying the UI. Note that `:Git status --long` will display the normal output, that you would see when running `git status` in the terminal
+
+### Git Branch
+Git commands that display a list of branches, such as `:Git branch`, `:Git branch --all`, `:Git branch --merged`, and so on, bring up a branch UI, from which keymaps can be used to view commits, rename branches, merge branches, etc. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the branch UI.
+
+Git branch commands that do not display a list of branches, such as `:Git branch --delete`, run the command in terminal mode, as if it were a non-special command.
+
 ## Dependencies
 
 ### Optional
