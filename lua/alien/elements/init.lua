@@ -284,48 +284,41 @@ M.terminal = function(cmd, opts)
                     end
                 end,
             })
-        else
-            local height = 2
-            local max_height = math.floor(vim.o.lines * 0.5)
-            vim.api.nvim_win_set_height(window, height)
-            channel_id = vim.fn.termopen(cmd, {
-                on_stdout = function()
-                    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-                    local empty_lines = vim.tbl_filter(function(line)
-                        return line == ""
-                    end, lines)
-                    if #lines - #empty_lines + 1 > height and not (height > max_height) then
-                        height = #lines - #empty_lines + 1
-                    end
-                    vim.api.nvim_win_set_height(window, height)
-                end,
-                on_exit = function()
-                    local trim_terminal_output = function()
-                        local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-                        local num_lines_to_trim = 0
-                        for i = #lines, 1, -1 do
-                            if lines[i] == "" or lines[i]:find("[Process exited", 1, true) ~= nil then
-                                num_lines_to_trim = num_lines_to_trim + 1
-                            else
-                                break
-                            end
-                        end
-                        vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
-                        vim.api.nvim_buf_set_lines(bufnr, -num_lines_to_trim, -1, false, {})
-                        vim.api.nvim_win_set_height(window, math.min(#lines - (num_lines_to_trim - 1), max_height))
-                        vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
-                        if not opts.skip_redraw then
-                            register.redraw_elements()
-                        end
-                    end
-                    -- Sometimes this function runs before "[Process exited 0]" is in the buffer, and it doesn't get removed.
-                    -- A small pause here ensures that it gets cleaned up consistently. We might need to adjust the time though.
-                    vim.defer_fn(function()
-                        pcall(trim_terminal_output)
-                    end, 100)
-                end,
-            })
+            return
         end
+        local height = 2
+        local max_height = math.floor(vim.o.lines * 0.5)
+        vim.api.nvim_win_set_height(window, height)
+        channel_id = vim.fn.termopen(cmd, {
+            on_stdout = function()
+                local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+                local empty_lines = vim.tbl_filter(function(line)
+                    return line == ""
+                end, lines)
+                if #lines - #empty_lines + 1 > height then
+                    height = #lines - #empty_lines + 1
+                end
+                vim.api.nvim_win_set_height(window, math.min(height, max_height))
+            end,
+            on_exit = function()
+                local trim_terminal_output = function()
+                    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+                    local num_lines_to_trim = require("alien.elements.utils").get_num_lines_to_trim(lines)
+                    vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
+                    vim.api.nvim_buf_set_lines(bufnr, -num_lines_to_trim, -1, false, {})
+                    vim.api.nvim_win_set_height(window, math.min(#lines - (num_lines_to_trim - 1), max_height))
+                    vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+                    if not opts.skip_redraw then
+                        register.redraw_elements()
+                    end
+                end
+                -- Sometimes this function runs before "[Process exited 0]" is in the buffer, and it doesn't get removed.
+                -- A small pause here ensures that it gets cleaned up consistently. We might need to adjust the time though.
+                vim.defer_fn(function()
+                    pcall(trim_terminal_output)
+                end, 100)
+            end,
+        })
     end)
     local object_type = get_object_type(cmd)
     if not channel_id then
