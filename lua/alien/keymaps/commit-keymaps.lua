@@ -36,13 +36,13 @@ M.set_keymaps = function(bufnr)
         local tree_cmd = "git diff-tree --no-commit-id --name-only " .. commit.hash .. " -r"
         elements.window(tree_cmd, {
             output_handler = function(lines)
-                local new_lines = require("alien.utils").run_cmd(
+                local commit_file_tree =
+                    require("alien.utils.tree-view.commit-tree-view").render_commit_file_tree(lines).lines
+                local commit_data = require("alien.utils").run_cmd(
                     "git log " .. commit.hash .. " -n 1 --pretty=format:'%h %cr %an ◯ %s'"
-                )
-                for _, line in ipairs(lines) do
-                    table.insert(new_lines, line)
-                end
-                return new_lines
+                )[1]
+                table.insert(commit_file_tree, 1, commit_data)
+                return commit_file_tree
             end,
         })
     end, vim.tbl_extend("force", opts, { desc = "Display commit files" }))

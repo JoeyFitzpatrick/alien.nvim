@@ -60,6 +60,7 @@ M.default_config = {
             open_in_horizontal_split = "<C-h>",
             open_in_tab = "<C-t>",
             open_in_window = "<C-w>",
+            fold = "z",
         },
         stash = {
             pop = "p",

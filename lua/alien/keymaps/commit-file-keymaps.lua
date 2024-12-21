@@ -3,16 +3,18 @@ local keymaps = require("alien.config").config.keymaps.commit_file
 local config = require("alien.config").config.commit_file
 local commands = require("alien.actions.commands")
 local elements = require("alien.elements")
-local commit_file_extract = require("alien.extractors.commit-file-extractor").extract
-local get_args = commands.get_args(commit_file_extract)
+local extract = require("alien.extractors.commit-file-extractor").extract
 local map = require("alien.keymaps").map
 
 local M = {}
 
 M.set_keymaps = function(bufnr)
     local opts = { noremap = true, silent = true, buffer = bufnr, nowait = true }
-    local extract = function()
-        return require("alien.extractors.commit-file-extractor").extract(vim.api.nvim_get_current_line())
+    local extract_current_line = function()
+        return require("alien.extractors.commit-file-extractor").extract(bufnr, vim.api.nvim_get_current_line())
+    end
+    local get_args = function()
+        return extract(bufnr)
     end
 
     vim.keymap.set("n", keymaps.scroll_diff_down, function()
@@ -97,7 +99,7 @@ M.set_keymaps = function(bufnr)
     -- file open functions
     map(keymaps.open_in_vertical_split, function()
         set_auto_diff(false)
-        local commit_file_from_action = extract()
+        local commit_file_from_action = extract_current_line()
         if not commit_file_from_action then
             return
         end
@@ -112,7 +114,7 @@ M.set_keymaps = function(bufnr)
 
     map(keymaps.open_in_horizontal_split, function()
         set_auto_diff(false)
-        local commit_file_from_action = extract()
+        local commit_file_from_action = extract_current_line()
         if not commit_file_from_action then
             return
         end
@@ -123,7 +125,7 @@ M.set_keymaps = function(bufnr)
     end, vim.tbl_extend("force", opts, { desc = "Open file in horizontal split" }))
 
     map(keymaps.open_in_tab, function()
-        local commit_file_from_action = extract()
+        local commit_file_from_action = extract_current_line()
         if not commit_file_from_action then
             return
         end
@@ -133,7 +135,7 @@ M.set_keymaps = function(bufnr)
     end, vim.tbl_extend("force", opts, { desc = "Open file in tab" }))
 
     map(keymaps.open_in_window, function()
-        local commit_file_from_action = extract()
+        local commit_file_from_action = extract_current_line()
         if not commit_file_from_action then
             return
         end
@@ -141,6 +143,28 @@ M.set_keymaps = function(bufnr)
         vim.api.nvim_buf_set_name(0, get_tmp_name(commit_file_from_action.hash, commit_file_from_action.filename))
         set_commit_file_options(buf)
     end, vim.tbl_extend("force", opts, { desc = "Open file in window" }))
+
+    map(keymaps.fold, function()
+        local current_file = extract(bufnr)
+        if not current_file then
+            return
+        end
+        local state = require("alien.elements.register.state").get_state(bufnr)
+        if not state then
+            return
+        end
+        local current_fold = false
+        if
+            state.specific_state[current_file.raw_filename] and state.specific_state[current_file.raw_filename].folded
+        then
+            current_fold = true
+        end
+        require("alien.elements.register.state").set_state(
+            bufnr,
+            { specific_state = { [current_file.raw_filename] = { folded = not current_fold } } }
+        )
+        require("alien.elements.register").redraw_elements()
+    end, vim.tbl_extend("force", opts, { desc = "Fold dir" }))
 
     -- Autocmds
     local alien_status_group = vim.api.nvim_create_augroup("Alien", { clear = true })

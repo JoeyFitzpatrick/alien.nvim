@@ -26,15 +26,19 @@ M._flatten_node = function(base_node)
     for _, child in ipairs(base_node.children) do
         flatten(child)
     end
-    -- return { children = { base_node } }
 end
 
 --- Sort a node. Dirs before files at the same level, then sort alphabetically
+--- Pass a flag if this is being used for commit files. In this case, don't try to parse the file status
 ---@param node Node
-local function sort_node(node)
+---@param is_commit_file? boolean
+local function sort_node(node, is_commit_file)
     table.sort(node.children, function(a, b)
         if a.type == b.type then
             if a.type == "file" then
+                if is_commit_file then
+                    return a.name < b.name
+                end
                 return a.name:sub(4) < b.name:sub(4) -- don't account for status when sorting
             else
                 return a.name < b.name
