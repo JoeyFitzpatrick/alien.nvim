@@ -66,9 +66,14 @@ M.set_keymaps = function(bufnr)
         return "git merge " .. branch.branch_name
     end, alien_opts, vim.tbl_extend("force", opts, { desc = "Merge into current branch" }))
 
-    map_action(keymaps.rebase, function(branch)
-        return "git rebase " .. branch.branch_name
-    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Rebase onto current branch" }))
+    map(keymaps.rebase, function()
+        local branch = extract()
+        if not branch then
+            return
+        end
+        local alien_command_name = require("alien.config").config.command_mode_commands[1]
+        vim.cmd(alien_command_name .. " rebase " .. branch.branch_name)
+    end, vim.tbl_extend("force", opts, { desc = "Rebase onto current branch" }))
 
     map(keymaps.log, function()
         local branch = extract()
