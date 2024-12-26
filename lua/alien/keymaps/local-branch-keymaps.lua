@@ -27,13 +27,18 @@ M.set_keymaps = function(bufnr)
         return "git switch --create " .. new_branch_name .. " " .. branch.branch_name
     end, { prompt = "New branch name: " }, alien_opts, vim.tbl_extend("force", opts, { desc = "Create new branch" }))
 
+    ---@param delete_branch_cmd string
     local delete_branch_prompt = function(delete_branch_cmd)
         vim.ui.select(
             { "yes", "no" },
             { prompt = "This branch is not fully merged. Are you sure you want to delete it?" },
             function(selection)
                 if selection == "yes" then
-                    action(delete_branch_cmd .. " -D", alien_opts)
+                    if delete_branch_cmd:find("push", nil, true) ~= nil then
+                        action(delete_branch_cmd .. " --no-verify", alien_opts)
+                    else
+                        action(delete_branch_cmd .. " -D", alien_opts)
+                    end
                 end
             end
         )
