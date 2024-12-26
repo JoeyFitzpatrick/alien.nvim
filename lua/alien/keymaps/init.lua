@@ -50,7 +50,7 @@ M.map_action_with_input = function(keys, cmd_fn, input_opts, alien_opts, opts)
 end
 
 M.set_command_keymap = function(mapping, command, opts)
-    local alien_command_name = require("alien.config").config.command_mode_commands[1]
+    local alien_command_name = require("alien.keymaps.utils.get-command-name").get_command_name()
     vim.keymap.set("n", mapping, "<cmd>" .. alien_command_name .. " " .. command .. "<CR>", opts)
 end
 

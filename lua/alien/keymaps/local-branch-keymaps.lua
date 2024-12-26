@@ -71,7 +71,7 @@ M.set_keymaps = function(bufnr)
         if not branch then
             return
         end
-        local alien_command_name = require("alien.config").config.command_mode_commands[1]
+        local alien_command_name = require("alien.keymaps.utils.get-command-name").get_command_name()
         vim.cmd(alien_command_name .. " rebase " .. branch.branch_name)
     end, vim.tbl_extend("force", opts, { desc = "Rebase onto current branch" }))
 
