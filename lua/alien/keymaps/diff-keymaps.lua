@@ -23,6 +23,23 @@ M.set_staging_keymaps = function(bufnr, is_staged)
         end
         require("alien.actions").action(cmd, action_opts)
     end, vim.tbl_extend("force", opts, { desc = "Stage/unstage hunk" }))
+
+    map(keymaps.staging_area.stage_line, function()
+        local hunk = extract()
+        if not hunk or not hunk.patch_single_line then
+            return
+        end
+        local local_opts = action_opts
+        local_opts.stdin = hunk.patch_single_line
+        vim.print(hunk.patch_single_line)
+        local cmd
+        if is_staged then
+            cmd = "git apply --reverse --cached --whitespace=nowarn -"
+        else
+            cmd = "git apply --cached --whitespace=nowarn -"
+        end
+        require("alien.actions").action(cmd, action_opts)
+    end, vim.tbl_extend("force", opts, { desc = "Stage/unstage line" }))
 end
 
 M.set_keymaps = function(bufnr)
