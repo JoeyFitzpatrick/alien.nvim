@@ -52,6 +52,8 @@ There are some advantages to using terminal mode for these commands, as opposed 
 * Command output keeps it's coloring
 * Existing tools such as `delta` that improve git output can still be leveraged
 
+Note that using the `%` character will expand it to the current buffer's filename, similar to vim-fugitive, e.g. `:Git log --follow %` to see commits that changed the current file.
+
 ### Default Configuration
 Here is the default configuration for the plugin, as well as what each option does:
 
@@ -177,16 +179,30 @@ Git commands that display a list of branches, such as `:Git branch`, `:Git branc
 
 Git branch commands that do not display a list of branches, such as `:Git branch --delete`, run the command in terminal mode, as if it were a non-special command.
 
+### Git Log
+Git log commands will always open a UI. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the log UI.
+
+When pressing the `log` keymap on a branch from the branch UI, it will display a specially formatted log output, but you can use plain old `:Git log`, or map a more sophisticated log command if you wish.
+
+In large repos (e.g. the Linux kernel repo), this command will take some time, unless you specify that you only want a limited number of commits, e.g. `:Git log -n 100` for the most recent 100 commits. There is some work that would make this much faster, by streaming in the content to the buffer instead of writing it all at once, but this has not been implemented yet.
+
+## UI Management (Tabs, Windows, Buffers)
+When Alien opens a UI, this will typically either open a new buffer in the current window, or open a new window in a split. In either case, the window can be closed with the `q` keymap, which will return you to the last non-Alien buffer that was open.
+
+If you want to open something in a non-standard ui, this is supported natively via command mode:
+Open `G status` in a left split instead of a full window: `split | G status`
+Open `G branch` in a right split instead of a full window `rightbelow vsplit | G branch`
+Note that this functionality can be used in both command mode and in keymaps.
+
 ## Dependencies
 
 ### Optional
-[Telescope](https://github.com/nvim-telescope/telescope.nvim) - Neovim fuzzy finder\
 [Delta](https://github.com/dandavison/delta) - improved git diff output (used in the demos/examples)
 
 
 ## Development
 
-I always welcome contributors of any experience level. If you'd like to contribute, you can start by cloning the repo and running the setup script. This script should handle everything you need to get started making contributions, including setting up git hooks.
+I welcome contributors of any experience level. If you'd like to contribute, you can start by cloning the repo and running the setup script. This script should handle everything you need to get started making contributions, including setting up git hooks.
 
 ```bash
 git clone https://github.com/JoeyFitzpatrick/alien.nvim.git
