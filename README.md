@@ -180,9 +180,11 @@ Git commands that display a list of branches, such as `:Git branch`, `:Git branc
 Git branch commands that do not display a list of branches, such as `:Git branch --delete`, run the command in terminal mode, as if it were a non-special command.
 
 ### Git Log
-Git log commands will always open a UI. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the log UI.
+Git log commands will typically open a UI. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the log UI.
 
 When pressing the `log` keymap on a branch from the branch UI, it will display a specially formatted log output, but you can use plain old `:Git log`, or map a more sophisticated log command if you wish.
+
+TODO: add git log -L docs
 
 In large repos (e.g. the Linux kernel repo), this command will take some time, unless you specify that you only want a limited number of commits, e.g. `:Git log -n 100` for the most recent 100 commits. There is some work that would make this much faster, by streaming in the content to the buffer instead of writing it all at once, but this has not been implemented yet.
 
