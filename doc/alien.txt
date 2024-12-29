@@ -3,18 +3,29 @@
 ==============================================================================
 Table of Contents                                    *alien-table-of-contents*
 
-  - What is Alien?                                      |alien-what-is-alien?|
-  - Installation                                          |alien-installation|
-  - Usage                                                        |alien-usage|
-  - UI Management (Tabs, Windows, Buffers)|alien-ui-management-(tabs,-windows,-buffers)|
-  - Dependencies                                          |alien-dependencies|
-  - Development                                            |alien-development|
-1. This should list lua related files in /usr/share lib and include|alien-this-should-list-lua-related-files-in-/usr/share-lib-and-include|
-2. It removes errors                                 |alien-it-removes-errors|
+1. What is Alien?                                       |alien-what-is-alien?|
+2. Installation                                           |alien-installation|
+3. Usage                                                         |alien-usage|
+4. Default Configuration                         |alien-default-configuration|
+5. Special Commands                                   |alien-special-commands|
+  - Git Status                             |alien-special-commands-git-status|
+  - Git Branch                             |alien-special-commands-git-branch|
+  - Git Log                                   |alien-special-commands-git-log|
+  - Git Commit                             |alien-special-commands-git-commit|
+  - Git Blame                               |alien-special-commands-git-blame|
+  - Git Stash List                     |alien-special-commands-git-stash-list|
+  - Git Show                                 |alien-special-commands-git-show|
+  - Git Help Commands               |alien-special-commands-git-help-commands|
+6. UI Management (Tabs, Windows, Buffers)|alien-ui-management-(tabs,-windows,-buffers)|
+7. Optional Dependencies                         |alien-optional-dependencies|
+8. Development                                             |alien-development|
+9. This should list lua related files in /usr/share lib and include|alien-this-should-list-lua-related-files-in-/usr/share-lib-and-include|
+10. It removes errors                                |alien-it-removes-errors|
   - Credits                                  |alien-it-removes-errors-credits|
   - Self-Promotion                    |alien-it-removes-errors-self-promotion|
 
-WHAT IS ALIEN?                                          *alien-what-is-alien?*
+==============================================================================
+1. What is Alien?                                       *alien-what-is-alien?*
 
 Alien is a Neovim git client. It takes some ideas from vim-fugitive
 <https://github.com/tpope/vim-fugitive>, lazygit
@@ -36,7 +47,8 @@ available actions - Easy and straightforward customizability
 https://github.com/user-attachments/assets/dbae252d-2031-4703-8016-9b2cdd60e605
 
 
-INSTALLATION                                              *alien-installation*
+==============================================================================
+2. Installation                                           *alien-installation*
 
 Here’s an example using Lazy <https://github.com/folke/lazy.nvim>:
 
@@ -62,7 +74,8 @@ command (or `:G`): - `Git commit` - `Git log -n 10` - `Git commit -m "initial
 commit"`
 
 
-USAGE                                                            *alien-usage*
+==============================================================================
+3. Usage                                                         *alien-usage*
 
 1. To use this plugin, simply call git commands from command mode, using the command(s) specified in your configuration (`G` and `Git` by default). Most commands will simply call the git command in terminal mode, with some improvements:
 
@@ -81,7 +94,8 @@ filename, similar to vim-fugitive, e.g. `:Git log --follow %` to see commits
 that changed the current file.
 
 
-DEFAULT CONFIGURATION ~
+==============================================================================
+4. Default Configuration                         *alien-default-configuration*
 
 Here is the default configuration for the plugin, as well as what each option
 does:
@@ -167,13 +181,15 @@ does:
 <
 
 
-SPECIAL COMMANDS ~
+==============================================================================
+5. Special Commands                                   *alien-special-commands*
 
 Some commands that are often used, or are normally cumbersome to use, are
 handled differently than just running the command in terminal mode. This
 typically means opening a buffer that serves as a UI for the command. Here are
 the special commands: * `git status` * `git branch` * `git log` * `git commit`
-* `git blame` * `git status` * `git stash list`
+* `git blame` * `git stash list` * `git show` * `git {command} -h` * `git
+{command} --help`
 
 Note that for any command that brings up a UI: * You can close the UI by
 pressing `q`, in addition to the normal methods, such as `:q` * The jumplist
@@ -181,7 +197,7 @@ still works like normal `<C-i>` and `<C-o>` * You can view keymaps by pressing
 `g?`
 
 
-GIT STATUS ~
+GIT STATUS                                 *alien-special-commands-git-status*
 
 Using the `:Git status` command brings up a list of all staged and unstaged
 changes. By default, autodiff is toggled on, meaning that when your cursor
@@ -213,7 +229,7 @@ display the normal output, that you would see when running `git status` in the
 terminal
 
 
-GIT BRANCH ~
+GIT BRANCH                                 *alien-special-commands-git-branch*
 
 Git commands that display a list of branches, such as `:Git branch`, `:Git
 branch --all`, `:Git branch --merged`, and so on, bring up a branch UI, from
@@ -226,7 +242,7 @@ branch --delete`, run the command in terminal mode, as if it were a non-special
 command.
 
 
-GIT LOG ~
+GIT LOG                                       *alien-special-commands-git-log*
 
 Git log commands will typically open a UI. The
 |alien-default-configuration-section| shows every keymap, as does pressing `g?`
@@ -236,8 +252,6 @@ When pressing the `log` keymap on a branch from the branch UI, it will display
 a specially formatted log output, but you can use plain old `:Git log`, or map
 a more sophisticated log command if you wish.
 
-TODO: add git log -L docs
-
 In large repos (e.g. the Linux kernel repo), this command will take some time,
 unless you specify that you only want a limited number of commits, e.g. `:Git
 log -n 100` for the most recent 100 commits. There is some work that would make
@@ -245,7 +259,66 @@ this much faster, by streaming in the content to the buffer instead of writing
 it all at once, but this has not been implemented yet.
 
 
-UI MANAGEMENT (TABS, WINDOWS, BUFFERS)*alien-ui-management-(tabs,-windows,-buffers)*
+GIT LOG -L ~
+
+Git log has a `-L` flag, as shown in the docs
+<https://git-scm.com/docs/git-log#Documentation/git-log.txt--Lltstartgtltendgtltfilegt>.
+This can be used to see the commits that changed just the line numbers given,
+e.g. `git log -L20,40:example.lua`, to see just the commits that changed lines
+from 20 to 40 in `example.lua`. In many cases, this can be an extremely useful
+way to search for changes, as opposed to running something like `git log
+--follow example.lua`, which could show commits that made changes that you
+don’t care about. With Alien, if you make a visual selection and run `:'<,'>G
+log -L`, without passing line numbers or a file name, it will pass the line
+numbers and file name automatically to the git command, making it much more
+convenient to use.
+
+
+GIT COMMIT                                 *alien-special-commands-git-commit*
+
+Git commit will open an editor to create the commit message when that message
+is not passed to the command, e.g. `git commit` (no message, opens the editor)
+vs `git commit -m "some message"` (does not open the commit message editor).
+When the commit message editor is opened, Alien opens it in the current Neovim
+instance. You can write and quit the editor (`:wq`) to apply the message, or
+simply close the editor without saving to abort the commit due to an empty
+commit message. If the commit message editor doesn’t need to open, the
+command will just run in terminal mode like most other commands.
+
+
+GIT BLAME                                   *alien-special-commands-git-blame*
+
+Like vim-fugitive, running `:G blame` will open a blame window to the left,
+that uses |scrollbind| to sync with with the opened file. From there, many of
+the keymaps for the commit UI also work in the blame UI. The
+|alien-default-configuration-section| shows every keymap, as does pressing `g?`
+in the blame UI.
+
+
+GIT STASH LIST                         *alien-special-commands-git-stash-list*
+
+Running `:G stash list` will open a UI, in which you can view, pop, apply, and
+drop stashes. Other stash commands, like `:G stash show`, run in terminal mode
+like most other commands.
+
+
+GIT SHOW                                     *alien-special-commands-git-show*
+
+Running `:G show` commands will just open their output in the current window.
+Not amazingly helpful, but sometimes nice when that’s what you need. You can
+close this with `q` like other Alien buffers.
+
+
+GIT HELP COMMANDS                   *alien-special-commands-git-help-commands*
+
+Running a git help command, such as `:G commit -h` or `:G log --help`, will
+open that help file in the current window. This way, you can use your normal
+vim navigation to move through the docs, versus opening a pager. You can close
+it by pressing `q` to return to your last buffer.
+
+
+==============================================================================
+6. UI Management (Tabs, Windows, Buffers)*alien-ui-management-(tabs,-windows,-buffers)*
 
 When Alien opens a UI, this will typically either open a new buffer in the
 current window, or open a new window in a split. In either case, the window can
@@ -259,16 +332,15 @@ via command mode: Open `G status` in a left split instead of a full window:
 command mode and in keymaps.
 
 
-DEPENDENCIES                                              *alien-dependencies*
-
-
-OPTIONAL ~
+==============================================================================
+7. Optional Dependencies                         *alien-optional-dependencies*
 
 Delta <https://github.com/dandavison/delta> - improved git diff output (used in
 the demos/examples)
 
 
-DEVELOPMENT                                                *alien-development*
+==============================================================================
+8. Development                                             *alien-development*
 
 I welcome contributors of any experience level. If you’d like to contribute,
 you can start by cloning the repo and running the setup script. This script
@@ -342,11 +414,11 @@ files.
 
 
 ==============================================================================
-1. This should list lua related files in /usr/share lib and include*alien-this-should-list-lua-related-files-in-/usr/share-lib-and-include*
+9. This should list lua related files in /usr/share lib and include*alien-this-should-list-lua-related-files-in-/usr/share-lib-and-include*
 
 
 ==============================================================================
-2. It removes errors                                 *alien-it-removes-errors*
+10. It removes errors                                *alien-it-removes-errors*
 
 `find /usr/{share,lib,include} -name "*lua*" 2>/dev/null` I’d advise against
 directly piping this into rm, you may have programs who have an embedded lua
