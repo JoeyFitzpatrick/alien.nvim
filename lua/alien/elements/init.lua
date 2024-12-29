@@ -176,7 +176,9 @@ M.float = function(cmd, opts)
     if not bufnr then
         return
     end
-    vim.api.nvim_open_win(bufnr, true, float_opts)
+    local win = vim.api.nvim_open_win(bufnr, true, float_opts)
+    -- Opening from a scrollbinded window, like a blame window, sets scrollbind on the float, which we don't want
+    vim.api.nvim_set_option_value("scrollbind", false, { win = win })
     -- post_create()
     return bufnr
 end
