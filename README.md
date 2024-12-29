@@ -1,4 +1,4 @@
-## What is Alien?
+# What is Alien?
 
 Alien is a Neovim git client. It takes some ideas from [vim-fugitive](https://github.com/tpope/vim-fugitive), [lazygit](https://github.com/jesseduffield/lazygit), and [git](https://git-scm.com/) itself, and introduces some other ideas. The main features are:
 - Any valid git command can be called via command-mode, e.g. `:Git commit`, like fugitive
@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/dbae252d-2031-4703-8016-9b2cdd60e605
 
 
 
-## Installation
+# Installation
 
 Here's an example using [Lazy](https://github.com/folke/lazy.nvim):
 
@@ -41,7 +41,7 @@ After that, using Alien is as simple as calling git commands via the `:Git` comm
 - `Git commit -m "initial commit"`
 
 
-## Usage
+# Usage
 1. To use this plugin, simply call git commands from command mode, using the command(s) specified in your configuration (`G` and `Git` by default). Most commands will simply call the git command in terminal mode, with some improvements:
 * The terminal will only take as much space as it needs, resizing as command output streams into the terminal
 * The terminal can be remove by pressing "Enter", to make it very convenient to remove the terminal once you're done with the output
@@ -54,7 +54,7 @@ There are some advantages to using terminal mode for these commands, as opposed 
 
 Note that using the `%` character will expand it to the current buffer's filename, similar to vim-fugitive, e.g. `:Git log --follow %` to see commits that changed the current file.
 
-### Default Configuration
+# Default Configuration
 Here is the default configuration for the plugin, as well as what each option does:
 
 ```lua
@@ -137,7 +137,7 @@ default_config = {
 }
 ```
 
-### Special Commands
+# Special Commands
 
 Some commands that are often used, or are normally cumbersome to use, are handled differently than just running the command in terminal mode. This typically means opening a buffer that serves as a UI for the command. Here are the special commands:
 * `git status`
@@ -145,15 +145,17 @@ Some commands that are often used, or are normally cumbersome to use, are handle
 * `git log`
 * `git commit`
 * `git blame`
-* `git status`
 * `git stash list`
+* `git show`
+* `git {command} -h`
+* `git {command} --help`
 
 Note that for any command that brings up a UI:
 * You can close the UI by pressing `q`, in addition to the normal methods, such as `:q`
 * The jumplist still works like normal `<C-i>` and `<C-o>`
 * You can view keymaps by pressing `g?`
 
-### Git Status
+## Git Status
 Using the `:Git status` command brings up a list of all staged and unstaged changes. By default, autodiff is toggled on, meaning that when your cursor moves to a file, a diff of that file is automatically displayed. This can be toggled off by default from your config, by passing an option to the plugin:
 
 ```lua
@@ -174,21 +176,38 @@ The [default configuration section](#default-configuration) shows the keymaps fo
 
 If you want to see the normal output of "git status" instead of the UI, you can pass any flags to the command, and it will display the normal output of that command, instead of displaying the UI. Note that `:Git status --long` will display the normal output, that you would see when running `git status` in the terminal
 
-### Git Branch
+## Git Branch
 Git commands that display a list of branches, such as `:Git branch`, `:Git branch --all`, `:Git branch --merged`, and so on, bring up a branch UI, from which keymaps can be used to view commits, rename branches, merge branches, etc. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the branch UI.
 
 Git branch commands that do not display a list of branches, such as `:Git branch --delete`, run the command in terminal mode, as if it were a non-special command.
 
-### Git Log
+## Git Log
 Git log commands will typically open a UI. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the log UI.
 
 When pressing the `log` keymap on a branch from the branch UI, it will display a specially formatted log output, but you can use plain old `:Git log`, or map a more sophisticated log command if you wish.
 
-TODO: add git log -L docs
-
 In large repos (e.g. the Linux kernel repo), this command will take some time, unless you specify that you only want a limited number of commits, e.g. `:Git log -n 100` for the most recent 100 commits. There is some work that would make this much faster, by streaming in the content to the buffer instead of writing it all at once, but this has not been implemented yet.
 
-## UI Management (Tabs, Windows, Buffers)
+### Git log -L
+
+Git log has a `-L` flag, as shown [in the docs](https://git-scm.com/docs/git-log#Documentation/git-log.txt--Lltstartgtltendgtltfilegt). This can be used to see the commits that changed just the line numbers given, e.g. `git log -L20,40:example.lua`, to see just the commits that changed lines from 20 to 40 in `example.lua`. In many cases, this can be an extremely useful way to search for changes, as opposed to running something like `git log --follow example.lua`, which could show commits that made changes that you don't care about. With Alien, if you make a visual selection and run `:'<,'>G log -L`, without passing line numbers or a file name, it will pass the line numbers and file name automatically to the git command, making it much more convenient to use.
+
+## Git Commit
+Git commit will open an editor to create the commit message when that message is not passed to the command, e.g. `git commit` (no message, opens the editor) vs `git commit -m "some message"` (does not open the commit message editor). When the commit message editor is opened, Alien opens it in the current Neovim instance. You can write and quit the editor (`:wq`) to apply the message, or simply close the editor without saving to abort the commit due to an empty commit message. If the commit message editor doesn't need to open, the command will just run in terminal mode like most other commands.
+
+## Git Blame
+Like vim-fugitive, running `:G blame` will open a blame window to the left, that uses `:h scrollbind` to sync with with the opened file. From there, many of the keymaps for the commit UI also work in the blame UI. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the blame UI.
+
+## Git Stash List
+Running `:G stash list` will open a UI, in which you can view, pop, apply, and drop stashes. Other stash commands, like `:G stash show`, run in terminal mode like most other commands.
+
+## Git Show
+Running `:G show` commands will just open their output in the current window. Not amazingly helpful, but sometimes nice when that's what you need. You can close this with `q` like other Alien buffers.
+
+## Git Help Commands
+Running a git help command, such as `:G commit -h` or `:G log --help`, will open that help file in the current window. This way, you can use your normal vim navigation to move through the docs, versus opening a pager. You can close it by pressing `q` to return to your last buffer.
+
+# UI Management (Tabs, Windows, Buffers)
 When Alien opens a UI, this will typically either open a new buffer in the current window, or open a new window in a split. In either case, the window can be closed with the `q` keymap, which will return you to the last non-Alien buffer that was open.
 
 If you want to open something in a non-standard ui, this is supported natively via command mode:
@@ -196,13 +215,11 @@ Open `G status` in a left split instead of a full window: `split | G status`
 Open `G branch` in a right split instead of a full window `rightbelow vsplit | G branch`
 Note that this functionality can be used in both command mode and in keymaps.
 
-## Dependencies
+# Optional Dependencies
 
-### Optional
 [Delta](https://github.com/dandavison/delta) - improved git diff output (used in the demos/examples)
 
-
-## Development
+# Development
 
 I welcome contributors of any experience level. If you'd like to contribute, you can start by cloning the repo and running the setup script. This script should handle everything you need to get started making contributions, including setting up git hooks.
 
