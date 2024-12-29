@@ -44,6 +44,7 @@ M.default_config = {
             display_files = "<enter>",
             copy_commit_url = "o",
             commit_info = "i",
+            show = "s",
         },
         commit = {
             display_files = "<enter>",
@@ -51,6 +52,7 @@ M.default_config = {
             reset = "rs",
             copy_commit_url = "o",
             commit_info = "i",
+            show = "s",
         },
         commit_file = {
             scroll_diff_down = "J",

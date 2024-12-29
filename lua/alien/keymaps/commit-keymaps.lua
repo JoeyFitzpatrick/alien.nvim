@@ -64,6 +64,14 @@ M.set_keymaps = function(bufnr)
         alien_opts,
         vim.tbl_extend("force", opts, { desc = "Reset to commit" })
     )
+
+    map(keymaps.show, function()
+        local commit = extract()
+        if not commit then
+            return
+        end
+        elements.float("git show " .. commit.hash)
+    end, vim.tbl_extend("force", opts, { desc = "Show commit" }))
 end
 
 return M

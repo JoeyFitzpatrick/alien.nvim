@@ -47,6 +47,14 @@ M.set_keymaps = function(bufnr)
         end
         commands.copy_git_commit_url(commit.hash)
     end, vim.tbl_extend("force", opts, { desc = "Copy commit url" }))
+
+    map(keymaps.show, function()
+        local commit = extract()
+        if not commit then
+            return
+        end
+        elements.float("git show " .. commit.hash)
+    end, vim.tbl_extend("force", opts, { desc = "Show commit" }))
 end
 
 return M
