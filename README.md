@@ -176,6 +176,9 @@ The [default configuration section](#default-configuration) shows the keymaps fo
 
 If you want to see the normal output of "git status" instead of the UI, you can pass any flags to the command, and it will display the normal output of that command, instead of displaying the UI. Note that `:Git status --long` will display the normal output, that you would see when running `git status` in the terminal
 
+### Staging Area
+By default, pressing `D` (capital d) on a file in the status UI will open the staging area for that file. You can see the keymaps in the `staging_area` portion of the [default configuration section](#default-configuration), or by pressing `g?`. The main features here are seeing what changes are staged, what changes are unstaged, navigating between hunks, and staging hunks or single lines.
+
 ## Git Branch
 Git commands that display a list of branches, such as `:Git branch`, `:Git branch --all`, `:Git branch --merged`, and so on, bring up a branch UI, from which keymaps can be used to view commits, rename branches, merge branches, etc. The [default configuration section](#default-configuration) shows every keymap, as does pressing `g?` in the branch UI.
 
