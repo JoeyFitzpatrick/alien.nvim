@@ -62,9 +62,14 @@ M.set_keymaps = function(bufnr)
         return "git branch -m " .. branch.branch_name .. " " .. new_branch_name
     end, { prompt = "Rename branch: " }, alien_opts, vim.tbl_extend("force", opts, { desc = "Rename branch" }))
 
-    map_action(keymaps.merge, function(branch)
-        return "git merge " .. branch.branch_name
-    end, alien_opts, vim.tbl_extend("force", opts, { desc = "Merge into current branch" }))
+    map(keymaps.merge, function()
+        local branch = extract()
+        if not branch then
+            return
+        end
+        local alien_command_name = require("alien.keymaps.utils.get-command-name").get_command_name()
+        vim.cmd(alien_command_name .. " merge " .. branch.branch_name)
+    end, vim.tbl_extend("force", opts, { desc = "Merge into current branch" }))
 
     map(keymaps.rebase, function()
         local branch = extract()
