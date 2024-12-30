@@ -43,7 +43,7 @@ M.start_spinner = function(bufnr, line_num)
         spinner_index = (spinner_index % #spinner_chars) + 1
     end
 
-    timer:start(0, 50, vim.schedule_wrap(update_spinner))
+    timer:start(0, 50, pcall(vim.schedule_wrap(update_spinner)))
 
     return timer
 end
