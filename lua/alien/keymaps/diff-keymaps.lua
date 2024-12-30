@@ -31,7 +31,6 @@ M.set_staging_keymaps = function(bufnr, is_staged)
         end
         local local_opts = action_opts
         local_opts.stdin = hunk.patch_single_line
-        vim.print(hunk.patch_single_line)
         local cmd
         if is_staged then
             cmd = "git apply --reverse --cached --whitespace=nowarn -"

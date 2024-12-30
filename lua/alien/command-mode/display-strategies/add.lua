@@ -6,6 +6,7 @@ local M = {}
 local interactive_options = {
     "-i",
     "--interactive",
+    "-p",
     "--patch",
 }
 

@@ -15,29 +15,46 @@ local function is_patch_line(line)
     return line:sub(1, 2) == "@@"
 end
 
+--- Whatever the current patch is, just add one line
+--- For adding a line, remove any lines that start with +, and remove the starting - from any lines
 ---@param patch_line string
+---@param line_to_apply string
 ---@return string?
-local function get_single_line_patch(patch_line, line_num)
-    local old_start, old_count, new_start, new_count, content =
-        string.match(patch_line, "@@ %-(%d+),(%d+) %+(%d+),(%d+) @@ (.*)")
-    old_start, old_count, new_start, new_count =
-        tonumber(old_start), tonumber(old_count), tonumber(new_start), tonumber(new_count)
-
-    -- Validate if the line number is within bounds
-    if line_num == nil or new_start == nil or new_count == nil then
+M._get_single_line_patch = function(patch_line, line_to_apply)
+    local old_num_lines = patch_line:match(",(%d+)")
+    local new_num_lines
+    local first_char = line_to_apply:sub(1, 1)
+    if first_char == "+" then
+        new_num_lines = tonumber(old_num_lines) + 1
+    elseif first_char == "-" then
+        new_num_lines = tonumber(old_num_lines) - 1
+    else
         return nil
     end
-    if line_num < new_start or line_num >= (new_start + new_count) then
-        return nil -- line_num is outside the range of the patch change
+    local new_patch_line = patch_line:gsub("(%+%d+,)%d+", "%1" .. tostring(new_num_lines), 1)
+    return new_patch_line
+end
+
+---@param lines string[]
+---@param patched_line_num integer
+M._filter_patch_lines = function(lines, patched_line_num)
+    local new_lines = {}
+    for i, line in ipairs(lines) do
+        if i == patched_line_num then
+            table.insert(new_lines, line)
+            goto continue
+        end
+        local first_char = line:sub(1, 1)
+        if first_char == "+" then
+            goto continue
+        elseif first_char == "-" then
+            table.insert(new_lines, " " .. line:sub(2))
+        else
+            table.insert(new_lines, line)
+        end
+        ::continue::
     end
-
-    -- Calculate the new `old_start` and counts for a single line
-    local offset = line_num - new_start
-    local single_old_line = old_start + offset
-    local single_new_line = new_start + offset
-
-    -- Return the single line patch line
-    return string.format("@@ -%d,1 +%d,1 @@ %s", single_old_line, single_new_line, content)
+    return new_lines
 end
 
 --- Returns info on a diff hunk
@@ -99,7 +116,7 @@ M.extract = function()
 
     local patch_lines = { lines[3], lines[4] }
 
-    for i = hunk_start - 1, hunk_end, 1 do
+    for i = hunk_start - 1, hunk_end do
         table.insert(patch_lines, lines[i])
     end
 
@@ -109,8 +126,20 @@ M.extract = function()
     local patch_single_line = nil
     local current_line = lines[line_num]
     if not is_patch_line(current_line) then
-        patch_single_line =
-            { lines[3], lines[4], get_single_line_patch(lines[hunk_first_changed_line], line_num), current_line, "" }
+        patch_single_line = {
+            lines[3],
+            lines[4],
+            M._get_single_line_patch(lines[hunk_start - 1], current_line),
+        }
+        local patch_context_lines = {}
+        for i = hunk_start, hunk_end do
+            table.insert(patch_context_lines, lines[i])
+        end
+        patch_context_lines = M._filter_patch_lines(patch_context_lines, line_num - (hunk_start - 1))
+        for _, line in ipairs(patch_context_lines) do
+            table.insert(patch_single_line, line)
+        end
+        table.insert(patch_single_line, "")
     end
 
     return {
