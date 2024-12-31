@@ -135,6 +135,15 @@ return {
             ["--term-"] = "--term-",
             ["--term-bad"] = "--term-bad",
             ["--term-good"] = "--term-good",
+            help = "help",
+            log = "log",
+            next = "next",
+            replay = "replay",
+            reset = "reset",
+            run = "run",
+            skip = "skip",
+            start = "start",
+            terms = "terms",
         },
     },
     blame = {
@@ -203,6 +212,10 @@ return {
             ["--progress"] = "--progress",
             ["--quiet"] = "--quiet",
             ["--version"] = "--version",
+            create = "create",
+            ["list-heads"] = "list-heads",
+            unbundle = "unbundle",
+            verify = "verify",
         },
     },
     ["cat-file"] = {
@@ -290,6 +303,7 @@ return {
         options = {
             ["--abbrev"] = "--abbrev",
             ["--verbose"] = "--verbose",
+            ["-v"] = "-v",
         },
     },
     ["cherry-pick"] = {
@@ -320,6 +334,7 @@ return {
             ["--force"] = "--force",
             ["--interactive"] = "--interactive",
             ["--quiet"] = "--quiet",
+            ["-d"] = "-d",
         },
     },
     clone = {
@@ -413,6 +428,7 @@ return {
             ["--trailer"] = "--trailer",
             ["--untracked-files"] = "--untracked-files",
             ["--verbose"] = "--verbose",
+            ["-a"] = "-a",
         },
     },
     ["commit-graph"] = {
@@ -499,7 +515,9 @@ return {
         },
     },
     cvsexportcommit = {
-        options = {},
+        options = {
+            ["-h"] = "-h",
+        },
     },
     cvsimport = {
         options = {},
@@ -939,11 +957,15 @@ return {
             ["--user-interfaces"] = "--user-interfaces",
             ["--verbose"] = "--verbose",
             ["--web"] = "--web",
+            ["-a"] = "-a",
+            ["-c"] = "-c",
+            ["-g"] = "-g",
         },
     },
     hook = {
         options = {
             ["--ignore-missing"] = "--ignore-missing",
+            run = "run",
         },
     },
     ["http-backend"] = {
@@ -989,6 +1011,7 @@ return {
             ["--separate-git-dir"] = "--separate-git-dir",
             ["--shared"] = "--shared",
             ["--template"] = "--template",
+            ["-q"] = "-q",
         },
     },
     ["init-db"] = {
@@ -1012,6 +1035,7 @@ return {
             ["--restart"] = "--restart",
             ["--start"] = "--start",
             ["--stop"] = "--stop",
+            options = "options",
         },
     },
     ["interpret-trailers"] = {
@@ -1136,6 +1160,7 @@ return {
             ["--until"] = "--until",
             ["--verify"] = "--verify",
             ["--walk-reflogs"] = "--walk-reflogs",
+            ["-p"] = "-p",
         },
     },
     ["ls-files"] = {
@@ -1204,6 +1229,7 @@ return {
     mailsplit = {
         options = {
             ["--keep-cr"] = "--keep-cr",
+            ["-d"] = "-d",
         },
     },
     maintenance = {
@@ -1318,6 +1344,7 @@ return {
         options = {
             ["--batch"] = "--batch",
             ["--missing"] = "--missing",
+            ["-z"] = "-z",
         },
     },
     ["multi-pack-index"] = {
@@ -1355,6 +1382,7 @@ return {
             ["--allow-empty"] = "--allow-empty",
             ["--commit"] = "--commit",
             ["--ref"] = "--ref",
+            merge = "merge",
         },
     },
     p4 = {
@@ -1456,6 +1484,7 @@ return {
             ["--expire"] = "--expire",
             ["--progress"] = "--progress",
             ["--verbose"] = "--verbose",
+            ["-n"] = "-n",
         },
     },
     ["prune-packed"] = {
@@ -1548,6 +1577,7 @@ return {
             ["--keep-non-patch"] = "--keep-non-patch",
             ["--patches"] = "--patches",
             ["--series"] = "--series",
+            options = "options",
         },
     },
     ["range-diff"] = {
@@ -1691,6 +1721,7 @@ return {
             ["--update-refs"] = "--update-refs",
             ["--verbose"] = "--verbose",
             ["--whitespace"] = "--whitespace",
+            ["-i"] = "-i",
         },
     },
     ["receive-pack"] = {
@@ -1709,6 +1740,10 @@ return {
             ["--stale-fix"] = "--stale-fix",
             ["--updateref"] = "--updateref",
             ["--verbose"] = "--verbose",
+            delete = "delete",
+            exists = "exists",
+            expire = "expire",
+            show = "show",
         },
     },
     remote = {
@@ -1724,6 +1759,15 @@ return {
             ["--push"] = "--push",
             ["--tags"] = "--tags",
             ["--verbose"] = "--verbose",
+            ["-v"] = "-v",
+            add = "add",
+            ["get-url"] = "get-url",
+            prune = "prune",
+            remove = "remove",
+            rename = "rename",
+            ["set-branches"] = "set-branches",
+            ["set-head"] = "set-head",
+            ["set-url"] = "set-url",
         },
     },
     ["remote-ext"] = {
@@ -1778,6 +1822,8 @@ return {
             ["--graft"] = "--graft",
             ["--list"] = "--list",
             ["--raw"] = "--raw",
+            ["-d"] = "-d",
+            ["-f"] = "-f",
         },
     },
     ["request-pull"] = {
@@ -1786,6 +1832,7 @@ return {
     rerere = {
         options = {
             ["--rerere-autoupdate"] = "--rerere-autoupdate",
+            clear = "clear",
         },
     },
     reset = {
@@ -1802,6 +1849,7 @@ return {
             ["--quiet"] = "--quiet",
             ["--recurse-submodules"] = "--recurse-submodules",
             ["--soft"] = "--soft",
+            ["-q"] = "-q",
         },
     },
     restore = {
@@ -1872,6 +1920,7 @@ return {
     },
     revert = {
         options = {
+            ["--"] = "--",
             ["--abort"] = "--abort",
             ["--cleanup"] = "--cleanup",
             ["--continue"] = "--continue",
@@ -1898,6 +1947,7 @@ return {
             ["--pathspec-from-file"] = "--pathspec-from-file",
             ["--quiet"] = "--quiet",
             ["--sparse"] = "--sparse",
+            ["-f"] = "-f",
         },
     },
     ["send-email"] = {
@@ -2061,6 +2111,17 @@ return {
             ["--pathspec-from-file"] = "--pathspec-from-file",
             ["--quiet"] = "--quiet",
             ["--staged"] = "--staged",
+            apply = "apply",
+            branch = "branch",
+            clear = "clear",
+            create = "create",
+            drop = "drop",
+            list = "list",
+            pop = "pop",
+            push = "push",
+            save = "save",
+            show = "show",
+            store = "store",
         },
     },
     status = {
@@ -2085,6 +2146,8 @@ return {
         options = {
             ["--comment-lines"] = "--comment-lines",
             ["--strip-comments"] = "--strip-comments",
+            ["-c"] = "-c",
+            ["-s"] = "-s",
         },
     },
     submodule = {
@@ -2120,6 +2183,11 @@ return {
             ["--prefix"] = "--prefix",
             ["--rejoin"] = "--rejoin",
             ["--squash"] = "--squash",
+            add = "add",
+            merge = "merge",
+            pull = "pull",
+            push = "push",
+            split = "split",
         },
     },
     switch = {
@@ -2175,6 +2243,10 @@ return {
             ["--sign"] = "--sign",
             ["--sort"] = "--sort",
             ["--verify"] = "--verify",
+            ["-a"] = "-a",
+            ["-d"] = "-d",
+            ["-n"] = "-n",
+            ["-v"] = "-v",
         },
     },
     ["unpack-file"] = {
@@ -2292,6 +2364,14 @@ return {
             ["--lock"] = "--lock",
             ["--porcelain"] = "--porcelain",
             ["--reason"] = "--reason",
+            add = "add",
+            list = "list",
+            lock = "lock",
+            move = "move",
+            prune = "prune",
+            remove = "remove",
+            repair = "repair",
+            unlock = "unlock",
         },
     },
     ["write-tree"] = {
