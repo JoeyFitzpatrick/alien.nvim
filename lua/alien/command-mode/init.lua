@@ -1,7 +1,5 @@
 local DISPLAY_STRATEGIES = require("alien.command-mode.constants").DISPLAY_STRATEGIES
 
----@alias DisplayStrategyOpts { dynamic_resize?: boolean } | nil
-
 local M = {}
 
 local PORCELAIN_COMMAND_STRATEGY_MAP = {
@@ -46,7 +44,7 @@ end
 
 --- Get the command strategy for a given command.
 ---@param cmd string
----@return string, DisplayStrategyOpts
+---@return string
 M.get_command_strategy = function(cmd)
     if M._is_help_command(cmd) then
         return DISPLAY_STRATEGIES.SHOW
@@ -92,14 +90,17 @@ end
 ---@param cmd string
 ---@param input_args { line1?: integer, line2?: integer, range?: integer }
 M.run_command = function(cmd, input_args)
-    local strategy, custom_opts = M.get_command_strategy(cmd)
+    local strategy = M.get_command_strategy(cmd)
     cmd = intercept(cmd, input_args)
     local output_handler_fn = require("alien.actions.output-handlers").get_output_handler(cmd)
     local output_handler = output_handler_fn and { output_handler = output_handler_fn } or nil
     if strategy == DISPLAY_STRATEGIES.TERMINAL then
         local default_opts = { enter = true, dynamic_resize = true, window = { split = "below" } }
-        local opts = vim.tbl_deep_extend("force", default_opts, custom_opts or {})
-        require("alien.elements").terminal(cmd, opts)
+        require("alien.elements").terminal(cmd, default_opts)
+    elseif strategy == DISPLAY_STRATEGIES.TERMINAL_INSERT then
+        local terminal_insert_default_opts =
+            { enter = true, insert = true, dynamic_resize = false, window = { split = "below" } }
+        require("alien.elements").terminal(cmd, terminal_insert_default_opts)
     elseif strategy == DISPLAY_STRATEGIES.UI then
         require("alien.elements").window(cmd, output_handler)
     elseif strategy == DISPLAY_STRATEGIES.BLAME then

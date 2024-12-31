@@ -138,7 +138,9 @@ end
 
 --TODO: Make this function redraw current element immediately, then redraw the rest async
 M.redraw_elements = function()
-    vim.schedule(M.redraw_elements_logic)
+    vim.schedule(function()
+        pcall(M.redraw_elements_logic)
+    end)
 end
 
 return M

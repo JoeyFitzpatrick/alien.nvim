@@ -23,13 +23,13 @@ local print_options = {
 }
 
 ---@param cmd string
----@return DisplayStrategy, DisplayStrategyOpts
+---@return DisplayStrategy
 M.get_strategy = function(cmd)
     local options = utils.parse_command_options(cmd)
     if utils.overlap(options, print_options) then
         return DISPLAY_STRATEGIES.TERMINAL
     end
-    return DISPLAY_STRATEGIES.TERMINAL, { dynamic_resize = false }
+    return DISPLAY_STRATEGIES.TERMINAL_INSERT
 end
 
 return M

@@ -45,7 +45,7 @@ M.get_strategy = function(cmd)
         return DISPLAY_STRATEGIES.UI
     end
     if utils.overlap(options, interactive_options) then
-        return DISPLAY_STRATEGIES.INTERACTIVE_BRANCH
+        return DISPLAY_STRATEGIES.TERMINAL_INSERT
     end
     return DISPLAY_STRATEGIES.TERMINAL
 end

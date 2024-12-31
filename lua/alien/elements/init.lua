@@ -257,6 +257,7 @@ end
 ---@class TerminalOpts
 ---@field window? vim.api.keyset.win_config
 ---@field enter? boolean
+---@field insert? boolean
 ---@field dynamic_resize? boolean
 ---@field skip_redraw? boolean
 
@@ -274,6 +275,9 @@ M.terminal = function(cmd, opts)
     local terminal_opts = vim.tbl_extend("force", default_terminal_opts, opts.window or {})
     local bufnr = vim.api.nvim_create_buf(false, true)
     local window = vim.api.nvim_open_win(bufnr, opts.enter, terminal_opts)
+    if opts.enter and opts.insert then
+        vim.cmd("startinsert")
+    end
     local channel_id = nil
     vim.api.nvim_buf_call(bufnr, function()
         vim.opt_local.number = false
