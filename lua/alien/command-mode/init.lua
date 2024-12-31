@@ -37,11 +37,18 @@ M.get_subcommand = function(cmd)
     return second_word
 end
 
+---@param cmd string
+---@return boolean
+M._is_help_command = function(cmd)
+    local help_option_found = cmd:find(" -h", 0, true) or cmd:find(" --help$", 0, false)
+    return help_option_found ~= nil
+end
+
 --- Get the command strategy for a given command.
 ---@param cmd string
 ---@return string, DisplayStrategyOpts
 M.get_command_strategy = function(cmd)
-    if cmd:find(" -h", 0, true) or cmd:find(" --help", 0, true) then
+    if M._is_help_command(cmd) then
         return DISPLAY_STRATEGIES.SHOW
     end
     local subcommand = M.get_subcommand(cmd)
