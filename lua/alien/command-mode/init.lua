@@ -103,6 +103,8 @@ M.run_command = function(cmd, input_args)
             show_cmd,
             { output_handler = require("alien.actions.output-handlers").get_output_handler(show_cmd) }
         )
+    elseif strategy == DISPLAY_STRATEGIES.MERGETOOL then
+        vim.notify("Mergetool is not currently supported by Alien", vim.log.levels.ERROR)
     end
 end
 
