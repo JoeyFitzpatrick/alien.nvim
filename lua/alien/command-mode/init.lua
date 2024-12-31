@@ -159,7 +159,7 @@ function M.create_git_command()
         })
     end
 
-    vim.api.nvim_create_user_command("Gt", run_git_log, {})
+    -- vim.api.nvim_create_user_command("Gt", run_git_log, {})
 end
 
 return M

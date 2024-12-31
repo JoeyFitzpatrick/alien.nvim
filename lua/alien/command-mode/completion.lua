@@ -4,7 +4,7 @@ local M = {}
 
 ---@param subcommand string
 ---@return table<string, string>
-local function subcommand_flags(subcommand)
+local function subcommand_options(subcommand)
     return constants.SUBCOMMAND_FLAGS[subcommand].options
 end
 
@@ -25,14 +25,16 @@ local SUBCOMMAND_TO_ARGUMENTS_MAP = {
     revert = local_branches_command,
 }
 
+---@param subcommand string
+---@return string[] | nil
 local function get_arguments(subcommand)
     local cmd = SUBCOMMAND_TO_ARGUMENTS_MAP[subcommand]
     if not cmd then
-        return {}
+        return nil
     end
     local output = vim.fn.systemlist(cmd)
     if vim.v.shell_error ~= 0 then
-        return {}
+        return nil
     end
     return output
 end
@@ -51,10 +53,14 @@ M.complete_git_command = function(arglead, cmdline)
     end
     if space_count > 1 then
         local subcommand = get_subcommand(cmdline)
-        if arglead:sub(1, 1) == "-" then
-            return subcommand_flags(subcommand)
+        local completion_arguments = get_arguments(subcommand)
+        if completion_arguments ~= nil then
+            return completion_arguments
         end
-        return get_arguments(subcommand)
+        local completion_options = subcommand_options(subcommand)
+        if completion_options ~= nil then
+            return completion_options
+        end
     end
     return { arglead, cmdline }
 end
