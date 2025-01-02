@@ -65,9 +65,9 @@ local patterns = {
     ["^git status$"] = function()
         return require("alien.actions.commands").status
     end,
-    ["^git log %-L"] = function(cmd, input_args)
+    ["^git log"] = function(cmd, input_args)
         if require("alien.command-mode.utils").is_visual_range(input_args) then
-            return cmd .. input_args.line1 .. "," .. input_args.line2 .. ":" .. vim.api.nvim_buf_get_name(0)
+            return "git log -L" .. input_args.line1 .. "," .. input_args.line2 .. ":" .. vim.api.nvim_buf_get_name(0)
         end
         return cmd
     end,
