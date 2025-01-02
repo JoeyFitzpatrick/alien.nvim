@@ -38,7 +38,8 @@ end
 ---@param cmd string
 ---@return boolean
 M._is_help_command = function(cmd)
-    local help_option_found = cmd:find(" -h", 0, true) or cmd:find(" --help$", 0, false)
+    local parsed_cmd = require("alien.command-mode.utils").remove_quoted_text(cmd)
+    local help_option_found = parsed_cmd:find(" -h", 0, true) or parsed_cmd:find(" --help$", 0, false)
     return help_option_found ~= nil
 end
 

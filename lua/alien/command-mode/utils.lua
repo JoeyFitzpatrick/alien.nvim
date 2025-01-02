@@ -39,4 +39,8 @@ M.populate_filename = function(cmd)
     return command_with_filename
 end
 
+M.remove_quoted_text = function(input)
+    return input:gsub("[\"'].-[\"']", "")
+end
+
 return M
