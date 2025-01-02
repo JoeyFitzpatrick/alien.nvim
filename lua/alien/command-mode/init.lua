@@ -77,7 +77,7 @@ local patterns = {
 ---@param input_args { line1?: integer, line2?: integer, range?: integer }
 ---@return string
 local intercept = function(cmd, input_args)
-    cmd = require("alien.command-mode.utils").populate_filename(cmd)
+    cmd = require("alien.command-mode.utils").expand_filename(cmd)
     for pattern, fn in pairs(patterns) do
         if cmd:find(pattern) then
             cmd = fn(cmd, input_args)
